@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ระบบจัดการชั้นเรียน | My Attendance</title>
+    
+    <!-- PWA & iOS Meta Tags -->
+    <!-- ลิงก์ไปยังไฟล์ Manifest ตัวจริงที่เราแยกไว้ -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1D4ED8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="เช็คชื่อ">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'] },
+                    colors: {
+                        primary: '#1D4ED8', // น้ำเงิน (School Blue)
+                        secondary: '#FBBF24', // เหลือง (School Yellow)
+                        accent: '#1E3A8A', // น้ำเงินเข้ม
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            /* พื้นหลังสีเทาอ่อนแบบ iOS System Gray 6 */
+            background-color: #f2f2f7;
+            color: #1c1c1e;
+            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Prompt', sans-serif;
+        }
+
+        /* Animated Liquid Blobs (Liquid Glass Effect) */
+        .blob {
+            position: fixed;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.65;
+            animation: float 12s infinite ease-in-out alternate;
+            border-radius: 50%;
+        }
+        /* ปรับสี Blob ให้เป็นธีม น้ำเงิน-เหลือง */
+        .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #DBEAFE; animation-delay: 0s; } /* ฟ้าอ่อน */
+        .blob-2 { bottom: -20%; right: -10%; width: 60vw; height: 60vw; background: #FEF08A; animation-delay: -3s; } /* เหลืองพาสเทล */
+        .blob-3 { top: 40%; left: 30%; width: 45vw; height: 45vw; background: #93C5FD; animation-delay: -6s; } /* ฟ้า */
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(15vw, 15vh) scale(1.15); }
+        }
+
+        /* Glassmorphism Card Style (iOS Squircle style) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* ปรับแต่ง Scrollbar ให้ดูเนียนตา */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 10px; }
+
+        /* การทำ Transition ให้ปุ่ม */
+        .btn-animate {
+            transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+        .btn-animate:active { transform: scale(0.95); }
+
+        /* iOS Segmented Control สำหรับสถานะ */
+        .ios-segmented {
+            background: rgba(118, 118, 128, 0.12);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 3px;
+            display: flex;
+        }
+        .ios-segment-btn {
+            flex: 1;
+            text-align: center;
+            padding: 6px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: rgba(0,0,0,0.6);
+            border-radius: 8px;
+            transition: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+            border: 0.5px solid transparent;
+        }
+        
+        /* สีเมื่อกดเลือกสถานะ (iOS Native Colors) */
+        .ios-segment-btn.active[data-status="มา"] { background: #fff; color: #34C759; box-shadow: 0 3px 8px rgba(0,0,0,0.12); border-color: rgba(0,0,0,0.04); }
+        .ios-segment-btn.active[data-status="ลา"] { background: #fff; color: #007AFF; box-shadow: 0 3px 8px rgba(0,0,0,0.12); border-color: rgba(0,0,0,0.04); }
+        .ios-segment-btn.active[data-status="ขาด"] { background: #fff; color: #FF3B30; box-shadow: 0 3px 8px rgba(0,0,0,0.12); border-color: rgba(0,0,0,0.04); }
+        .ios-segment-btn.active[data-status="สาย"] { background: #fff; color: #FF9500; box-shadow: 0 3px 8px rgba(0,0,0,0.12); border-color: rgba(0,0,0,0.04); }
+
+        /* iOS Text Input */
+        .ios-input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.9);
+            font-size: 16px;
+            color: #1c1c1e;
+            transition: all 0.2s ease;
+        }
+        .ios-input:focus {
+            outline: none;
+            border-color: #1D4ED8;
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+            background: #fff;
+        }
+        .ios-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.5);
+            margin-bottom: 6px;
+            margin-left: 4px;
+        }
+
+        /* Checkbox สำหรับความประพฤติ */
+        .behavior-checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 6px 0;
+        }
+        .behavior-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #CBD5E1;
+            border-radius: 6px;
+            margin-right: 10px;
+            outline: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .behavior-checkbox:checked {
+            background-color: #FF3B30;
+            border-color: #FF3B30;
+        }
+        .behavior-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* iOS Toast (Dynamic Island style) */
+        #toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-150%) scale(0.9);
+            opacity: 0;
+            background: rgba(28, 28, 30, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            border-radius: 999px;
+            padding: 12px 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: max-content;
+        }
+        #toast.show {
+            transform: translateX(-50%) translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        /* รูปแบบสรุปผลก่อน Export */
+        #export-canvas, #export-behavior-canvas {
+            background-color: #ffffff;
+            background-image: radial-gradient(#E2E8F0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center pb-10">
+
+    <!-- Liquid Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- Toast Notification (Dynamic Island Style) -->
+    <div id="toast">
+        <div id="toast-icon" class="text-xl flex items-center"></div>
+        <div id="toast-message" class="text-[15px] font-medium tracking-tight"></div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto max-w-md px-5 pt-12 relative z-20 w-full">
+        
+        <!-- ================= VIEW 1: เมนูหลัก (หน้าโหลดข้อมูล) ================= -->
+        <section id="view-loading" class="transition-all duration-300">
+            
+            <!-- iOS Large Title Header -->
+            <header class="mb-6 px-1 text-center">
+                <h1 class="text-[34px] leading-tight font-bold tracking-tight text-primary">ระบบเช็คชื่อ</h1>
+                <p class="text-[15px] text-accent font-semibold mt-1"><i class="fa-solid fa-school mr-1.5"></i>โรงเรียนสันติธรรมวิทยามูลนิธิ</p>
+            </header>
+
+            <!-- กล่องกระจกสำหรับเนื้อหาโหลดข้อมูล -->
+            <div class="glass-card p-8 text-center">
+                <div id="loading-spinner" class="mb-5">
+                    <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary"></i>
+                </div>
+                <h2 class="text-[20px] font-bold text-black mb-1 tracking-tight" id="loading-title">กำลังโหลดข้อมูล...</h2>
+                <p class="text-[15px] text-black/50 mb-8" id="loading-desc">เชื่อมต่อฐานข้อมูล Google Sheets</p>
+                
+                <button id="btn-start" class="btn-animate w-full bg-primary text-white font-semibold text-[17px] py-3.5 px-6 rounded-[14px] shadow-sm hidden flex items-center justify-center gap-2">
+                    เริ่มใช้งาน
+                </button>
+
+                <!-- ปุ่มติดตั้ง PWA (จะแสดงอัตโนมัติเมื่อระบบตรวจพบว่ารองรับ) -->
+                <button id="btn-install" class="btn-animate w-full bg-white text-primary border-2 border-primary font-semibold text-[17px] py-3.5 px-6 rounded-[14px] shadow-sm hidden flex items-center justify-center gap-2 mt-3">
+                    <i class="fa-solid fa-download"></i> ติดตั้งแอปลงเครื่อง
+                </button>
+
+                <div id="system-error-msg" class="text-[#FF3B30] text-[13px] mt-4 font-medium hidden"></div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 2: เลือกชั้นเรียน ================= -->
+        <section id="view-class" class="hidden transition-all duration-300">
+            <div class="mb-4 px-1">
+                <h2 class="text-[22px] font-bold text-primary tracking-tight">เลือกชั้นเรียน</h2>
+            </div>
+            <div id="class-list" class="glass-card overflow-hidden flex flex-col">
+                <!-- ปุ่มชั้นเรียนจะถูกสร้างที่นี่อัตโนมัติจาก Config -->
+            </div>
+        </section>
+
+        <!-- ================= VIEW 3: เลือกห้องเรียน ================= -->
+        <section id="view-room" class="hidden transition-all duration-300">
+            <div class="flex items-center mb-4 px-1">
+                <div class="flex items-center gap-2">
+                    <button class="text-primary hover:opacity-70 transition text-xl px-2 py-1 -ml-2" onclick="switchView('view-class')">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <h2 class="inline text-[22px] font-bold text-primary tracking-tight" id="display-selected-class">ห้องเรียน</h2>
+                </div>
+            </div>
+            <div id="room-list" class="grid grid-cols-2 gap-3">
+                <!-- ปุ่มห้องเรียนจะถูกสร้างที่นี่อัตโนมัติ -->
+            </div>
+        </section>
+
+        <!-- ================= VIEW 3.5: ข้อมูลการสอน ================= -->
+        <section id="view-setup" class="hidden transition-all duration-300">
+            <div class="flex items-center mb-6 px-1">
+                <button class="text-primary hover:opacity-70 transition text-xl px-2 py-1 -ml-2" onclick="switchView('view-room')">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <h2 class="inline text-[22px] font-bold text-primary tracking-tight">ข้อมูลการสอน</h2>
+            </div>
+            
+            <div class="glass-card p-6 mb-6">
+                <!-- แก้ไขส่วนนี้ให้มีช่องวิชาและจำนวนคาบอยู่ในบรรทัดเดียวกัน -->
+                <div class="mb-5 flex gap-3">
+                    <div class="flex-[3]">
+                        <label class="ios-label">วิชาที่สอน</label>
+                        <input type="text" id="input-subject" class="ios-input" placeholder="เช่น ฟิกฮ์" autocomplete="off">
+                    </div>
+                    <div class="flex-[1]">
+                        <label class="ios-label">จำนวนคาบ</label>
+                        <select id="input-period" class="ios-input bg-white cursor-pointer px-3">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="ios-label">ชื่ออาจารย์ผู้สอน</label>
+                    <input type="text" id="input-teacher" class="ios-input" placeholder="เช่น ครูอาณัติ เหล็มสะ" autocomplete="off">
+                </div>
+            </div>
+
+            <button onclick="proceedToAttendance()" class="btn-animate w-full bg-primary text-white font-semibold text-[17px] py-3.5 px-6 rounded-[14px] shadow-lg shadow-primary/30 flex items-center justify-center gap-2">
+                ถัดไป <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </section>
+
+        <!-- ================= VIEW 4: รายชื่อและเช็คชื่อ ================= -->
+        <section id="view-attendance" class="hidden transition-all duration-300">
+            <!-- Header ของหน้ารายชื่อ -->
+            <div class="flex justify-between items-center pb-4 mb-2 px-1">
+                <div class="flex items-center gap-2">
+                    <button class="text-primary hover:opacity-70 transition text-xl px-2 py-1 -ml-2" onclick="switchView('view-setup')">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-[22px] font-bold text-primary tracking-tight leading-tight" id="header-subject-room">ห้อง</h2>
+                        <p class="text-[13px] text-accent font-medium" id="header-student-count">จำนวน 0 คน</p>
+                    </div>
+                </div>
+                <button onclick="resetCurrentRoomAttendance()" class="text-[13px] text-[#FF3B30] bg-[#FF3B30]/10 hover:bg-[#FF3B30]/20 px-3 py-1.5 rounded-full transition font-semibold">
+                    ล้างข้อมูล
+                </button>
+            </div>
+
+            <!-- Scrollable Area (รวมทั้งรายชื่อและปุ่มไว้ด้วยกัน) -->
+            <div class="max-h-[75vh] overflow-y-auto pr-1 custom-scrollbar pb-8">
+                
+                <!-- List นักเรียน -->
+                <div id="student-list" class="space-y-0">
+                    <!-- แถวรายชื่อนักเรียนจะถูกแทรกที่นี่ -->
+                </div>
+
+                <!-- Action Buttons (อยู่ต่อท้ายรายชื่อนักเรียน) -->
+                <div class="pt-5 mt-3 flex flex-col gap-3">
+                    <button id="btn-view-summary" class="btn-animate w-full bg-primary text-white font-semibold text-[17px] py-3.5 px-4 rounded-[14px] shadow-lg shadow-primary/30 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-file-lines"></i> สรุปผลการเข้าเรียน
+                    </button>
+                    <button id="btn-view-behavior" class="btn-animate w-full bg-secondary text-accent font-bold text-[17px] py-3.5 px-4 rounded-[14px] shadow-lg shadow-yellow-500/30 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user-pen"></i> รายงานความประพฤติ
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= VIEW 4.5: บันทึกความประพฤติ ================= -->
+        <section id="view-behavior" class="hidden transition-all duration-300">
+            <!-- Header ของหน้าความประพฤติ -->
+            <div class="flex justify-between items-center pb-4 mb-2 px-1">
+                <div class="flex items-center gap-2">
+                    <button class="text-primary hover:opacity-70 transition text-xl px-2 py-1 -ml-2" onclick="switchView('view-attendance')">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-[22px] font-bold text-primary tracking-tight leading-tight">บันทึกความประพฤติ</h2>
+                        <p class="text-[13px] text-accent font-medium" id="header-behavior-room">ห้อง</p>
+                    </div>
+                </div>
+                <button onclick="resetCurrentRoomBehavior()" class="text-[13px] text-[#FF3B30] bg-[#FF3B30]/10 hover:bg-[#FF3B30]/20 px-3 py-1.5 rounded-full transition font-semibold">
+                    ล้างข้อมูล
+                </button>
+            </div>
+
+            <!-- List นักเรียนสำหรับการบันทึกพฤติกรรม -->
+            <div id="behavior-student-list" class="space-y-0 max-h-[60vh] overflow-y-auto pr-1 custom-scrollbar pb-4">
+                <!-- แถวรายชื่อนักเรียนจะถูกแทรกที่นี่ -->
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 mt-2 sticky bottom-0">
+                <button id="btn-view-behavior-summary" class="btn-animate w-full bg-secondary text-accent font-bold text-[17px] py-3.5 px-6 rounded-[14px] shadow-lg shadow-yellow-500/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-invoice"></i> สรุปรายงานความประพฤติ
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 5: สรุปผลและบันทึก (เช็คชื่อ) ================= -->
+        <section id="view-summary" class="hidden transition-all duration-300">
+            <div class="flex justify-between items-center pb-4 mb-2 px-1">
+                <div class="flex items-center gap-2">
+                    <button class="text-primary hover:opacity-70 transition text-xl px-2 py-1 -ml-2" onclick="switchView('view-attendance')">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-[22px] font-bold text-primary tracking-tight leading-tight">สรุปผลการเข้าเรียน</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas สำหรับแสดงและ Export เช็คชื่อ -->
+            <div id="export-canvas" class="p-6 bg-white w-full rounded-[24px] border border-black/5 shadow-sm relative overflow-hidden mb-6">
+                <!-- Decoration Bar (น้ำเงิน-เหลือง) -->
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
+                
+                <!-- Header (ย้ายวันที่มาไว้ใต้รายงานการเข้าเรียน) -->
+                <div class="text-center mb-5 pt-3">
+                    <h2 class="text-[24px] font-bold text-primary mb-1">รายงานการเข้าเรียน</h2>
+                    <div class="text-[14px] text-slate-500 font-medium mb-4" id="export-header-date"></div>
+                    
+                    <div class="text-[16px] text-slate-700 font-medium leading-relaxed">
+                        <div>วิชา: <span class="font-bold text-primary" id="export-subject-val"></span></div>
+                        <div>ผู้สอน: <span class="font-bold text-primary" id="export-teacher-val"></span></div>
+                    </div>
+                </div>
+
+                <!-- แถบ ห้อง (เหลือแค่ห้องอย่างเดียว) -->
+                <div class="text-center mb-5 py-2 bg-slate-50 rounded-[14px] border border-slate-100">
+                     <p id="export-room-only" class="text-[17px] font-bold text-accent"></p>
+                </div>
+
+                <!-- กล่องนับจำนวน 4 สถานะ -->
+                <div class="grid grid-cols-4 gap-2 sm:gap-3 mb-6 text-center">
+                    <div class="bg-emerald-50 text-[#34C759] p-3 rounded-2xl">
+                        <div class="text-[13px] font-medium">มา</div><div id="export-count-มา" class="text-xl font-bold">0</div>
+                    </div>
+                    <div class="bg-blue-50 text-[#007AFF] p-3 rounded-2xl">
+                        <div class="text-[13px] font-medium">ลา</div><div id="export-count-ลา" class="text-xl font-bold">0</div>
+                    </div>
+                    <div class="bg-red-50 text-[#FF3B30] p-3 rounded-2xl">
+                        <div class="text-[13px] font-medium">ขาด</div><div id="export-count-ขาด" class="text-xl font-bold">0</div>
+                    </div>
+                    <div class="bg-yellow-50 text-[#FF9500] p-3 rounded-2xl">
+                        <div class="text-[13px] font-medium">สาย</div><div id="export-count-สาย" class="text-xl font-bold">0</div>
+                    </div>
+                </div>
+
+                <!-- รายชื่อคนไม่มา (ลา, ขาด, สาย) -->
+                <div id="export-absent-list" class="mb-4"></div>
+
+                <!-- Footer (ชื่อโรงเรียน สีน้ำเงิน) -->
+                <div class="mt-6 text-center text-[12px] font-medium leading-relaxed">
+                    <div class="text-primary font-bold">โรงเรียนสันติธรรมวิทยามูลนิธิ</div>
+                    <div class="text-slate-400">บันทึกเมื่อ <span id="export-timestamp"></span></div>
+                </div>
+            </div>
+
+            <!-- Export Button (ปรับเป็นสีเหลือง ตัวอักษรสีน้ำเงินเข้ม) -->
+            <div class="pt-2 sticky bottom-4">
+                <button id="btn-save-image" class="btn-animate w-full bg-secondary text-accent font-bold text-[17px] py-3.5 px-6 rounded-[14px] shadow-lg shadow-yellow-500/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i> บันทึกรูปภาพเช็คชื่อ
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 6: สรุปผลและบันทึก (ความประพฤติ) ================= -->
+        <section id="view-behavior-summary" class="hidden transition-all duration-300">
+            <div class="flex justify-between items-center pb-4 mb-2 px-1">
+                <div class="flex items-center gap-2">
+                    <button class="text-primary hover:opacity-70 transition text-xl px-2 py-1 -ml-2" onclick="switchView('view-behavior')">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-[22px] font-bold text-primary tracking-tight leading-tight">สรุปรายงานความประพฤติ</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas สำหรับแสดงและ Export ความประพฤติ -->
+            <div id="export-behavior-canvas" class="p-6 bg-white w-full rounded-[24px] border border-black/5 shadow-sm relative overflow-hidden mb-6">
+                <!-- Decoration Bar (แดง-ส้ม) -->
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-orange-400"></div>
+                
+                <!-- Header -->
+                <div class="text-center mb-5 pt-3">
+                    <h2 class="text-[24px] font-bold text-[#FF3B30] mb-1">รายงานความประพฤติ</h2>
+                    <div class="text-[14px] text-slate-500 font-medium mb-4" id="export-behavior-header-date"></div>
+                    
+                    <div class="text-[16px] text-slate-700 font-medium leading-relaxed">
+                        <div>วิชา: <span class="font-bold text-primary" id="export-behavior-subject-val"></span></div>
+                        <div>ผู้สอน: <span class="font-bold text-primary" id="export-behavior-teacher-val"></span></div>
+                    </div>
+                </div>
+
+                <!-- แถบ ห้อง -->
+                <div class="text-center mb-5 py-2 bg-slate-50 rounded-[14px] border border-slate-100">
+                     <p id="export-behavior-room-only" class="text-[17px] font-bold text-accent"></p>
+                </div>
+
+                <!-- รายชื่อคนที่มีพฤติกรรม -->
+                <div id="export-behavior-list" class="mb-4"></div>
+
+                <!-- Footer (ชื่อโรงเรียน) -->
+                <div class="mt-6 text-center text-[12px] font-medium leading-relaxed">
+                    <div class="text-primary font-bold">โรงเรียนสันติธรรมวิทยามูลนิธิ</div>
+                    <div class="text-slate-400">บันทึกเมื่อ <span id="export-behavior-timestamp"></span></div>
+                </div>
+            </div>
+
+            <!-- Export Button -->
+            <div class="pt-2 sticky bottom-4">
+                <button id="btn-save-behavior-image" class="btn-animate w-full bg-[#FF3B30] text-white font-bold text-[17px] py-3.5 px-6 rounded-[14px] shadow-lg shadow-red-500/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download"></i> บันทึกรูปภาพความประพฤติ
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= JAVASCRIPT & CONFIGURATION ================= -->
+    <script>
+        /**
+         * 📝 ตั้งค่าระบบของคุณที่นี่ (CONFIGURATION)
+         * คุณสามารถแก้ไขข้อมูลด้านล่างนี้ให้เป็นข้อมูลของคุณเองได้เลยครับ
+         */
+        const CONFIG = {
+            TEACHER_NAME: "ครูอาณัติ เหล็มสะ", // ใส่ชื่อของคุณ
+            
+            // ข้อมูล Google Sheets (ต้องแชร์เป็น 'ทุกคนที่มีลิงก์' (Anyone with the link))
+            SHEET_ID: "1mPl20ilAZAJmgfktHVPIDxZWSWQKNK7Y1_wJxAIMeBY", 
+            API_KEY: "AIzaSyBEIDAElc5HiX9sX6Ldwx__ll55DZJj85s", 
+            RANGE: "A:D", // เปลี่ยนเป็น A:D เพื่ออ่านทั้งหมดและข้ามหัวตารางอัตโนมัติ
+            
+            // ตั้งค่าระดับชั้นและห้องเรียน
+            CLASSES: {
+                "ชั้น ม.1": ["1/1", "1/2", "1/3", "1/4"],
+                "ชั้น ม.2": ["2/1", "2/2", "2/3", "2/4"],
+                "ชั้น ม.3": ["3/1", "3/2", "3/3", "3/4"],
+                "ชั้น ม.4": ["4/1", "4/2", "4/3"],
+                "ชั้น ม.5": ["5/1", "5/2", "5/3"],
+                "ชั้น ม.6": ["6/1", "6/2", "6/3"]
+            },
+            
+            // สถานะการเช็คชื่อ
+            STATUSES: ["มา", "ลา", "ขาด", "สาย"],
+            
+            // หัวข้อความประพฤติที่ต้องการให้เลือก
+            BEHAVIORS: ["โดดเรียน", "หลับในห้อง", "ไม่ส่งงาน", "เล่นโทรศัพท์", "คุยเสียงดัง", "ไม่แต่งกายให้เรียบร้อย"]
+        };
+
+        // --- State (ตัวแปรเก็บข้อมูลชั่วคราวขณะใช้งาน) ---
+        const State = {
+            allStudents: [],
+            attendance: {}, // รูปแบบ: { "ชั้น-ห้อง": { id_นักเรียน: "สถานะ" } }
+            behavior: {}, // รูปแบบ: { "ชั้น-ห้อง": { id_นักเรียน: { tags: ["โดดเรียน"], other: "..." } } }
+            currentClass: "",
+            currentRoom: "",
+            subjectName: "",
+            teacherName: "",
+            periodCount: "1" // เพิ่มตัวแปรเก็บจำนวนคาบ
+        };
+
+        // ตัวแปรสำหรับระบบติดตั้ง PWA
+        let deferredPrompt;
+
+        // --- PWA Setup (ทำให้สามารถติดตั้งแอปได้) ---
+        function setupPWA() {
+            // ลบโค้ด blob ออก และเปลี่ยนไปเรียกไฟล์ sw.js ของจริง (หากนำไปใช้งานบนเซิร์ฟเวอร์จริง)
+            if ('serviceWorker' in navigator) {
+                // พยายามเรียกไฟล์ sw.js แต่ครอบด้วย try-catch เพื่อไม่ให้เกิด Error ในหน้าต่างพรีวิว
+                try {
+                    navigator.serviceWorker.register('sw.js').then((registration) => {
+                        console.log('Service Worker registered with scope:', registration.scope);
+                    }).catch((error) => {
+                        console.warn('Service Worker registration failed (this is normal in preview environments):', error);
+                    });
+                } catch(e) {
+                     console.warn('Cannot register Service Worker in this environment.');
+                }
+            }
+        }
+
+        // --- Initialize App ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // โหลดชื่อครูจาก LocalStorage (ถ้าเคยบันทึกไว้) หรือใช้จาก CONFIG
+            const savedTeacher = localStorage.getItem('myAttendance_teacher') || CONFIG.TEACHER_NAME;
+            const displayTeacherNameEl = document.getElementById('display-teacher-name');
+            if (displayTeacherNameEl) {
+                displayTeacherNameEl.innerText = savedTeacher;
+            }
+            
+            // เปิดใช้งานระบบ PWA
+            setupPWA();
+
+            // ดักจับ Event การขอติดตั้งแอป (Android/Chrome/Edge)
+            const installBtn = document.getElementById('btn-install');
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (installBtn) {
+                     installBtn.classList.remove('hidden'); // แสดงปุ่มเมื่อรองรับการติดตั้ง
+                }
+            });
+
+            // เมื่อกดปุ่มติดตั้ง
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`ผลการติดตั้ง: ${outcome}`);
+                        deferredPrompt = null;
+                        installBtn.classList.add('hidden');
+                    }
+                });
+            }
+            
+            // ผูก Event ให้ปุ่มต่างๆ
+            document.getElementById('btn-start').addEventListener('click', () => switchView('view-class'));
+            document.getElementById('btn-view-summary').addEventListener('click', prepareAndShowSummary);
+            document.getElementById('btn-save-image').addEventListener('click', () => downloadImage('export-canvas', 'เช็คชื่อ'));
+            
+            document.getElementById('btn-view-behavior').addEventListener('click', () => {
+                renderBehaviorList();
+                switchView('view-behavior');
+            });
+            document.getElementById('btn-view-behavior-summary').addEventListener('click', prepareAndShowBehaviorSummary);
+            document.getElementById('btn-save-behavior-image').addEventListener('click', () => downloadImage('export-behavior-canvas', 'ความประพฤติ'));
+
+            // เริ่มโหลดข้อมูล
+            fetchStudentData();
+        });
+
+        // --- Functions ---
+
+        // 1. สลับหน้าจอแบบนุ่มนวล
+        function switchView(viewId) {
+            const views = ['view-loading', 'view-class', 'view-room', 'view-setup', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary'];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return; // ป้องกัน Error หากหา element ไม่เจอ
+                
+                if (id === viewId) {
+                    el.classList.remove('hidden');
+                    // ใส่ timeout เล็กน้อยเพื่อให้ opacity ทำงานตอน remove hidden
+                    setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; }, 10);
+                } else {
+                    el.classList.add('hidden');
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(10px)';
+                }
+            });
+
+            // ถ้าเปิดหน้าเลือกชั้นเรียน ให้ render ปุ่ม
+            if(viewId === 'view-class') renderClasses();
+        }
+
+        // 2. แสดงแจ้งเตือน (Toast)
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msgEl = document.getElementById('toast-message');
+
+            msgEl.innerText = message;
+            
+            let iconHtml = '';
+            if (type === 'success') {
+                iconHtml = '<i class="fa-solid fa-circle-check text-[#34C759]"></i>';
+            } else if (type === 'error') {
+                iconHtml = '<i class="fa-solid fa-circle-xmark text-[#FF3B30]"></i>';
+            } else {
+                iconHtml = '<i class="fa-solid fa-circle-info text-primary"></i>';
+            }
+            icon.innerHTML = iconHtml;
+
+            // Show
+            toast.classList.add('show');
+            
+            // Hide after 3 secs
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 3. ดึงข้อมูลจาก Google Sheets (เพิ่ม Exponential Backoff แบบสมบูรณ์)
+        async function fetchStudentData() {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${CONFIG.RANGE}?key=${CONFIG.API_KEY}`;
+            const errorMsgEl = document.getElementById('system-error-msg');
+            
+            const delays = [1000, 2000, 4000, 8000, 16000]; // 1s, 2s, 4s, 8s, 16s
+            let lastError = null;
+
+            for (let attempt = 0; attempt <= 5; attempt++) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        let errMsg = `HTTP Error ${response.status}`;
+                        try {
+                            const errData = await response.json();
+                            errMsg = errData.error?.message || errMsg;
+                        } catch (e) {
+                            // กรณีที่ Google ส่ง HTML 503 กลับมาแทน JSON
+                            errMsg = "The service is currently unavailable.";
+                        }
+                        throw new Error(`คำอธิบายจาก Google: ${errMsg}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // ตรวจสอบว่ามีข้อมูลในตารางหรือไม่
+                    if (data.values && data.values.length > 0) {
+                        
+                        // แปลงและคัดกรองข้อมูล
+                        State.allStudents = data.values.map(row => ({
+                            id: parseInt(row[0]),
+                            studentNumber: row[1] || "-",
+                            name: row[2] || "ไม่มีชื่อ",
+                            room: row[3] || ""
+                        })).filter(s => !isNaN(s.id) && s.name !== "ไม่มีชื่อ" && s.room !== "");
+
+                        if (State.allStudents.length === 0) {
+                            throw new Error("ไม่พบข้อมูลนักเรียนที่สมบูรณ์ (คอลัมน์ A ต้องเป็นเลขที่, C ต้องเป็นชื่อ, และ D ต้องเป็นห้อง)");
+                        }
+
+                        // สำเร็จ (ข้อมูลพร้อมใช้งาน)
+                        document.getElementById('loading-spinner').innerHTML = '<i class="fa-solid fa-check-circle text-5xl text-[#34C759] mb-2"></i>';
+                        document.getElementById('loading-title').innerText = "ข้อมูลพร้อมใช้งาน";
+                        document.getElementById('loading-title').classList.add('text-[#34C759]');
+                        document.getElementById('loading-desc').innerText = `โหลดรายชื่อสำเร็จทั้งหมด ${State.allStudents.length} คน`;
+                        document.getElementById('btn-start').classList.remove('hidden');
+                        return; // ออกจากการวนลูป Retry ทันทีที่สำเร็จ
+                    } else {
+                        throw new Error("ตารางว่างเปล่า ไม่พบข้อมูลใดๆ ในไฟล์ Google Sheets");
+                    }
+                } catch (error) {
+                    lastError = error;
+                    
+                    // ถ้าข้อผิดพลาดไม่ได้เกิดจาก Network หรือ Google API ไม่ต้อง Retry ต่อ (เช่น ตารางว่างเปล่าจริงๆ)
+                    if (error.message.includes("ไม่พบข้อมูลนักเรียนที่สมบูรณ์") || error.message.includes("ตารางว่างเปล่า")) {
+                        break;
+                    }
+
+                    // หยุดพักตามเวลา Exponential Backoff หากไม่ใช่รอบสุดท้าย
+                    if (attempt < 5) {
+                        console.log(`กำลังเชื่อมต่อใหม่รอบที่ ${attempt + 1}...`);
+                        await new Promise(resolve => setTimeout(resolve, delays[attempt]));
+                    }
+                }
+            }
+
+            // แสดงข้อผิดพลาดหากการลองเชื่อมต่อซ้ำทั้งหมดล้มเหลว
+            console.error("Fetch Error:", lastError);
+            document.getElementById('loading-spinner').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-5xl text-[#FF3B30] mb-2"></i>';
+            document.getElementById('loading-title').innerText = "เกิดข้อผิดพลาดในการเชื่อมต่อ";
+            errorMsgEl.innerText = lastError.message || "เซิร์ฟเวอร์ Google ไม่ตอบสนอง กรุณาลองใหม่ในภายหลัง";
+            errorMsgEl.classList.remove('hidden');
+            showToast('การดึงข้อมูลล้มเหลว', 'error');
+        }
+
+        // 4. สร้างปุ่มชั้นเรียน
+        function renderClasses() {
+            const container = document.getElementById('class-list');
+            container.innerHTML = '';
+            
+            const icons = ['fa-layer-group', 'fa-layer-group', 'fa-layer-group', 'fa-layer-group', 'fa-layer-group', 'fa-layer-group'];
+            let i = 0;
+
+            for (const classLevel in CONFIG.CLASSES) {
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-transparent hover:bg-black/5 text-left font-semibold py-4 px-4 flex items-center justify-between transition border-b border-black/5 last:border-0";
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-[10px] bg-primary text-white flex items-center justify-center shadow-sm">
+                            <i class="fa-solid ${icons[i % icons.length]} text-sm"></i>
+                        </div>
+                        <span class="text-[17px] text-black tracking-tight">${classLevel}</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-black/20 text-sm"></i>
+                `;
+                btn.onclick = () => {
+                    State.currentClass = classLevel;
+                    renderRooms(classLevel);
+                    switchView('view-room');
+                };
+                container.appendChild(btn);
+                i++;
+            }
+        }
+
+        // 5. สร้างปุ่มห้องเรียน
+        function renderRooms(classLevel) {
+            document.getElementById('display-selected-class').innerText = `${classLevel}`;
+            const container = document.getElementById('room-list');
+            container.innerHTML = '';
+            
+            const rooms = CONFIG.CLASSES[classLevel] || [];
+            
+            if(rooms.length === 0){
+                container.innerHTML = '<p class="col-span-full text-center text-slate-400 py-4">ไม่พบห้องเรียน</p>';
+                return;
+            }
+
+            rooms.forEach(room => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white/50 hover:bg-white/80 backdrop-blur-md border border-white/60 shadow-sm py-4 px-2 rounded-[20px] text-center transition btn-animate";
+                
+                const count = State.allStudents.filter(s => s.room === room).length;
+
+                btn.innerHTML = `
+                    <div class="text-[19px] font-semibold text-black tracking-tight mb-1">${room}</div>
+                    <div class="text-[12px] text-black/50 font-medium"><i class="fa-solid fa-user-group mr-1"></i>${count} คน</div>
+                `;
+                btn.onclick = () => {
+                    openSetupView(room);
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // 5.5 เปิดหน้ากรอกข้อมูลการสอน
+        function openSetupView(room) {
+            State.currentRoom = room;
+            
+            // ดึงค่าเดิมที่เคยกรอกไว้มาแสดงอัตโนมัติ (หัวใจสำคัญของระบบจำข้อมูล)
+            document.getElementById('input-subject').value = localStorage.getItem('myAttendance_subject') || "";
+            document.getElementById('input-teacher').value = localStorage.getItem('myAttendance_teacher') || CONFIG.TEACHER_NAME;
+            document.getElementById('input-period').value = localStorage.getItem('myAttendance_period') || "1"; // ดึงจำนวนคาบ
+            
+            switchView('view-setup');
+        }
+
+        // 5.6 บันทึกข้อมูลการสอนแล้วไปหน้าเช็คชื่อ
+        function proceedToAttendance() {
+            const subjectInput = document.getElementById('input-subject').value.trim();
+            const teacherInput = document.getElementById('input-teacher').value.trim();
+            const periodInput = document.getElementById('input-period').value; // รับค่าจำนวนคาบ
+            
+            if(!subjectInput || !teacherInput) {
+                showToast('กรุณากรอกวิชาและชื่อผู้สอนให้ครบถ้วน', 'error');
+                return;
+            }
+            
+            // บันทึกลง LocalStorage
+            localStorage.setItem('myAttendance_subject', subjectInput);
+            localStorage.setItem('myAttendance_teacher', teacherInput);
+            localStorage.setItem('myAttendance_period', periodInput); // บันทึกจำนวนคาบ
+            
+            // เก็บลง State
+            State.subjectName = subjectInput;
+            State.teacherName = teacherInput;
+            State.periodCount = periodInput;
+            
+            renderAttendanceList();
+            switchView('view-attendance');
+        }
+
+        // 6. หน้าเช็คชื่อ
+        function renderAttendanceList() {
+            const classLevel = State.currentClass;
+            const room = State.currentRoom;
+            const attendanceKey = `${classLevel}-${room}`;
+            
+            document.getElementById('header-subject-room').innerText = `ห้อง ${room}`;
+            
+            const studentsInRoom = State.allStudents.filter(s => s.room === room).sort((a,b) => a.id - b.id);
+            document.getElementById('header-student-count').innerText = `นักเรียน ${studentsInRoom.length} คน`;
+            
+            const container = document.getElementById('student-list');
+            container.innerHTML = '';
+
+            if (studentsInRoom.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-black/40"><i class="fa-regular fa-folder-open text-4xl mb-3"></i><br>ไม่มีข้อมูลนักเรียนในห้องนี้</div>`;
+                return;
+            }
+
+            if (!State.attendance[attendanceKey]) {
+                State.attendance[attendanceKey] = {};
+            }
+
+            studentsInRoom.forEach(student => {
+                const currentStatus = State.attendance[attendanceKey][student.id];
+                
+                const item = document.createElement('div');
+                item.className = "bg-white/60 backdrop-blur-xl border border-white/80 p-4 rounded-[22px] shadow-sm mb-3";
+                
+                let html = `
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <span class="font-semibold text-[17px] text-black tracking-tight">${student.id}. ${student.name}</span>
+                            <div class="text-[13px] text-black/50 mt-0.5">รหัส: ${student.studentNumber}</div>
+                        </div>
+                    </div>
+                    <div class="ios-segmented w-full" id="btn-group-${student.id}">
+                `;
+
+                CONFIG.STATUSES.forEach(status => {
+                    const isActive = currentStatus === status ? 'active' : '';
+                    html += `<button class="ios-segment-btn ${isActive}" data-id="${student.id}" data-status="${status}">${status}</button>`;
+                });
+
+                html += `</div>`;
+                item.innerHTML = html;
+                container.appendChild(item);
+
+                const btns = item.querySelectorAll('.ios-segment-btn');
+                btns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        btns.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        const stId = this.getAttribute('data-id');
+                        const stStatus = this.getAttribute('data-status');
+                        State.attendance[attendanceKey][stId] = stStatus;
+                    });
+                });
+            });
+        }
+
+        // 6.5 หน้าบันทึกความประพฤติ
+        function renderBehaviorList() {
+            const classLevel = State.currentClass;
+            const room = State.currentRoom;
+            const behaviorKey = `${classLevel}-${room}`;
+            
+            document.getElementById('header-behavior-room').innerText = `ห้อง ${room}`;
+            
+            const studentsInRoom = State.allStudents.filter(s => s.room === room).sort((a,b) => a.id - b.id);
+            const container = document.getElementById('behavior-student-list');
+            container.innerHTML = '';
+
+            if (studentsInRoom.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-black/40"><i class="fa-regular fa-folder-open text-4xl mb-3"></i><br>ไม่มีข้อมูลนักเรียนในห้องนี้</div>`;
+                return;
+            }
+
+            if (!State.behavior[behaviorKey]) {
+                State.behavior[behaviorKey] = {};
+            }
+
+            studentsInRoom.forEach(student => {
+                // โครงสร้างข้อมูลความประพฤติของนักเรียน 1 คน
+                if (!State.behavior[behaviorKey][student.id]) {
+                    State.behavior[behaviorKey][student.id] = { tags: [], other: "" };
+                }
+                const currentData = State.behavior[behaviorKey][student.id];
+                
+                const item = document.createElement('div');
+                item.className = "bg-white/60 backdrop-blur-xl border border-white/80 p-4 rounded-[22px] shadow-sm mb-3";
+                
+                // หัวข้อชื่อนักเรียน
+                let html = `
+                    <div class="mb-3 border-b border-black/5 pb-2">
+                        <span class="font-semibold text-[16px] text-black tracking-tight">${student.id}. ${student.name}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-x-2 gap-y-1 mb-3">
+                `;
+
+                // สร้าง Checkbox สำหรับพฤติกรรมแต่ละข้อ
+                CONFIG.BEHAVIORS.forEach(behavior => {
+                    const isChecked = currentData.tags.includes(behavior) ? 'checked' : '';
+                    html += `
+                        <label class="behavior-checkbox-label">
+                            <input type="checkbox" class="behavior-checkbox behavior-tag-${student.id}" value="${behavior}" ${isChecked} data-id="${student.id}">
+                            <span class="text-[13px] text-slate-700">${behavior}</span>
+                        </label>
+                    `;
+                });
+
+                html += `
+                    </div>
+                    <div>
+                        <input type="text" class="ios-input !text-[13px] !py-2 !rounded-lg" placeholder="พฤติกรรมอื่นๆ..." id="behavior-other-${student.id}" value="${currentData.other}" data-id="${student.id}">
+                    </div>
+                `;
+                
+                item.innerHTML = html;
+                container.appendChild(item);
+
+                // ผูก Event ให้ Checkbox
+                const checkboxes = item.querySelectorAll(`.behavior-tag-${student.id}`);
+                checkboxes.forEach(cb => {
+                    cb.addEventListener('change', function() {
+                        const stId = this.getAttribute('data-id');
+                        const val = this.value;
+                        
+                        if (this.checked) {
+                            if (!State.behavior[behaviorKey][stId].tags.includes(val)) {
+                                State.behavior[behaviorKey][stId].tags.push(val);
+                            }
+                        } else {
+                            State.behavior[behaviorKey][stId].tags = State.behavior[behaviorKey][stId].tags.filter(t => t !== val);
+                        }
+                    });
+                });
+
+                // ผูก Event ให้กล่อง Text อื่นๆ (บันทึกเมื่อพิมพ์เสร็จ)
+                const otherInput = item.querySelector(`#behavior-other-${student.id}`);
+                otherInput.addEventListener('input', function() {
+                    const stId = this.getAttribute('data-id');
+                    State.behavior[behaviorKey][stId].other = this.value.trim();
+                });
+            });
+        }
+
+        // 7. ล้างข้อมูลหน้าปัจจุบัน (เช็คชื่อ)
+        function resetCurrentRoomAttendance() {
+            if(confirm('คุณแน่ใจหรือไม่ว่าจะล้างข้อมูลการเช็คชื่อของห้องนี้ทั้งหมด?')) {
+                const attendanceKey = `${State.currentClass}-${State.currentRoom}`;
+                State.attendance[attendanceKey] = {};
+                renderAttendanceList();
+                showToast('ล้างข้อมูลเช็คชื่อเรียบร้อย', 'info');
+            }
+        }
+
+        // 7.5 ล้างข้อมูลหน้าปัจจุบัน (ความประพฤติ)
+        function resetCurrentRoomBehavior() {
+            if(confirm('คุณแน่ใจหรือไม่ว่าจะล้างข้อมูลความประพฤติของห้องนี้ทั้งหมด?')) {
+                const behaviorKey = `${State.currentClass}-${State.currentRoom}`;
+                State.behavior[behaviorKey] = {};
+                renderBehaviorList();
+                showToast('ล้างข้อมูลความประพฤติเรียบร้อย', 'info');
+            }
+        }
+
+        // 8. เตรียมและแสดงข้อมูลหน้าสรุปผลเช็คชื่อ
+        function prepareAndShowSummary() {
+            const classLevel = State.currentClass;
+            const room = State.currentRoom;
+            const attendanceKey = `${classLevel}-${room}`;
+            const roomData = State.attendance[attendanceKey] || {};
+
+            if (Object.keys(roomData).length === 0) {
+                showToast('ยังไม่มีการเช็คชื่อ กรุณาเช็คชื่อก่อน', 'error');
+                return;
+            }
+
+            // เตรียม Text ใน Canvas HTML
+            const studentsInRoom = State.allStudents.filter(s => s.room === room);
+            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // เตรียมข้อความจำนวนคาบ
+            const periodText = State.periodCount === "1" ? "(1 คาบ)" : `(${State.periodCount} คาบ)`;
+
+            // อัปเดตข้อมูลบนสลิปรายงาน 
+            document.getElementById('export-subject-val').innerText = `${State.subjectName || "-"} ${periodText}`;
+            document.getElementById('export-teacher-val').innerText = State.teacherName || "-";
+            document.getElementById('export-header-date').innerText = `ประจำวันที่ ${dateStr}`;
+            document.getElementById('export-room-only').innerText = `ห้อง ${room}`;
+            
+            const counts = { "มา": 0, "ลา": 0, "ขาด": 0, "สาย": 0 };
+            const namesStatus = { "ลา": [], "ขาด": [], "สาย": [] }; 
+
+            studentsInRoom.forEach(student => {
+                const status = roomData[student.id];
+                if (status) {
+                    counts[status]++;
+                    if(status !== "มา") namesStatus[status].push(student.name);
+                }
+            });
+
+            CONFIG.STATUSES.forEach(status => {
+                document.getElementById(`export-count-${status}`).innerText = counts[status];
+            });
+
+            // สร้างลิสต์คนไม่มา
+            let absentHtml = '';
+            ["ลา", "ขาด", "สาย"].forEach(status => {
+                if(namesStatus[status].length > 0) {
+                    const colorClass = status==='ลา' ? 'text-[#007AFF]' : (status==='ขาด' ? 'text-[#FF3B30]' : 'text-[#FF9500]');
+                    
+                    const namesListHtml = namesStatus[status]
+                        .map((name, index) => `<div class="py-0.5">${index + 1}. ${name}</div>`)
+                        .join('');
+
+                    absentHtml += `
+                        <div class="text-left bg-black/5 border border-black/5 p-3 rounded-[14px] mb-2 text-[14px] shadow-sm">
+                            <div class="font-bold ${colorClass} mb-1.5 border-b border-black/5 pb-1">
+                                <i class="fa-solid fa-user-tag mr-1"></i> ${status} (${namesStatus[status].length} คน)
+                            </div>
+                            <div class="text-black/70 pl-2">
+                                ${namesListHtml}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            document.getElementById('export-absent-list').innerHTML = absentHtml;
+            
+            const timeStr = new Date().toLocaleTimeString('th-TH');
+            document.getElementById('export-timestamp').innerText = `${dateStr} เวลา ${timeStr}`;
+
+            switchView('view-summary');
+        }
+
+        // 8.5 เตรียมและแสดงข้อมูลหน้าสรุปความประพฤติ
+        function prepareAndShowBehaviorSummary() {
+            const classLevel = State.currentClass;
+            const room = State.currentRoom;
+            const behaviorKey = `${classLevel}-${room}`;
+            const behaviorData = State.behavior[behaviorKey] || {};
+
+            let hasData = false;
+            for (const key in behaviorData) {
+                if (behaviorData[key].tags.length > 0 || behaviorData[key].other.trim() !== "") {
+                    hasData = true;
+                    break;
+                }
+            }
+
+            if (!hasData) {
+                showToast('ยังไม่มีการบันทึกความประพฤติ', 'error');
+                return;
+            }
+
+            const studentsInRoom = State.allStudents.filter(s => s.room === room);
+            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // เตรียมข้อความจำนวนคาบ
+            const periodText = State.periodCount === "1" ? "(1 คาบ)" : `(${State.periodCount} คาบ)`;
+
+            // อัปเดตหัวกระดาษสลิปความประพฤติ
+            document.getElementById('export-behavior-subject-val').innerText = `${State.subjectName || "-"} ${periodText}`;
+            document.getElementById('export-behavior-teacher-val').innerText = State.teacherName || "-";
+            document.getElementById('export-behavior-header-date').innerText = `ประจำวันที่ ${dateStr}`;
+            document.getElementById('export-behavior-room-only').innerText = `ห้อง ${room}`;
+
+            // สร้างลิสต์เด็กที่มีพฤติกรรม
+            let behaviorHtml = '';
+            let countBadBehavior = 0;
+
+            studentsInRoom.forEach((student) => {
+                const data = behaviorData[student.id];
+                if (data && (data.tags.length > 0 || data.other.trim() !== "")) {
+                    countBadBehavior++;
+                    
+                    let issues = [...data.tags];
+                    if (data.other.trim() !== "") {
+                        issues.push(`อื่นๆ (${data.other.trim()})`);
+                    }
+
+                    behaviorHtml += `
+                        <div class="text-left bg-red-50/50 border border-red-100 p-3 rounded-[14px] mb-2 text-[14px] shadow-sm">
+                            <div class="font-bold text-slate-800 mb-1">
+                                ${student.id}. ${student.name}
+                            </div>
+                            <div class="text-[#FF3B30] pl-2 font-medium">
+                                <i class="fa-solid fa-triangle-exclamation mr-1 text-[12px]"></i> ${issues.join(' / ')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            if (countBadBehavior === 0) {
+                 behaviorHtml = `<div class="text-center py-4 text-slate-400 font-medium">ไม่พบการทำผิดระเบียบในวันนี้</div>`;
+            }
+
+            document.getElementById('export-behavior-list').innerHTML = behaviorHtml;
+            
+            const timeStr = new Date().toLocaleTimeString('th-TH');
+            document.getElementById('export-behavior-timestamp').innerText = `${dateStr} เวลา ${timeStr}`;
+
+            switchView('view-behavior-summary');
+        }
+
+
+        // 9. บันทึกรูปภาพรวม (ใช้ได้กับทั้งสองสลิป)
+        function downloadImage(canvasId, reportType) {
+            showToast('กำลังประมวลผลรูปภาพ...', 'info');
+
+            const canvasEl = document.getElementById(canvasId);
+            
+            html2canvas(canvasEl, {
+                scale: 3, 
+                backgroundColor: null,
+                useCORS: true
+            }).then(canvas => {
+                const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+                const imgUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                const dName = dateStr.replace(/\s+/g, '-');
+                link.download = `${reportType}_ห้อง${State.currentRoom}_${dName}.png`;
+                link.href = imgUrl;
+                link.click();
+                
+                showToast('บันทึกรูปภาพสำเร็จ!', 'success');
+            }).catch(err => {
+                console.error(err);
+                showToast('เกิดข้อผิดพลาดในการสร้างรูป', 'error');
+            });
+        }
+
+    </script>
+</body>
+</html>
