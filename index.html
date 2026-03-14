@@ -318,6 +318,53 @@
         </div>
     </div>
 
+    <!-- ================= API KEY SETUP MODAL ================= -->
+    <div id="api-key-modal" class="modal-bg">
+        <div class="modal-box">
+            <div class="flex items-center gap-4 mb-4 shrink-0 border-b border-blue-100 pb-4">
+                <div class="w-14 h-14 bg-gradient-to-tr from-blue-500 to-indigo-500 text-white rounded-2xl flex items-center justify-center text-[28px] shadow-lg shadow-blue-500/30 border border-white/50">
+                    🔑
+                </div>
+                <div>
+                    <h3 class="text-[20px] font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight leading-normal text-left pb-1">ตั้งค่า อาบัง AI</h3>
+                    <p class="text-[11px] font-bold text-indigo-900/50 mt-1 uppercase tracking-widest">ขั้นตอนการรับรหัสเชื่อมต่อฟรี</p>
+                </div>
+            </div>
+
+            <div class="overflow-y-auto scroll-fine pr-2 space-y-4 flex-1 mb-4">
+                <div class="bg-blue-50/70 p-4 rounded-2xl border border-blue-100">
+                    <p class="text-[13px] text-blue-900 font-bold mb-3 leading-relaxed">
+                        เพื่อให้ "อาบัง AI" ทำงานได้ คุณครูจำเป็นต้องมี "รหัสเชื่อมต่อ (API Key)" ซึ่งขอรับได้ฟรี! ทำตามขั้นตอนง่ายๆ นี้นะครับ:
+                    </p>
+                    <ol class="text-[12.5px] text-blue-800/80 space-y-2.5 list-decimal list-inside pl-1 font-medium">
+                        <li>กดไปที่เว็บ <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-600 font-black underline bg-white/50 px-1.5 py-0.5 rounded-md">Google AI Studio (คลิกที่นี่)</a></li>
+                        <li>ล็อกอินด้วยบัญชี <b class="text-blue-700">Gmail</b> ของคุณครูให้เรียบร้อย</li>
+                        <li>มองหาเมนูซ้ายมือ กดปุ่ม <b class="text-blue-700">"Get API key"</b> (รูปกุญแจ)</li>
+                        <li>กดปุ่มสีฟ้าตรงกลางจอที่เขียนว่า <b class="text-blue-700">"Create API key"</b></li>
+                        <li>ระบบจะสร้างรหัสให้ <b>กดคัดลอก (Copy)</b> รหัสยาวๆ นั้น (มักขึ้นต้นด้วย AIza...) มาวางในช่องด้านล่างนี้ได้เลยครับ</li>
+                    </ol>
+                </div>
+
+                <div class="bg-white/60 p-4 rounded-2xl border border-indigo-50">
+                    <label class="text-[11px] font-black uppercase text-indigo-900/60 ml-1 mb-2 block tracking-widest flex items-center gap-1.5"><i class="fa-solid fa-paste"></i> วางรหัส API Key ของคุณครูที่นี่</label>
+                    <input type="text" id="input-api-key" class="warm-field !py-3.5 !text-sm border-indigo-200 focus:border-indigo-500 w-full" placeholder="AIzaSy...">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mt-2 shrink-0">
+                <button onclick="saveAPIKey()" class="btn-press w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-black py-3.5 rounded-[16px] shadow-lg flex items-center justify-center gap-2 text-[14px]">
+                    ✅ บันทึกรหัส
+                </button>
+                <button onclick="clearAPIKey()" class="btn-press w-full bg-red-50 text-red-600 font-black py-3.5 rounded-[16px] border border-red-200 flex items-center justify-center gap-2 text-[14px]">
+                    🗑️ ล้างค่าเดิม
+                </button>
+            </div>
+            <button onclick="closeAPIKeyModal()" class="mt-3 shrink-0 btn-press w-full bg-white text-accent/50 font-bold py-3.5 rounded-[16px] border border-orange-100 flex items-center justify-center gap-2 text-[13px]">
+                ปิดหน้าต่าง
+            </button>
+        </div>
+    </div>
+
     <!-- ================= AI ASSISTANT MODAL ================= -->
     <div id="ai-modal" class="modal-bg">
         <div class="modal-box">
@@ -653,7 +700,7 @@
             currentClass: "", currentRoom: "", subjectName: "", teacherName: "", periodCount: "1"
         };
 
-        // คีย์ API สำหรับ Gemini AI ถูกจัดการโดยระบบ Execution Environment อัตโนมัติ
+        // คีย์ API สำหรับ Gemini AI ถูกจัดการโดยระบบ Execution Environment อัตโนมัติ (ในเว็บพรีวิว)
         const apiKey = ""; 
 
         function initPWA() {
@@ -722,20 +769,37 @@
             reader.readAsDataURL(file);
         });
 
-        // ====== ฟังก์ชันตั้งค่า API Key สำหรับนำไปใช้ภายนอก ======
+        // ====== ฟังก์ชันตั้งค่า API Key สำหรับหน้าต่าง Modal ======
         function setupAPIKey() {
             const currentKey = localStorage.getItem('s_gemini_api_key') || '';
-            const newKey = prompt("🔑 ตั้งค่า Gemini API Key สำหรับอาบัง AI\n\nระบบนี้ต้องการ API Key เพื่อทำงานเมื่อเปิดใช้งานนอกระบบทดสอบ คุณครูสามารถสมัครรับฟรีได้ที่เว็บ aistudio.google.com\n\nกรุณาวาง API Key ของคุณด้านล่างนี้:", currentKey);
+            const inputField = document.getElementById('input-api-key');
+            if (inputField) inputField.value = currentKey;
             
-            if (newKey !== null) {
-                if (newKey.trim() === '') {
-                    localStorage.removeItem('s_gemini_api_key');
-                    alert("ล้างค่า API Key แล้วครับ");
-                } else {
-                    localStorage.setItem('s_gemini_api_key', newKey.trim());
-                    alert("บันทึก API Key เรียบร้อยแล้ว! อาบัง AI พร้อมทำงานครับ 👳🏽‍♂️✨");
-                }
+            document.getElementById('api-key-modal')?.classList.add('active');
+        }
+
+        function closeAPIKeyModal() {
+            document.getElementById('api-key-modal')?.classList.remove('active');
+        }
+
+        function saveAPIKey() {
+            const inputField = document.getElementById('input-api-key');
+            const newKey = inputField ? inputField.value.trim() : '';
+            
+            if (newKey !== '') {
+                localStorage.setItem('s_gemini_api_key', newKey);
+                alert("บันทึก API Key เรียบร้อยแล้ว! อาบัง AI พร้อมทำงานครับ 👳🏽‍♂️✨");
+                closeAPIKeyModal();
+            } else {
+                alert("กรุณาวางรหัส API Key ก่อนกดบันทึกครับ หรือหากต้องการลบให้กด 'ล้างค่าเดิม'");
             }
+        }
+
+        function clearAPIKey() {
+            localStorage.removeItem('s_gemini_api_key');
+            const inputField = document.getElementById('input-api-key');
+            if (inputField) inputField.value = '';
+            alert("ล้างค่า API Key เดิมเรียบร้อยแล้วครับ ระบบจะกลับไปใช้ค่าตั้งต้น (ถ้ามี)");
         }
 
         // ====== ฟังก์ชันโหลดข้อมูลนักเรียนจาก Google Sheets ======
