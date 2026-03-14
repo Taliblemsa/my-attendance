@@ -47,6 +47,11 @@
         body {
             color: #451a03;
             background-color: #fffcf9;
+            background-image: url('https://i.postimg.cc/6QNJdJt9/tylijura-child-10112985-1920.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             overflow-x: hidden;
             -webkit-user-select: none;
             user-select: none;
@@ -624,7 +629,7 @@
                 const cur = State.attendance[key][st.id];
                 const item = document.createElement('div');
                 item.className = `glass-panel ${CONFIG.PASTEL_THEMES[idx % 4]} p-4 rounded-[24px] border border-orange-100 shadow-sm fade-in`;
-                let html = `<div class="flex items-center gap-4 mb-3"><div class="w-9 h-9 rounded-2xl bg-orange-50 text-primary font-black text-sm flex items-center justify-center shrink-0 border border-orange-100">${st.id}</div><span class="font-black text-accent text-[17px] leading-none tracking-tight">${st.name}</span></div><div class="status-container">`;
+                let html = `<div class="flex items-center gap-4 mb-3"><div class="w-9 h-9 rounded-2xl bg-orange-50 text-primary font-black text-sm flex items-center justify-center shrink-0 border border-orange-100">${st.id}</div><span class="font-light text-accent text-[18px] leading-none tracking-tight">${st.name}</span></div><div class="status-container">`;
                 CONFIG.STATUSES.forEach(stat => {
                     const act = cur === stat ? 'active' : '';
                     html += `<button class="status-tab ${act}" data-id="${st.id}" data-status="${stat}">${stat}</button>`;
@@ -656,7 +661,7 @@
                     let score = CONFIG.BEHAVIORS[tag] || 0;
                     return `<span class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-xl text-[11px] font-black border border-red-100">${tag} <i class="fa-solid fa-circle-xmark cursor-pointer behavior-remove-btn opacity-50" data-id="${st.id}" data-tag="${tag}"></i></span>`;
                 }).join('');
-                let html = `<div class="flex gap-4 mb-3 border-b border-orange-50 pb-2 items-center"><div class="w-8 h-8 bg-orange-50 text-primary font-black rounded-full flex items-center justify-center shrink-0 text-xs">${st.id}</div><span class="font-black text-accent text-[16px]">${st.name}</span></div>`;
+                let html = `<div class="flex gap-4 mb-3 border-b border-orange-50 pb-2 items-center"><div class="w-8 h-8 bg-orange-50 text-primary font-black rounded-full flex items-center justify-center shrink-0 text-xs">${st.id}</div><span class="font-light text-accent text-[17px]">${st.name}</span></div>`;
                 if(tagsHtml) html += `<div class="flex flex-wrap gap-1.5 mb-2">${tagsHtml}</div>`;
                 html += `<select class="warm-field !py-2.5 !text-sm behavior-select !rounded-xl cursor-pointer font-extrabold text-accent/40" data-id="${st.id}"><option value="" disabled selected>+ ระบุพฤติกรรม</option>`;
                 Object.keys(CONFIG.BEHAVIORS).forEach(b => html += `<option value="${b}">${b} (-${CONFIG.BEHAVIORS[b]})</option>`);
@@ -695,7 +700,7 @@
                 if(statusNames[s].length > 0) {
                     let c = s === 'ลา' ? 'sky' : 'red';
                     // ย่อขนาดระยะห่างบรรทัดให้กระชับที่สุดเพื่อลดความยาวสลิป
-                    html += `<div class="bg-${c}-50/50 p-3 rounded-[20px] border border-${c}-100"><div class="font-black text-${c}-700 mb-1 border-b border-${c}-100 pb-1 flex justify-between items-center text-[13px]"><span>สถานะ: ${s}</span><span class="bg-white px-2.5 py-0.5 rounded-lg shadow-sm text-[10px] font-black">${statusNames[s].length} คน</span></div><div class="grid grid-cols-1 gap-0.5">${statusNames[s].map((n, i) => `<div class="text-[12px] font-bold text-orange-900/70 pl-1"><span class="opacity-40 mr-1 text-[10px]">${i+1}.</span> ${n}</div>`).join('')}</div></div>`;
+                    html += `<div class="bg-${c}-50/50 p-3 rounded-[20px] border border-${c}-100"><div class="font-black text-${c}-700 mb-1 border-b border-${c}-100 pb-1 flex justify-between items-center text-[13px]"><span>สถานะ: ${s}</span><span class="bg-white px-2.5 py-0.5 rounded-lg shadow-sm text-[10px] font-black">${statusNames[s].length} คน</span></div><div class="grid grid-cols-1 gap-0.5">${statusNames[s].map((n, i) => `<div class="text-[13px] font-light text-orange-900/90 pl-1"><span class="opacity-40 mr-1 text-[10px]">${i+1}.</span> ${n}</div>`).join('')}</div></div>`;
                 }
             });
             document.getElementById('export-absent-list').innerHTML = html || '<div class="text-center py-6 glass-panel border-emerald-100 bg-emerald-50/20"><i class="fa-solid fa-check-circle text-3xl text-emerald-400 mb-2 block"></i><p class="font-black text-emerald-600 text-sm">มาเรียนครบทุกคนครับ!</p></div>';
@@ -722,7 +727,7 @@
                         else { pts += CONFIG.BEHAVIORS[t]; issues.push(`${t} (-${CONFIG.BEHAVIORS[t]})`); }
                     });
                     // ย่อขนาดระยะห่างบรรทัดให้กระชับที่สุด
-                    html += `<div class="bg-white border-l-[4px] border-red-500 p-3 rounded-[16px] shadow-sm mb-2"><div class="flex justify-between items-start mb-0.5"><div class="font-black text-accent text-[14px] tracking-tight">${count}. ${st.name} <span class="text-accent/30 font-bold ml-1 text-[10px]">(เลขที่ ${st.id})</span></div><div class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded-lg shadow-sm uppercase">หัก ${pts} คะแนน</div></div><div class="text-[11px] font-bold text-red-600/80 flex items-center gap-1.5 pl-1 leading-tight"><i class="fa-solid fa-triangle-exclamation text-[8px]"></i> ${issues.join(' • ')}</div></div>`;
+                    html += `<div class="bg-white border-l-[4px] border-red-500 p-3 rounded-[16px] shadow-sm mb-2"><div class="flex justify-between items-start mb-0.5"><div class="font-light text-accent text-[15px] tracking-tight">${count}. ${st.name} <span class="text-accent/30 font-bold ml-1 text-[10px]">(เลขที่ ${st.id})</span></div><div class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded-lg shadow-sm uppercase">หัก ${pts} คะแนน</div></div><div class="text-[11px] font-bold text-red-600/80 flex items-center gap-1.5 pl-1 leading-tight"><i class="fa-solid fa-triangle-exclamation text-[8px]"></i> ${issues.join(' • ')}</div></div>`;
                 }
             });
             document.getElementById('export-behavior-list').innerHTML = html;
