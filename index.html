@@ -678,7 +678,7 @@
                 const data = await res.json();
                 if (data.values && data.values.length > 0) {
                     State.allStudents = data.values.map(r => ({ id: parseInt(r[0]), num: r[1], name: r[2], room: r[3] })).filter(s => !isNaN(s.id) && s.name && s.room);
-                    if (loadingSpinner) loadingSpinner.innerHTML = '<div class="text-[70px] mb-2 animate-bounce drop-shadow-md">🎉</div>';
+                    if (loadingSpinner) loadingSpinner.innerHTML = '<div class="text-[70px] mb-2 animate-bounce drop-shadow-md">📚✨</div>';
                     const loadingTitle = document.getElementById('loading-title');
                     if (loadingTitle) loadingTitle.innerText = "ห้องเรียนพร้อมแล้ว! ✨";
                     const loadingDesc = document.getElementById('loading-desc');
