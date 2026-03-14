@@ -206,17 +206,56 @@
                     <h4 class="text-xs font-black text-primaryDark uppercase tracking-widest mb-2 flex items-center gap-2 text-left">
                         <i class="fa-solid fa-star text-primary text-[10px]"></i> ขั้นตอนการใช้งาน
                     </h4>
-                    <div class="bg-white/40 p-4 rounded-2xl border border-white flex gap-4 shadow-sm">
-                        <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-black shrink-0 text-center">1</div>
-                        <p class="text-[13px] font-bold text-accent"><b>เข้าสู่ระบบ:</b> เลือกห้องเรียน ข้อมูลนักเรียนจะถูกดึงมาให้อัตโนมัติ</p>
+                    <div class="bg-white/40 p-4 rounded-2xl border border-white flex gap-4 shadow-sm items-start">
+                        <div class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-[12px] font-black shrink-0 text-center mt-0.5">1</div>
+                        <div class="text-[13px] text-accent leading-relaxed">
+                            <b class="font-black">เลือกระดับชั้นและข้อมูลการสอน:</b><br> 
+                            รอระบบดึงข้อมูลรายชื่อจากนั้นกดเข้าสู่ระบบ เลือกระดับชั้น ห้องเรียน กรอกชื่อวิชาที่สอน และจำนวนคาบเรียน
+                        </div>
                     </div>
-                    <div class="bg-white/40 p-4 rounded-2xl border border-white flex gap-4 shadow-sm">
-                        <div class="w-7 h-7 rounded-full bg-info text-white flex items-center justify-center text-[12px] font-black shrink-0 text-center">2</div>
-                        <p class="text-[13px] font-bold text-accent"><b>บันทึก:</b> เช็คยอดมาเรียน หรือกดปุ่มพฤติกรรมเพื่อหักคะแนนหากนักเรียนสายหรือผิดระเบียบ</p>
+                    <div class="bg-white/40 p-4 rounded-2xl border border-white flex gap-4 shadow-sm items-start">
+                        <div class="w-7 h-7 rounded-full bg-info text-white flex items-center justify-center text-[12px] font-black shrink-0 text-center mt-0.5">2</div>
+                        <div class="text-[13px] text-accent leading-relaxed">
+                            <b class="font-black">บันทึกการมาเรียน:</b><br> 
+                            กดเลือกสถานะ <span class="text-emerald-600 font-bold">มา</span>, <span class="text-sky-600 font-bold">ลา</span>, หรือ <span class="text-red-600 font-bold">ขาด</span> ให้กับนักเรียนแต่ละคน (ค่าเริ่มต้นคือไม่ได้เลือก)
+                        </div>
                     </div>
-                    <div class="bg-white/40 p-4 rounded-2xl border border-white flex gap-4 shadow-sm">
-                        <div class="w-7 h-7 rounded-full bg-peach text-white flex items-center justify-center text-[12px] font-black shrink-0 text-center">3</div>
-                        <p class="text-[13px] font-bold text-accent"><b>สลิปผล:</b> เลื่อนลงล่างสุดเพื่อกดปุ่มบันทึกรูปภาพรายงานที่สวยงามเป็นระเบียบ</p>
+                    <div class="bg-white/40 p-4 rounded-2xl border border-white flex gap-4 shadow-sm items-start">
+                        <div class="w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center text-[12px] font-black shrink-0 text-center mt-0.5">3</div>
+                        <div class="text-[13px] text-accent leading-relaxed">
+                            <b class="font-black">บันทึกพฤติกรรม (ถ้ามี):</b><br> 
+                            กดปุ่ม <b>"พฤติกรรม"</b> ที่มุมขวาบน เลือกรายชื่อเด็กที่ผิดระเบียบ และระบุฐานความผิด <i>(กรณีโดดเรียน สามารถระบุจำนวนคาบเพื่อหักคะแนนทวีคูณได้)</i>
+                        </div>
+                    </div>
+                    <div class="bg-white/40 p-4 rounded-2xl border border-white flex gap-4 shadow-sm items-start">
+                        <div class="w-7 h-7 rounded-full bg-peach text-white flex items-center justify-center text-[12px] font-black shrink-0 text-center mt-0.5">4</div>
+                        <div class="text-[13px] text-accent leading-relaxed">
+                            <b class="font-black">ตรวจสอบและบันทึกสลิป:</b><br> 
+                            เลื่อนลงด้านล่างสุด กดปุ่มเพื่อดูใบสรุปผล ระบบจะประมวลผลเป็นรูปภาพที่สวยงาม ให้กด <b>"บันทึกสลิปลงมือถือ"</b> เพื่อนำไปส่งงานต่อได้ทันที
+                        </div>
+                    </div>
+                </section>
+
+                <section class="space-y-3">
+                    <h4 class="text-xs font-black text-primaryDark uppercase tracking-widest mb-2 flex items-center gap-2 text-left mt-2">
+                        <i class="fa-solid fa-scale-balanced text-primary text-[10px]"></i> เกณฑ์การตัดคะแนนพฤติกรรม
+                    </h4>
+                    <div class="bg-red-50/60 p-5 rounded-2xl border border-red-100 shadow-sm">
+                        <div class="grid grid-cols-2 gap-x-2 gap-y-3 text-[12.5px] text-accent font-medium">
+                            <div class="flex justify-between border-b border-red-100/50 pb-1"><span>แต่งกายไม่สุภาพ</span> <span class="font-black text-red-600">-1</span></div>
+                            <div class="flex justify-between border-b border-red-100/50 pb-1"><span>เข้าเรียนสาย</span> <span class="font-black text-red-600">-1</span></div>
+                            <div class="flex justify-between border-b border-red-100/50 pb-1"><span>แต่งหน้า</span> <span class="font-black text-red-600">-2</span></div>
+                            <div class="flex justify-between border-b border-red-100/50 pb-1"><span>ไม่ส่งงาน</span> <span class="font-black text-red-600">-2</span></div>
+                            <div class="flex justify-between border-b border-red-100/50 pb-1"><span>ไม่มีอุปกรณ์ฯ</span> <span class="font-black text-red-600">-2</span></div>
+                            <div class="flex justify-between border-b border-red-100/50 pb-1"><span>กินในห้อง</span> <span class="font-black text-red-600">-2</span></div>
+                            <div class="flex justify-between border-b border-red-100/50 pb-1"><span>หลับในห้อง</span> <span class="font-black text-red-600">-2</span></div>
+                            <div class="flex justify-between border-b border-red-100/50 pb-1"><span>พูดจาไม่สุภาพ</span> <span class="font-black text-red-600">-5</span></div>
+                            <div class="flex justify-between col-span-2 border-b border-red-100/50 pb-1"><span>โดดเรียน</span> <span class="font-black text-red-600">-5 / คาบ</span></div>
+                            <div class="flex justify-between col-span-2 border-b border-red-100/50 pb-1"><span>แสดงกิริยาก้าวร้าว</span> <span class="font-black text-red-600">-30</span></div>
+                            <div class="flex justify-between col-span-2 pt-1">
+                                <span class="text-orange-800"><b>อื่นๆ</b> (คุณครูสามารถพิมพ์ระบุความผิดและกำหนดคะแนนที่ต้องการหักได้ด้วยตนเอง)</span>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -653,7 +692,7 @@
             const c = document.getElementById('behavior-student-list'); c.innerHTML = '';
             if (!State.behavior[key]) State.behavior[key] = {};
             students.forEach((st, idx) => {
-                if (!State.behavior[key][st.id]) State.behavior[key][st.id] = { tags: [], other: "", otherScore: "" };
+                if (!State.behavior[key][st.id]) State.behavior[key][st.id] = { tags: [], other: "", otherScore: "", skipPeriods: "1" };
                 const cur = State.behavior[key][st.id];
                 const item = document.createElement('div');
                 item.className = `glass-panel ${CONFIG.PASTEL_THEMES[(idx + 2) % 4]} p-4 rounded-[24px] border border-orange-100 shadow-sm fade-in`;
@@ -664,12 +703,22 @@
                 let html = `<div class="flex gap-4 mb-3 border-b border-orange-50 pb-2 items-center"><div class="w-8 h-8 bg-orange-50 text-primary font-black rounded-full flex items-center justify-center shrink-0 text-xs">${st.id}</div><span class="font-light text-accent text-[17px]">${st.name}</span></div>`;
                 if(tagsHtml) html += `<div class="flex flex-wrap gap-1.5 mb-2">${tagsHtml}</div>`;
                 html += `<select class="warm-field !py-2.5 !text-sm behavior-select !rounded-xl cursor-pointer font-extrabold text-accent/40" data-id="${st.id}"><option value="" disabled selected>+ ระบุพฤติกรรม</option>`;
-                Object.keys(CONFIG.BEHAVIORS).forEach(b => html += `<option value="${b}">${b} (-${CONFIG.BEHAVIORS[b]})</option>`);
+                
+                Object.keys(CONFIG.BEHAVIORS).forEach(b => {
+                    let desc = `(-${CONFIG.BEHAVIORS[b]})`;
+                    if (b === 'โดดเรียน') desc = '(-5/คาบ)';
+                    if (b === 'อื่นๆ') desc = '';
+                    html += `<option value="${b}">${b} ${desc}</option>`;
+                });
+                
                 html += `</select>`;
                 let showO = cur.tags.includes('อื่นๆ') ? 'flex' : 'hidden';
+                let showSkip = cur.tags.includes('โดดเรียน') ? 'flex' : 'hidden';
                 html += `<div class="${showO} mt-2 gap-2 animate-fade-in"><input type="text" class="warm-field !py-2.5 flex-[3] text-sm behavior-other-input" placeholder="ระบุเหตุผล..." data-id="${st.id}" value="${cur.other}"><input type="number" class="warm-field !py-2.5 flex-[1.5] text-sm text-center text-red-600 font-black behavior-other-score-input" placeholder="คะแนน" data-id="${st.id}" value="${cur.otherScore}"></div>`;
+                html += `<div class="${showSkip} mt-2 gap-2 animate-fade-in items-center"><input type="number" min="1" class="warm-field !py-2.5 flex-[1] text-sm text-center text-red-600 font-black behavior-skip-input" placeholder="คาบ" data-id="${st.id}" value="${cur.skipPeriods || 1}"><span class="text-[13px] font-bold text-accent/70 w-full flex-[2]">คาบ (หัก 5 คะแนน/คาบ)</span></div>`;
                 item.innerHTML = html;
                 c.appendChild(item);
+                
                 item.querySelector('.behavior-select').onchange = function() {
                     if(this.value && !State.behavior[key][st.id].tags.includes(this.value)) { State.behavior[key][st.id].tags.push(this.value); renderBehaviorList(); }
                 };
@@ -677,10 +726,13 @@
                     const tag = this.getAttribute('data-tag');
                     State.behavior[key][st.id].tags = State.behavior[key][st.id].tags.filter(t => t !== tag);
                     if(tag === 'อื่นๆ') { State.behavior[key][st.id].other = ""; State.behavior[key][st.id].otherScore = ""; }
+                    if(tag === 'โดดเรียน') { State.behavior[key][st.id].skipPeriods = "1"; }
                     renderBehaviorList();
                 });
+                
                 const oIn = item.querySelector('.behavior-other-input'); if(oIn) oIn.oninput = function() { State.behavior[key][st.id].other = this.value.trim(); };
                 const sIn = item.querySelector('.behavior-other-score-input'); if(sIn) sIn.oninput = function() { State.behavior[key][st.id].otherScore = this.value; };
+                const skipIn = item.querySelector('.behavior-skip-input'); if(skipIn) skipIn.oninput = function() { State.behavior[key][st.id].skipPeriods = this.value; };
             });
         }
 
@@ -723,8 +775,16 @@
                 if(d && d.tags.length > 0) {
                     count++; let pts = 0, issues = [];
                     d.tags.forEach(t => {
-                        if(t === 'อื่นๆ') { let s = parseInt(d.otherScore)||0; pts += s; issues.push(`${d.other||"อื่นๆ"} (-${s})`); }
-                        else { pts += CONFIG.BEHAVIORS[t]; issues.push(`${t} (-${CONFIG.BEHAVIORS[t]})`); }
+                        if(t === 'อื่นๆ') { 
+                            let s = parseInt(d.otherScore)||0; pts += s; issues.push(`${d.other||"อื่นๆ"} (-${s})`); 
+                        } else if (t === 'โดดเรียน') {
+                            let periods = parseInt(d.skipPeriods) || 1;
+                            let s = periods * 5;
+                            pts += s;
+                            issues.push(`โดดเรียน ${periods} คาบ (-${s})`);
+                        } else { 
+                            pts += CONFIG.BEHAVIORS[t]; issues.push(`${t} (-${CONFIG.BEHAVIORS[t]})`); 
+                        }
                     });
                     // ย่อขนาดระยะห่างบรรทัดให้กระชับที่สุด
                     html += `<div class="bg-white border-l-[4px] border-red-500 p-3 rounded-[16px] shadow-sm mb-2"><div class="flex justify-between items-start mb-0.5"><div class="font-light text-accent text-[15px] tracking-tight">${count}. ${st.name} <span class="text-accent/30 font-bold ml-1 text-[10px]">(เลขที่ ${st.id})</span></div><div class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded-lg shadow-sm uppercase">หัก ${pts} คะแนน</div></div><div class="text-[11px] font-bold text-red-600/80 flex items-center gap-1.5 pl-1 leading-tight"><i class="fa-solid fa-triangle-exclamation text-[8px]"></i> ${issues.join(' • ')}</div></div>`;
