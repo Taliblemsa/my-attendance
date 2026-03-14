@@ -395,14 +395,17 @@
 
                     <!-- ส่วนที่ซ่อนอยู่ (วิธีใช้ & เปลี่ยนพื้นหลัง) เป็นแบบ Accordion Panel -->
                     <div id="more-options-panel" class="hidden flex-col gap-3 bg-white/50 p-5 rounded-[24px] border border-white shadow-inner fade-in">
-                        <div class="grid grid-cols-2 gap-3">
-                            <button onclick="openGuideModal()" class="btn-press w-full bg-white/90 text-accent font-black py-4 rounded-[16px] shadow-sm flex flex-col items-center justify-center gap-2 text-[13px] border border-white/50">
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="openGuideModal()" class="btn-press w-full bg-white/90 text-accent font-black py-4 rounded-[16px] shadow-sm flex flex-col items-center justify-center gap-2 text-[12px] border border-white/50">
                                 <span class="text-2xl mb-0.5">📖</span> วิธีใช้
                             </button>
-                            <label for="bg-upload" class="btn-press w-full bg-white/90 text-accent font-black py-4 rounded-[16px] shadow-sm flex flex-col items-center justify-center gap-2 text-[13px] cursor-pointer mb-0 border border-white/50">
+                            <label for="bg-upload" class="btn-press w-full bg-white/90 text-accent font-black py-4 rounded-[16px] shadow-sm flex flex-col items-center justify-center gap-2 text-[12px] cursor-pointer mb-0 border border-white/50">
                                 <span class="text-2xl mb-0.5">🎨</span> เปลี่ยนรูป
                             </label>
                             <input type="file" id="bg-upload" accept="image/*" class="hidden">
+                            <button onclick="setupAPIKey()" class="btn-press w-full bg-white/90 text-accent font-black py-4 rounded-[16px] shadow-sm flex flex-col items-center justify-center gap-2 text-[12px] border border-white/50">
+                                <span class="text-2xl mb-0.5">🔑</span> ตั้งค่า AI
+                            </button>
                         </div>
                         <button onclick="resetBackground()" id="btn-reset-bg" class="hidden flex items-center justify-center gap-2 text-[13px] font-bold text-red-600/80 bg-red-50/90 py-3 rounded-[14px] border border-red-100 mt-1 active:scale-95 transition-all">
                             🔄 คืนค่าพื้นหลังเริ่มต้น
@@ -718,6 +721,22 @@
             }
             reader.readAsDataURL(file);
         });
+
+        // ====== ฟังก์ชันตั้งค่า API Key สำหรับนำไปใช้ภายนอก ======
+        function setupAPIKey() {
+            const currentKey = localStorage.getItem('s_gemini_api_key') || '';
+            const newKey = prompt("🔑 ตั้งค่า Gemini API Key สำหรับอาบัง AI\n\nระบบนี้ต้องการ API Key เพื่อทำงานเมื่อเปิดใช้งานนอกระบบทดสอบ คุณครูสามารถสมัครรับฟรีได้ที่เว็บ aistudio.google.com\n\nกรุณาวาง API Key ของคุณด้านล่างนี้:", currentKey);
+            
+            if (newKey !== null) {
+                if (newKey.trim() === '') {
+                    localStorage.removeItem('s_gemini_api_key');
+                    alert("ล้างค่า API Key แล้วครับ");
+                } else {
+                    localStorage.setItem('s_gemini_api_key', newKey.trim());
+                    alert("บันทึก API Key เรียบร้อยแล้ว! อาบัง AI พร้อมทำงานครับ 👳🏽‍♂️✨");
+                }
+            }
+        }
 
         // ====== ฟังก์ชันโหลดข้อมูลนักเรียนจาก Google Sheets ======
         async function fetchStudentData() {
@@ -1052,12 +1071,26 @@
                 promptText = `สร้างปัญหาเชาว์ 1 ข้อ พร้อมเฉลยแบบกวนๆ น่ารักๆ เพื่อใช้ถามนักเรียนในคาบวิชา "${subject}" โยงกับวิชานี้หรือชีวิตมุสลิมนิดๆ (รูปแบบ: 🧠 คำถาม: [คำถาม] \n\n เฉลย: [เฉลย])`;
             }
 
+            // ตรวจสอบ API Key (ทั้งจากระบบและที่ครูตั้งค่าไว้)
+            const customApiKey = localStorage.getItem('s_gemini_api_key');
+            const activeApiKey = apiKey || customApiKey || "";
+            
+            // เลือกรุ่นของ AI (หากมีคีย์ส่วนตัว ให้ใช้รุ่นปกติ เพื่อให้รองรับคีย์สาธารณะ)
+            const aiModel = customApiKey ? "gemini-2.5-flash" : "gemini-2.5-flash-preview-09-2025";
+
             // เชื่อมต่อ Gemini API
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${aiModel}:generateContent?key=${activeApiKey}`;
             const payload = {
                 contents: [{ parts: [{ text: promptText }] }],
                 systemInstruction: { parts: [{ text: "คุณคือ 'อาบัง AI' ผู้ช่วยอารมณ์ดีสำหรับคุณครูโรงเรียนอิสลาม มีบุคลิกเป็นอาบังใจดี มีมุกตลกน่ารักๆ ตอบสั้นๆ กระชับ โดนใจ ไม่ใช้คำหยาบคาย ใช้ภาษาไทยเป็นหลัก" }] }
             };
+
+            if (!activeApiKey) {
+                outputEl.innerText = `⚠️ ยังไม่ได้ตั้งค่า API Key ครับ\nกรุณากดปุ่ม "เรียนรู้เพิ่มเติม" หน้าแรก แล้วเลือก "ตั้งค่า AI" เพื่อใส่รหัสเชื่อมต่อก่อนใช้งานนะครับ`;
+                outputEl.className = "text-[14px] text-red-600 font-bold leading-relaxed text-center relative z-10 whitespace-pre-line transition-opacity duration-300";
+                outputEl.style.opacity = 1;
+                return;
+            }
 
             let resultText = "เกิดข้อผิดพลาดในการคิดคำตอบ กรุณาลองใหม่ครับ 😅";
             let delay = 1000;
