@@ -336,4 +336,630 @@
                 <p class="text-[14px] text-orange-900/50 mb-10 font-bold text-center" id="loading-desc">จัดสมุดเรียกชื่อและข้อมูลนักเรียน</p>
                 
                 <div id="action-buttons-container" class="hidden flex-col gap-4">
-                    <button id="btn-start" class="btn-press w-full bg-gradient-to-r from-prim
+                    <button id="btn-start" class="btn-press w-full bg-gradient-to-r from-primary to-peach text-white font-black text-xl py-5 rounded-[24px] shadow-2xl shadow-orange-500/30 flex items-center justify-center gap-3">
+                        🔐 เข้าสู่ระบบ
+                    </button>
+                    
+                    <!-- ปุ่มเรียนรู้เพิ่มเติม -->
+                    <button onclick="toggleMoreOptions()" class="btn-press w-full bg-white/70 text-accent font-black py-4 rounded-[24px] border-2 border-white flex items-center justify-center gap-2 text-[16px]">
+                        ✨ เรียนรู้เพิ่มเติม
+                    </button>
+
+                    <!-- ส่วนที่ซ่อนอยู่ (วิธีใช้ & เปลี่ยนพื้นหลัง) เป็นแบบ Accordion Panel -->
+                    <div id="more-options-panel" class="hidden flex-col gap-3 bg-white/50 p-5 rounded-[24px] border border-white shadow-inner fade-in">
+                        <div class="grid grid-cols-2 gap-3">
+                            <button onclick="openGuideModal()" class="btn-press w-full bg-white/90 text-accent font-black py-4 rounded-[16px] shadow-sm flex flex-col items-center justify-center gap-2 text-[13px] border border-white/50">
+                                <span class="text-2xl mb-0.5">📖</span> วิธีใช้
+                            </button>
+                            <label for="bg-upload" class="btn-press w-full bg-white/90 text-accent font-black py-4 rounded-[16px] shadow-sm flex flex-col items-center justify-center gap-2 text-[13px] cursor-pointer mb-0 border border-white/50">
+                                <span class="text-2xl mb-0.5">🎨</span> เปลี่ยนรูป
+                            </label>
+                            <input type="file" id="bg-upload" accept="image/*" class="hidden">
+                        </div>
+                        <button onclick="resetBackground()" id="btn-reset-bg" class="hidden flex items-center justify-center gap-2 text-[13px] font-bold text-red-600/80 bg-red-50/90 py-3 rounded-[14px] border border-red-100 mt-1 active:scale-95 transition-all">
+                            🔄 คืนค่าพื้นหลังเริ่มต้น
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="system-error-msg" class="hidden text-red-600 text-[14px] mt-6 font-black bg-red-50/50 p-5 rounded-2xl border border-red-100/50 text-left">
+                    <div class="flex items-center gap-2 mb-2 text-red-700">
+                        <span>⚠️</span>
+                        <span>ไม่สามารถโหลดข้อมูลได้</span>
+                    </div>
+                    <div id="error-details" class="font-bold text-[12px] text-red-500/80 leading-relaxed"></div>
+                    <button onclick="window.location.reload()" class="mt-4 text-[12px] bg-white border border-red-200 px-4 py-2 rounded-lg text-red-600 font-bold">ลองใหม่อีกครั้ง</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 2: CLASS SELECTION ================= -->
+        <section id="view-class" class="hidden transition-all duration-300">
+            <div class="flex items-center mb-8 px-1">
+                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm" onclick="switchView('view-loading')">
+                    <i class="fa-solid fa-arrow-left text-lg text-center"></i>
+                </button>
+                <h2 class="text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none text-left">เลือกระดับชั้น</h2>
+            </div>
+            <div id="class-list" class="space-y-4 px-1"></div>
+        </section>
+
+        <!-- ================= VIEW 3: ROOM SELECTION ================= -->
+        <section id="view-room" class="hidden transition-all duration-300">
+            <div class="flex items-center mb-10 px-1">
+                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-class')">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <div>
+                    <p class="text-[10px] font-black text-primaryDark uppercase tracking-[4px]" id="display-selected-class">...</p>
+                    <h2 class="text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none mt-1">ห้องเรียน</h2>
+                </div>
+            </div>
+            <div id="room-list" class="grid grid-cols-2 gap-5"></div>
+        </section>
+
+        <!-- ================= VIEW 3.5: SETUP ================= -->
+        <section id="view-setup" class="hidden transition-all duration-300">
+            <div class="flex items-center mb-10 px-1">
+                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-room')">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <h2 class="text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none">ข้อมูลการสอน</h2>
+            </div>
+            <div class="glass-panel p-8 mb-10 border-white/50 shadow-lg">
+                <div class="grid grid-cols-5 gap-4 mb-6">
+                    <div class="col-span-4">
+                        <label class="text-[10px] font-black uppercase text-orange-900/40 ml-2 mb-3 block tracking-widest">📚 วิชาที่สอน</label>
+                        <input type="text" id="input-subject" class="warm-field" placeholder="รายวิชาที่สอน..." autocomplete="off">
+                    </div>
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-black uppercase text-orange-900/40 ml-1 mb-3 block tracking-widest text-center">⏱️ คาบ</label>
+                        <select id="input-period" class="warm-field px-1 text-center">
+                            <option value="1">1</option><option value="2">2</option>
+                        </select>
+                    </div>
+                </div>
+                <label class="text-[10px] font-black uppercase text-orange-900/40 ml-2 mb-3 block tracking-widest">👨‍🏫 ชื่อครูผู้สอน</label>
+                <input type="text" id="input-teacher" class="warm-field" placeholder="ครูอาณัติ เหล็มสะ" autocomplete="off">
+            </div>
+            <button onclick="proceedToAttendance()" class="btn-press w-full bg-gradient-to-r from-accent to-primaryDark text-white font-black text-xl py-5.5 rounded-[30px] shadow-2xl shadow-orange-950/20 flex items-center justify-center gap-3">
+                📝 เริ่มต้นการบันทึก
+            </button>
+        </section>
+
+        <!-- ================= VIEW 4: ATTENDANCE ================= -->
+        <section id="view-attendance" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
+            <div class="flex justify-between items-end pb-6 shrink-0 px-1">
+                <div class="flex items-center gap-3">
+                    <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-setup')">
+                        <i class="fa-solid fa-arrow-left text-lg"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-black text-accent leading-none" id="header-subject-room">ห้อง</h2>
+                        <p class="text-[12px] font-bold text-primaryDark/60 mt-1.5 uppercase tracking-widest" id="header-student-count">...</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openBehaviorView()" class="text-[11px] font-black uppercase bg-gradient-to-tr from-peachDark to-red-500 text-white px-4 py-3 rounded-xl shadow-lg shadow-orange-600/30 active:scale-95 transition flex items-center gap-1.5">
+                        <span class="text-sm">🎭</span> พฤติกรรม
+                    </button>
+                </div>
+            </div>
+            
+            <div class="overflow-y-auto pr-1 flex-1 scroll-fine pb-6">
+                <div id="student-list" class="space-y-3 mb-6"></div>
+                
+                <div class="pt-4 border-t-2 border-dashed border-orange-200">
+                    <button id="btn-view-summary" class="btn-press w-full bg-gradient-to-r from-primary to-peach text-white font-black py-5 rounded-[26px] shadow-2xl shadow-orange-500/30 text-xl flex items-center justify-center gap-3">
+                        📊 สรุปยอดมาเรียนวันนี้
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 4.5: BEHAVIOR ================= -->
+        <section id="view-behavior" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
+            <div class="flex justify-between items-end pb-6 shrink-0 px-1">
+                <div class="flex items-center gap-4">
+                    <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-attendance')">
+                        <i class="fa-solid fa-arrow-left text-lg"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-black text-accent leading-none">ความประพฤติ</h2>
+                        <p class="text-[13px] font-bold text-primaryDark/60 mt-1.5 uppercase tracking-widest" id="header-behavior-room">...</p>
+                    </div>
+                </div>
+                <div class="w-10"></div>
+            </div>
+            
+            <div class="overflow-y-auto pr-1 flex-1 scroll-fine pb-6">
+                <div id="behavior-student-list" class="space-y-3 mb-6"></div>
+                
+                <div class="pt-4 border-t-2 border-dashed border-orange-200">
+                    <button id="btn-view-behavior-summary" class="btn-press w-full bg-gradient-to-r from-accent to-red-800 text-white font-black py-5 rounded-[26px] shadow-2xl flex items-center justify-center gap-3 text-xl">
+                        📉 ดูผลการตัดคะแนน
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 5: SUMMARY SLIP (ATTENDANCE) ================= -->
+        <section id="view-summary" class="hidden transition-all duration-300 overflow-y-auto scroll-fine h-full">
+            <div class="flex items-center mb-6 px-1">
+                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-attendance')">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <h2 class="text-[30px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none">ใบสรุปผล</h2>
+            </div>
+            
+            <div id="export-canvas" class="relative shadow-xl">
+                <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-primary via-peach to-info"></div>
+                
+                <div class="text-center mb-4 pt-2">
+                    <p class="font-black text-accent text-[16px] tracking-tight mb-1 text-center">🏫 โรงเรียนสันติธรรมวิทยามูลนิธิ</p>
+                    <div class="w-16 h-1 bg-primary mx-auto rounded-full mb-3"></div>
+                    <h2 class="text-[20px] font-black text-accent leading-tight text-center">รายงานการมาเรียน</h2>
+                    <div class="text-[11px] font-black text-orange-900 bg-orange-100/60 inline-block px-5 py-1 rounded-full mt-2 border border-orange-200 shadow-sm text-center" id="export-header-date"></div>
+                </div>
+                
+                <!-- ข้อมูลการสอน จัดให้ขนาดตัวอักษรเท่ากันและกะทัดรัด (Space-saving) -->
+                <div class="bg-white rounded-[20px] p-3.5 border-2 border-orange-50 space-y-1.5 mb-4 relative overflow-hidden">
+                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">วิชาที่สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-subject-val"></span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ครูผู้สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-teacher-val"></span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ชั้นเรียน</span><span class="font-bold text-accent text-[14px] text-right" id="export-room-only"></span></div>
+                </div>
+
+                <!-- สถิติ มา ลา ขาด อยู่บรรทัดเดียวกันกับข้อความ (Inline compact) -->
+                <div class="grid grid-cols-3 gap-2 mb-4 font-black">
+                    <div class="bg-emerald-50/80 text-emerald-700 py-2.5 rounded-[16px] border border-emerald-100 shadow-sm flex items-center justify-center gap-1.5">
+                        <span class="text-[14px]">มา 🟢</span><span id="export-count-มา" class="text-[14px]">0</span>
+                    </div>
+                    <div class="bg-sky-50/80 text-sky-700 py-2.5 rounded-[16px] border border-sky-100 shadow-sm flex items-center justify-center gap-1.5">
+                        <span class="text-[14px]">ลา 🔵</span><span id="export-count-ลา" class="text-[14px]">0</span>
+                    </div>
+                    <div class="bg-red-50/80 text-red-700 py-2.5 rounded-[16px] border border-red-100 shadow-sm flex items-center justify-center gap-1.5">
+                        <span class="text-[14px]">ขาด 🔴</span><span id="export-count-ขาด" class="text-[14px]">0</span>
+                    </div>
+                </div>
+                
+                <div id="export-absent-list" class="space-y-2"></div>
+                
+                <div class="mt-6 pt-4 border-t-2 border-dashed border-orange-100 text-center">
+                    <p class="text-[10px] font-bold text-orange-800/40 uppercase tracking-[3px]">บันทึกข้อมูลเมื่อ: <span id="export-timestamp"></span></p>
+                </div>
+            </div>
+            <button id="btn-save-image" class="mt-6 mb-12 btn-press w-full bg-peach text-white font-black py-5 rounded-[26px] shadow-2xl shadow-orange-500/30 text-xl flex items-center justify-center gap-3">
+                📸 บันทึกสลิปลงมือถือ
+            </button>
+        </section>
+
+        <!-- ================= VIEW 6: BEHAVIOR SLIP ================= -->
+        <section id="view-behavior-summary" class="hidden transition-all duration-300 overflow-y-auto scroll-fine h-full">
+            <div class="flex items-center mb-6 px-1">
+                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-behavior')">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <h2 class="text-[30px] font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-900 tracking-tighter leading-none">ผลประพฤติ</h2>
+            </div>
+            <div id="export-behavior-canvas" class="relative shadow-xl">
+                <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-red-500 to-red-800"></div>
+                
+                <div class="text-center mb-4 pt-2">
+                    <p class="font-black text-accent text-[16px] tracking-tight mb-1 text-center">🏫 โรงเรียนสันติธรรมวิทยามูลนิธิ</p>
+                    <div class="w-16 h-1 bg-red-800/20 mx-auto rounded-full mb-3"></div>
+                    <h2 class="text-[20px] font-black text-red-600 leading-tight text-center">รายงานพฤติกรรม</h2>
+                    <div class="text-[11px] font-black text-red-900 bg-red-50 inline-block px-5 py-1 rounded-full mt-2 border border-red-100 shadow-sm text-center" id="export-behavior-header-date"></div>
+                </div>
+
+                <!-- ข้อมูลการสอน จัดให้ขนาดตัวอักษรเท่ากันและกะทัดรัด (Space-saving) -->
+                <div class="bg-red-50/20 rounded-[20px] p-3.5 border-2 border-red-100 space-y-1.5 mb-4 relative overflow-hidden">
+                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">วิชาที่สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-behavior-subject-val"></span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ครูผู้สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-behavior-teacher-val"></span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ชั้นเรียน</span><span class="font-bold text-accent text-[14px] text-right" id="export-behavior-room-only"></span></div>
+                </div>
+                
+                <div id="export-behavior-list" class="space-y-1.5"></div>
+                
+                <div class="mt-6 pt-4 border-t-2 border-dashed border-red-100 text-center">
+                    <p class="text-[10px] font-bold text-red-800/40 uppercase tracking-[3px]">บันทึกข้อมูลเมื่อ: <span id="export-behavior-timestamp"></span></p>
+                </div>
+            </div>
+            <button id="btn-save-behavior-image" class="mt-6 mb-12 btn-press w-full bg-accent text-white font-black py-5 rounded-[26px] shadow-2xl text-xl flex items-center justify-center gap-3">
+                🚨 บันทึกรายงานพฤติกรรม
+            </button>
+        </section>
+    </main>
+
+    <!-- ================= SYSTEM JAVASCRIPT ================= -->
+    <script>
+        const CONFIG = {
+            TEACHER_NAME: "ครูอาณัติ เหล็มสะ",
+            SHEET_ID: "1mPl20ilAZAJmgfktHVPIDxZWSWQKNK7Y1_wJxAIMeBY", 
+            API_KEY: "AIzaSyBEIDAElc5HiX9sX6Ldwx__ll55DZJj85s", 
+            RANGE: "A:D", 
+            CLASSES: {
+                "ชั้น ม.1": ["1/1", "1/2", "1/3", "1/4"],
+                "ชั้น ม.2": ["2/1", "2/2", "2/3", "2/4"],
+                "ชั้น ม.3": ["3/1", "3/2", "3/3", "3/4"],
+                "ชั้น ม.4": ["4/1", "4/2", "4/3"],
+                "ชั้น ม.5": ["5/1", "5/2", "5/3"],
+                "ชั้น ม.6": ["6/1", "6/2", "6/3"]
+            },
+            STATUSES: ["มา", "ลา", "ขาด"],
+            BEHAVIORS: {
+                "แต่งกายไม่สุภาพ": 1, "เข้าเรียนสาย": 1, "โดดเรียน": 5, "แต่งหน้า": 2, "ไม่ส่งงาน": 2, 
+                "ไม่มีอุปกรณ์การเรียน": 2, "กินในห้อง": 2, "หลับในห้อง": 2, "พูดจาไม่สุภาพ": 5, 
+                "แสดงกิริยาก้าวร้าว": 30, "อื่นๆ": 0
+            },
+            PASTEL_THEMES: ['glass-peach', 'glass-blue', 'glass-green', 'glass-purple']
+        };
+
+        const State = {
+            allStudents: [], attendance: {}, behavior: {},
+            currentClass: "", currentRoom: "", subjectName: "", teacherName: "", periodCount: "1"
+        };
+
+        function initPWA() {
+            const manifest = {
+                "name": "เช็คชื่อ ส.ธ.", "short_name": "เช็คชื่อ",
+                "start_url": location.href, "display": "standalone",
+                "background_color": "#fffcf9", "theme_color": "#f59e0b",
+                "icons": [{ "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iI2Y1OWUwYiIgcng9IjExMiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTIlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjIyMCIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSdTYXJhYnVuJyBmb250LXdlaWdodD0nYm9sZCc+U1QuPC90ZXh0Pjwvc3ZnPg==", "sizes": "512x512", "type": "image/svg+xml", "purpose": "any maskable" }]
+            };
+            document.getElementById('dynamic-manifest').setAttribute('href', URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/json'})));
+        }
+
+        // ====== ฟังก์ชันจัดการรูปภาพพื้นหลัง ======
+        function initBackground() {
+            const customBg = localStorage.getItem('s_custom_bg');
+            if (customBg) {
+                document.body.style.backgroundImage = `url(${customBg})`;
+                const btnReset = document.getElementById('btn-reset-bg');
+                if (btnReset) btnReset.classList.remove('hidden');
+            } else {
+                document.body.style.backgroundImage = "url('https://i.postimg.cc/hjXtYRzp/cdd20-creativity-4913133-1920.jpg')";
+                const btnReset = document.getElementById('btn-reset-bg');
+                if (btnReset) btnReset.classList.add('hidden');
+            }
+        }
+
+        function resetBackground() {
+            localStorage.removeItem('s_custom_bg');
+            initBackground();
+        }
+
+        document.getElementById('bg-upload')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const MAX_WIDTH = 1200;
+                    const MAX_HEIGHT = 1200;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                    } else {
+                        if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+                    try {
+                        localStorage.setItem('s_custom_bg', dataUrl);
+                        initBackground();
+                    } catch (err) {
+                        alert('รูปภาพมีขนาดใหญ่เกินไป ไม่สามารถบันทึกลงเครื่องได้ กรุณาเลือกรูปภาพที่มีขนาดเล็กลงครับ');
+                    }
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+        });
+
+        // ====== ฟังก์ชันโหลดข้อมูลนักเรียนจาก Google Sheets ======
+        async function fetchStudentData() {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${CONFIG.RANGE}?key=${CONFIG.API_KEY}`;
+            const errorContainer = document.getElementById('system-error-msg');
+            const errorDetails = document.getElementById('error-details');
+            const loadingSpinner = document.getElementById('loading-spinner');
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("เชื่อมต่อ Google ไม่สำเร็จ");
+                const data = await res.json();
+                if (data.values && data.values.length > 0) {
+                    State.allStudents = data.values.map(r => ({ id: parseInt(r[0]), num: r[1], name: r[2], room: r[3] })).filter(s => !isNaN(s.id) && s.name && s.room);
+                    if (loadingSpinner) loadingSpinner.innerHTML = '<div class="text-[70px] mb-2 animate-bounce drop-shadow-md">🎉</div>';
+                    const loadingTitle = document.getElementById('loading-title');
+                    if (loadingTitle) loadingTitle.innerText = "ห้องเรียนพร้อมแล้ว! ✨";
+                    const loadingDesc = document.getElementById('loading-desc');
+                    if (loadingDesc) loadingDesc.innerText = `รายชื่อนักเรียนรอคุณครูอยู่ ${State.allStudents.length} คนครับ`;
+                    const actionContainer = document.getElementById('action-buttons-container');
+                    if (actionContainer) {
+                        actionContainer.classList.remove('hidden');
+                        actionContainer.classList.add('flex');
+                    }
+                } else throw new Error("ไฟล์ว่างเปล่า");
+            } catch (err) {
+                if (loadingSpinner) loadingSpinner.innerHTML = '<div class="text-[70px] mb-2 drop-shadow-md">⚠️</div>';
+                if (errorContainer) errorContainer.classList.remove('hidden');
+                if (errorDetails) errorDetails.innerText = err.message;
+            }
+        }
+
+        // ====== ระบบควบคุมการเปลี่ยนหน้าจอ (Navigation) ======
+        function switchView(viewId) {
+            ['view-loading', 'view-class', 'view-room', 'view-setup', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (id === viewId) { 
+                        el.classList.remove('hidden'); 
+                        setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; }, 10); 
+                    } else { 
+                        el.classList.add('hidden'); 
+                        el.style.opacity = '0'; 
+                        el.style.transform = 'translateY(25px)'; 
+                    }
+                }
+            });
+            if(viewId === 'view-class') renderClasses();
+        }
+
+        function renderClasses() {
+            const c = document.getElementById('class-list'); 
+            if (!c) return;
+            c.innerHTML = '';
+            Object.keys(CONFIG.CLASSES).forEach((lvl, idx) => {
+                const b = document.createElement('button');
+                b.className = `w-full glass-panel ${CONFIG.PASTEL_THEMES[idx % 4]} py-5 px-6 flex items-center justify-between transition-all active:scale-95 shadow-sm mb-2`;
+                b.innerHTML = `<div class="flex items-center gap-5"><div class="text-[28px] drop-shadow-sm">📂</div><span class="text-xl font-black text-accent tracking-tighter">${lvl}</span></div><i class="fa-solid fa-chevron-right text-orange-200"></i>`;
+                b.onclick = () => { State.currentClass = lvl; renderRooms(lvl); switchView('view-room'); };
+                c.appendChild(b);
+            });
+        }
+
+        function renderRooms(lvl) {
+            const displaySelectedClass = document.getElementById('display-selected-class');
+            if (displaySelectedClass) displaySelectedClass.innerText = lvl;
+            const r = document.getElementById('room-list'); 
+            if (!r) return;
+            r.innerHTML = '';
+            CONFIG.CLASSES[lvl].forEach((rm, idx) => {
+                const b = document.createElement('button');
+                const count = State.allStudents.filter(s => s.room === rm).length;
+                b.className = `glass-panel ${CONFIG.PASTEL_THEMES[(idx+1)%4]} py-8 rounded-[32px] flex flex-col items-center justify-center btn-press shadow-sm text-center`;
+                b.innerHTML = `<div class="text-[32px] font-black text-accent leading-none text-center">${rm}</div><div class="text-[12px] font-black text-primaryDark/60 mt-2 tracking-wide">${count} คน</div>`;
+                b.onclick = () => { State.currentRoom = rm; openSetupView(); };
+                r.appendChild(b);
+            });
+        }
+
+        function openSetupView() {
+            const inputSubj = document.getElementById('input-subject');
+            if (inputSubj) inputSubj.value = localStorage.getItem('s_subj') || "";
+            const inputTeacher = document.getElementById('input-teacher');
+            if (inputTeacher) inputTeacher.value = localStorage.getItem('s_teach') || CONFIG.TEACHER_NAME;
+            const inputPeriod = document.getElementById('input-period');
+            if (inputPeriod) inputPeriod.value = localStorage.getItem('s_peri') || "1";
+            switchView('view-setup');
+        }
+
+        function proceedToAttendance() {
+            const s = document.getElementById('input-subject')?.value.trim();
+            const t = document.getElementById('input-teacher')?.value.trim();
+            const p = document.getElementById('input-period')?.value;
+            if(!s || !t) return;
+            localStorage.setItem('s_subj', s); localStorage.setItem('s_teach', t); localStorage.setItem('s_peri', p);
+            State.subjectName = s; State.teacherName = t; State.periodCount = p;
+            renderAttendanceList(); switchView('view-attendance');
+        }
+
+        function openBehaviorView() { renderBehaviorList(); switchView('view-behavior'); }
+
+        // ====== ระบบเรนเดอร์รายชื่อนักเรียน ======
+        function renderAttendanceList() {
+            const key = `${State.currentClass}-${State.currentRoom}`;
+            const headerSubject = document.getElementById('header-subject-room');
+            if (headerSubject) headerSubject.innerText = `ม.${State.currentRoom}`;
+            const students = State.allStudents.filter(s => s.room === State.currentRoom).sort((a,b) => a.id - b.id);
+            const headerStudent = document.getElementById('header-student-count');
+            if (headerStudent) headerStudent.innerText = `${students.length} คนในห้องนี้`;
+            const c = document.getElementById('student-list'); 
+            if (!c) return;
+            c.innerHTML = '';
+            if (!State.attendance[key]) State.attendance[key] = {};
+            students.forEach((st, idx) => {
+                const cur = State.attendance[key][st.id];
+                const item = document.createElement('div');
+                item.className = `glass-panel ${CONFIG.PASTEL_THEMES[idx % 4]} p-4 rounded-[24px] border border-orange-100 shadow-sm fade-in`;
+                let html = `<div class="flex items-center gap-4 mb-3"><div class="w-9 h-9 rounded-2xl bg-orange-50 text-primary font-black text-sm flex items-center justify-center shrink-0 border border-orange-100">${st.id}</div><span class="font-light text-accent text-[18px] leading-none tracking-tight">${st.name}</span></div><div class="status-container">`;
+                CONFIG.STATUSES.forEach(stat => {
+                    const act = cur === stat ? 'active' : '';
+                    html += `<button class="status-tab ${act}" data-id="${st.id}" data-status="${stat}">${stat}</button>`;
+                });
+                item.innerHTML = html + `</div>`;
+                c.appendChild(item);
+                item.querySelectorAll('.status-tab').forEach(btn => {
+                    btn.onclick = function() {
+                        item.querySelectorAll('.status-tab').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        State.attendance[key][st.id] = this.getAttribute('data-status');
+                    };
+                });
+            });
+        }
+
+        function renderBehaviorList() {
+            const key = `${State.currentClass}-${State.currentRoom}`;
+            const headerBeh = document.getElementById('header-behavior-room');
+            if (headerBeh) headerBeh.innerText = `ม.${State.currentRoom}`;
+            const students = State.allStudents.filter(s => s.room === State.currentRoom).sort((a,b) => a.id - b.id);
+            const c = document.getElementById('behavior-student-list'); 
+            if (!c) return;
+            c.innerHTML = '';
+            if (!State.behavior[key]) State.behavior[key] = {};
+            students.forEach((st, idx) => {
+                if (!State.behavior[key][st.id]) State.behavior[key][st.id] = { tags: [], other: "", otherScore: "", skipPeriods: "1" };
+                const cur = State.behavior[key][st.id];
+                const item = document.createElement('div');
+                item.className = `glass-panel ${CONFIG.PASTEL_THEMES[(idx + 2) % 4]} p-4 rounded-[24px] border border-orange-100 shadow-sm fade-in`;
+                let tagsHtml = cur.tags.map(tag => {
+                    return `<span class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 rounded-xl text-[11px] font-black border border-red-100">${tag} <i class="fa-solid fa-circle-xmark cursor-pointer behavior-remove-btn opacity-50" data-id="${st.id}" data-tag="${tag}"></i></span>`;
+                }).join('');
+                let html = `<div class="flex gap-4 mb-3 border-b border-orange-50 pb-2 items-center"><div class="w-8 h-8 bg-orange-50 text-primary font-black rounded-full flex items-center justify-center shrink-0 text-xs">${st.id}</div><span class="font-light text-accent text-[17px]">${st.name}</span></div>`;
+                if(tagsHtml) html += `<div class="flex flex-wrap gap-1.5 mb-2">${tagsHtml}</div>`;
+                html += `<select class="warm-field !py-2.5 !text-sm behavior-select !rounded-xl cursor-pointer font-extrabold text-accent/40" data-id="${st.id}"><option value="" disabled selected>⚠️ ระบุพฤติกรรม</option>`;
+                
+                Object.keys(CONFIG.BEHAVIORS).forEach(b => {
+                    let desc = `(-${CONFIG.BEHAVIORS[b]})`;
+                    if (b === 'โดดเรียน') desc = '(-5/คาบ)';
+                    if (b === 'อื่นๆ') desc = '';
+                    html += `<option value="${b}">${b} ${desc}</option>`;
+                });
+                
+                html += `</select>`;
+                let showO = cur.tags.includes('อื่นๆ') ? 'flex' : 'hidden';
+                let showSkip = cur.tags.includes('โดดเรียน') ? 'flex' : 'hidden';
+                html += `<div class="${showO} mt-2 gap-2 animate-fade-in"><input type="text" class="warm-field !py-2.5 flex-[3] text-sm behavior-other-input" placeholder="ระบุเหตุผล..." data-id="${st.id}" value="${cur.other}"><input type="number" class="warm-field !py-2.5 flex-[1.5] text-sm text-center text-red-600 font-black behavior-other-score-input" placeholder="คะแนน" data-id="${st.id}" value="${cur.otherScore}"></div>`;
+                html += `<div class="${showSkip} mt-2 gap-2 animate-fade-in items-center"><input type="number" min="1" class="warm-field !py-2.5 flex-[1] text-sm text-center text-red-600 font-black behavior-skip-input" placeholder="คาบ" data-id="${st.id}" value="${cur.skipPeriods || 1}"><span class="text-[13px] font-bold text-accent/70 w-full flex-[2]">คาบ (หัก 5 คะแนน/คาบ)</span></div>`;
+                item.innerHTML = html;
+                c.appendChild(item);
+                
+                item.querySelector('.behavior-select').onchange = function() {
+                    if(this.value && !State.behavior[key][st.id].tags.includes(this.value)) { State.behavior[key][st.id].tags.push(this.value); renderBehaviorList(); }
+                };
+                item.querySelectorAll('.behavior-remove-btn').forEach(btn => btn.onclick = function() {
+                    const tag = this.getAttribute('data-tag');
+                    State.behavior[key][st.id].tags = State.behavior[key][st.id].tags.filter(t => t !== tag);
+                    if(tag === 'อื่นๆ') { State.behavior[key][st.id].other = ""; State.behavior[key][st.id].otherScore = ""; }
+                    if(tag === 'โดดเรียน') { State.behavior[key][st.id].skipPeriods = "1"; }
+                    renderBehaviorList();
+                });
+                
+                const oIn = item.querySelector('.behavior-other-input'); if(oIn) oIn.oninput = function() { State.behavior[key][st.id].other = this.value.trim(); };
+                const sIn = item.querySelector('.behavior-other-score-input'); if(sIn) sIn.oninput = function() { State.behavior[key][st.id].otherScore = this.value; };
+                const skipIn = item.querySelector('.behavior-skip-input'); if(skipIn) skipIn.oninput = function() { State.behavior[key][st.id].skipPeriods = this.value; };
+            });
+        }
+
+        // ====== ฟังก์ชันคำนวณและแสดงสลิปสรุปผล ======
+        function prepareAndShowSummary() {
+            const data = State.attendance[`${State.currentClass}-${State.currentRoom}`] || {};
+            if (Object.keys(data).length === 0) return;
+            const students = State.allStudents.filter(s => s.room === State.currentRoom);
+            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('export-subject-val').innerText = `${State.subjectName} (${State.periodCount} คาบ)`;
+            document.getElementById('export-teacher-val').innerText = State.teacherName;
+            document.getElementById('export-header-date').innerText = dateStr;
+            document.getElementById('export-room-only').innerText = `ม.${State.currentRoom}`;
+            const counts = { "มา": 0, "ลา": 0, "ขาด": 0 }; const statusNames = { "ลา": [], "ขาด": [] };
+            students.forEach(st => { const s = data[st.id]; if(s) { counts[s]++; if(s !== "มา") statusNames[s].push(st.name); } });
+            CONFIG.STATUSES.forEach(s => document.getElementById(`export-count-${s}`).innerText = counts[s]);
+            let html = ''; ["ลา", "ขาด"].forEach(s => {
+                if(statusNames[s].length > 0) {
+                    let c = s === 'ลา' ? 'sky' : 'red';
+                    let icon = s === 'ลา' ? '🔵' : '🔴';
+                    html += `<div class="bg-${c}-50/50 p-3 rounded-[20px] border border-${c}-100"><div class="font-black text-${c}-700 mb-1 border-b border-${c}-100 pb-1 flex justify-between items-center text-[13px]"><span>สถานะ: ${s} ${icon}</span><span class="bg-white px-2.5 py-0.5 rounded-lg shadow-sm text-[10px] font-black">${statusNames[s].length} คน</span></div><div class="grid grid-cols-1 gap-0.5">${statusNames[s].map((n, i) => `<div class="text-[13px] font-light text-orange-900/90 pl-1"><span class="opacity-40 mr-1 text-[10px]">${i+1}.</span> ${n}</div>`).join('')}</div></div>`;
+                }
+            });
+            document.getElementById('export-absent-list').innerHTML = html || '<div class="text-center py-6 glass-panel border-emerald-100 bg-emerald-50/20"><div class="text-[40px] mb-2 animate-pulse drop-shadow-sm">🌟</div><p class="font-black text-emerald-600 text-sm">มาเรียนครบทุกคนครับ!</p></div>';
+            document.getElementById('export-timestamp').innerText = new Date().toLocaleTimeString('th-TH');
+            switchView('view-summary');
+        }
+
+        function prepareAndShowBehaviorSummary() {
+            const data = State.behavior[`${State.currentClass}-${State.currentRoom}`] || {};
+            if (!Object.values(data).some(d => d.tags.length > 0)) return;
+            const students = State.allStudents.filter(s => s.room === State.currentRoom);
+            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            document.getElementById('export-behavior-subject-val').innerText = State.subjectName;
+            document.getElementById('export-behavior-teacher-val').innerText = State.teacherName;
+            document.getElementById('export-behavior-header-date').innerText = dateStr;
+            document.getElementById('export-behavior-room-only').innerText = `ม.${State.currentRoom}`;
+            let html = '', count = 0;
+            students.forEach(st => {
+                const d = data[st.id];
+                if(d && d.tags.length > 0) {
+                    count++; let pts = 0, issues = [];
+                    d.tags.forEach(t => {
+                        if(t === 'อื่นๆ') { 
+                            let s = parseInt(d.otherScore)||0; pts += s; issues.push(`${d.other||"อื่นๆ"} (-${s})`); 
+                        } else if (t === 'โดดเรียน') {
+                            let periods = parseInt(d.skipPeriods) || 1;
+                            let s = periods * 5;
+                            pts += s;
+                            issues.push(`โดดเรียน ${periods} คาบ (-${s})`);
+                        } else { 
+                            pts += CONFIG.BEHAVIORS[t]; issues.push(`${t} (-${CONFIG.BEHAVIORS[t]})`); 
+                        }
+                    });
+                    html += `<div class="bg-white border-l-[4px] border-red-500 p-3 rounded-[16px] shadow-sm mb-2"><div class="flex justify-between items-start mb-0.5"><div class="font-light text-accent text-[15px] tracking-tight">${count}. ${st.name} <span class="text-accent/30 font-bold ml-1 text-[10px]">(เลขที่ ${st.id})</span></div><div class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded-lg shadow-sm uppercase">หัก ${pts} คะแนน</div></div><div class="text-[11px] font-bold text-red-600/80 flex items-center gap-1.5 pl-1 leading-tight">⚠️ ${issues.join(' • ')}</div></div>`;
+                }
+            });
+            document.getElementById('export-behavior-list').innerHTML = html;
+            document.getElementById('export-behavior-timestamp').innerText = new Date().toLocaleTimeString('th-TH');
+            switchView('view-behavior-summary');
+        }
+
+        // ====== ฟังก์ชันดาวน์โหลดสลิปเป็นรูปภาพ ======
+        function downloadImage(id, type) {
+            window.scrollTo(0,0);
+            setTimeout(() => {
+                const element = document.getElementById(id);
+                if (!element) return;
+                html2canvas(element, { scale: 3, backgroundColor: '#fffbf5', useCORS: true }).then(canvas => {
+                    const link = document.createElement('a');
+                    const prefix = type === 'Attendance' ? 'เช็คชื่อ' : 'พฤติกรรม';
+                    const d = new Date();
+                    const dateStr = `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getFullYear() + 543}`;
+                    const subject = State.subjectName ? State.subjectName : 'ไม่ระบุชื่อวิชา';
+                    link.download = `${prefix}วิชา${subject}_ชั้นม.${State.currentRoom}_วันที่${dateStr}.png`;
+                    link.href = canvas.toDataURL('image/png'); link.click();
+                });
+            }, 600);
+        }
+
+        // ====== Event Listeners หลักของแอป ======
+        document.addEventListener('DOMContentLoaded', () => {
+            initPWA();
+            initBackground(); 
+            const btnStart = document.getElementById('btn-start');
+            if (btnStart) btnStart.onclick = () => switchView('view-class');
+            const btnViewSum = document.getElementById('btn-view-summary');
+            if (btnViewSum) btnViewSum.onclick = prepareAndShowSummary;
+            const btnSaveImg = document.getElementById('btn-save-image');
+            if (btnSaveImg) btnSaveImg.onclick = () => downloadImage('export-canvas', 'Attendance');
+            const btnViewBeh = document.getElementById('btn-view-behavior-summary');
+            if (btnViewBeh) btnViewBeh.onclick = prepareAndShowBehaviorSummary;
+            const btnSaveBehImg = document.getElementById('btn-save-behavior-image');
+            if (btnSaveBehImg) btnSaveBehImg.onclick = () => downloadImage('export-behavior-canvas', 'Behavior');
+            fetchStudentData();
+        });
+
+        // ====== UI โหมดวิธีใช้งาน ======
+        function openGuideModal() { document.getElementById('guide-modal')?.classList.add('active'); }
+        function closeGuideModal() { document.getElementById('guide-modal')?.classList.remove('active'); }
+        
+        function toggleMoreOptions() {
+            const panel = document.getElementById('more-options-panel');
+            if (!panel) return;
+            if (panel.classList.contains('hidden')) {
+                panel.classList.remove('hidden');
+                panel.classList.add('flex');
+            } else {
+                panel.classList.add('hidden');
+                panel.classList.remove('flex');
+            }
+        }
+    </script>
+</body>
+</html>
