@@ -213,29 +213,30 @@
                     <div class="bg-white/60 p-4 rounded-2xl border border-white flex gap-4 shadow-sm items-start">
                         <div class="text-[20px] shrink-0 mt-0.5">1️⃣</div>
                         <div class="text-[13px] text-accent leading-relaxed">
-                            <b class="font-black">เลือกระดับชั้นและข้อมูลการสอน:</b><br> 
-                            รอระบบดึงข้อมูลรายชื่อจากนั้นกดเข้าสู่ระบบ เลือกระดับชั้น ห้องเรียน กรอกชื่อวิชาที่สอน และจำนวนคาบเรียน
+                            <b class="font-black">ข้อมูลการสอน:</b><br> 
+                            เลือกระดับชั้น ห้องเรียน กรอกชื่อวิชาที่สอน และจำนวนคาบเรียน จากนั้นกด <b>"เริ่มต้นการบันทึก"</b>
                         </div>
                     </div>
                     <div class="bg-white/60 p-4 rounded-2xl border border-white flex gap-4 shadow-sm items-start">
                         <div class="text-[20px] shrink-0 mt-0.5">2️⃣</div>
                         <div class="text-[13px] text-accent leading-relaxed">
-                            <b class="font-black">บันทึกการมาเรียน:</b><br> 
-                            กดเลือกสถานะ <span class="text-emerald-600 font-bold">มา</span>, <span class="text-sky-600 font-bold">ลา</span>, หรือ <span class="text-red-600 font-bold">ขาด</span> ให้กับนักเรียนแต่ละคน (ค่าเริ่มต้นคือไม่ได้เลือก)
+                            <b class="font-black">เลือกเมนูการบันทึก:</b><br> 
+                            ระบบจะแสดง 2 ตัวเลือกหลัก ให้กดเลือกระหว่าง <b>"เช็คชื่อนักเรียน"</b> หรือ <b>"รายงานพฤติกรรม"</b>
                         </div>
                     </div>
                     <div class="bg-white/60 p-4 rounded-2xl border border-white flex gap-4 shadow-sm items-start">
                         <div class="text-[20px] shrink-0 mt-0.5">3️⃣</div>
                         <div class="text-[13px] text-accent leading-relaxed">
-                            <b class="font-black">บันทึกพฤติกรรม (ถ้ามี):</b><br> 
-                            กดปุ่ม <b>"พฤติกรรม"</b> ที่มุมขวาบน เลือกรายชื่อเด็กที่ผิดระเบียบ และระบุฐานความผิด <i>(กรณีโดดเรียน สามารถระบุจำนวนคาบเพื่อหักคะแนนทวีคูณได้)</i>
+                            <b class="font-black">ดำเนินการบันทึก:</b><br> 
+                            • <b>เช็คชื่อ:</b> เลือกสถานะ <span class="text-emerald-600 font-bold">มา</span>, <span class="text-sky-600 font-bold">ลา</span>, <span class="text-red-600 font-bold">ขาด</span><br>
+                            • <b>พฤติกรรม:</b> เลือกฐานความผิด <i>(หากโดดเรียน ระบุจำนวนคาบได้)</i>
                         </div>
                     </div>
                     <div class="bg-white/60 p-4 rounded-2xl border border-white flex gap-4 shadow-sm items-start">
                         <div class="text-[20px] shrink-0 mt-0.5">4️⃣</div>
                         <div class="text-[13px] text-accent leading-relaxed">
                             <b class="font-black">ตรวจสอบและบันทึกสลิป:</b><br> 
-                            เลื่อนลงด้านล่างสุด กดปุ่มเพื่อดูใบสรุปผล ระบบจะประมวลผลเป็นรูปภาพที่สวยงาม ให้กด <b>"บันทึกสลิปลงมือถือ"</b> เพื่อนำไปส่งงานต่อได้ทันที
+                            กดปุ่ม <b>"สรุปยอด..."</b> หรือ <b>"ดูผล..."</b> ด้านล่างสุด ตรวจสอบข้อมูล แล้วกด <b>"บันทึกสลิปลงมือถือ"</b> เพื่อเซฟเป็นรูปภาพ
                         </div>
                     </div>
                 </section>
@@ -466,7 +467,6 @@
         <section id="view-attendance" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-end pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-3">
-                    <!-- แก้ไขให้ปุ่มย้อนกลับกลับไปยังหน้าเลือกรายการ -->
                     <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-action-selection')">
                         <i class="fa-solid fa-arrow-left text-lg"></i>
                     </button>
@@ -492,7 +492,6 @@
         <section id="view-behavior" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-end pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
-                    <!-- แก้ไขให้ปุ่มย้อนกลับกลับไปยังหน้าเลือกรายการ -->
                     <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-action-selection')">
                         <i class="fa-solid fa-arrow-left text-lg"></i>
                     </button>
