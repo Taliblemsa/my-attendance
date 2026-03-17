@@ -427,22 +427,53 @@
             </button>
         </section>
 
+        <!-- ================= VIEW 3.8: ACTION SELECTION (NEW) ================= -->
+        <section id="view-action-selection" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
+            <div class="flex items-center mb-8 px-1 shrink-0">
+                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-setup')">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <div>
+                    <p class="text-[11px] font-black text-primaryDark uppercase tracking-[3px]" id="selection-subtitle">...</p>
+                    <h2 class="text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none mt-1">เลือกการบันทึก</h2>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col justify-center gap-6 pb-20 px-2">
+                <!-- ปุ่มเช็คชื่อ -->
+                <button onclick="goToAttendance()" class="btn-press w-full glass-green py-10 rounded-[36px] shadow-xl flex flex-col items-center justify-center gap-4 relative overflow-hidden group border-2 border-emerald-100">
+                    <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-teal-100/50 opacity-80"></div>
+                    <div class="text-[55px] drop-shadow-md relative z-10 mb-1">📝</div>
+                    <div class="relative z-10 text-center">
+                        <h3 class="text-[26px] font-black text-emerald-800 tracking-tight mb-1">เช็คชื่อนักเรียน</h3>
+                        <p class="text-[14px] font-bold text-emerald-700/70">บันทึกการ มา ลา ขาด ประจำคาบ</p>
+                    </div>
+                </button>
+
+                <!-- ปุ่มพฤติกรรม -->
+                <button onclick="goToBehavior()" class="btn-press w-full glass-peach py-10 rounded-[36px] shadow-xl flex flex-col items-center justify-center gap-4 relative overflow-hidden group border-2 border-orange-100">
+                    <div class="absolute inset-0 bg-gradient-to-br from-orange-50/50 to-red-100/50 opacity-80"></div>
+                    <div class="text-[55px] drop-shadow-md relative z-10 mb-1">🎭</div>
+                    <div class="relative z-10 text-center">
+                        <h3 class="text-[26px] font-black text-red-800 tracking-tight mb-1">รายงานพฤติกรรม</h3>
+                        <p class="text-[14px] font-bold text-red-700/70">หักคะแนนพฤติกรรม หรือ โดดเรียน</p>
+                    </div>
+                </button>
+            </div>
+        </section>
+
         <!-- ================= VIEW 4: ATTENDANCE ================= -->
         <section id="view-attendance" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-end pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-3">
-                    <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-setup')">
+                    <!-- แก้ไขให้ปุ่มย้อนกลับกลับไปยังหน้าเลือกรายการ -->
+                    <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-action-selection')">
                         <i class="fa-solid fa-arrow-left text-lg"></i>
                     </button>
                     <div>
                         <h2 class="text-2xl font-black text-accent leading-none" id="header-subject-room">ห้อง</h2>
                         <p class="text-[12px] font-bold text-primaryDark/60 mt-1.5 uppercase tracking-widest" id="header-student-count">...</p>
                     </div>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="openBehaviorView()" class="text-[11px] font-black uppercase bg-gradient-to-tr from-peachDark to-red-500 text-white px-4 py-3 rounded-xl shadow-lg shadow-orange-600/30 active:scale-95 transition flex items-center gap-1.5">
-                        <span class="text-sm">🎭</span> พฤติกรรม
-                    </button>
                 </div>
             </div>
             
@@ -461,7 +492,8 @@
         <section id="view-behavior" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-end pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
-                    <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-attendance')">
+                    <!-- แก้ไขให้ปุ่มย้อนกลับกลับไปยังหน้าเลือกรายการ -->
+                    <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-action-selection')">
                         <i class="fa-solid fa-arrow-left text-lg"></i>
                     </button>
                     <div>
@@ -698,7 +730,8 @@
 
         // ====== ระบบควบคุมการเปลี่ยนหน้าจอ (Navigation) ======
         function switchView(viewId) {
-            ['view-loading', 'view-class', 'view-room', 'view-setup', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary'].forEach(id => {
+            // เพิ่ม 'view-action-selection' เข้าไปใน Array การจัดการหน้าจอ
+            ['view-loading', 'view-class', 'view-room', 'view-setup', 'view-action-selection', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     if (id === viewId) { 
@@ -753,6 +786,7 @@
             switchView('view-setup');
         }
 
+        // แก้ไขให้ปุ่ม "เริ่มต้นการบันทึก" นำทางไปยังหน้าเลือกรายการแทน
         function proceedToAttendance() {
             const s = document.getElementById('input-subject')?.value.trim();
             const t = document.getElementById('input-teacher')?.value.trim();
@@ -760,10 +794,24 @@
             if(!s || !t) return;
             localStorage.setItem('s_subj', s); localStorage.setItem('s_teach', t); localStorage.setItem('s_peri', p);
             State.subjectName = s; State.teacherName = t; State.periodCount = p;
-            renderAttendanceList(); switchView('view-attendance');
+            
+            // แสดงข้อมูลวิชาและห้องเรียนไว้ที่หัวข้อหน้าเลือกรายการ
+            const subtitle = document.getElementById('selection-subtitle');
+            if(subtitle) subtitle.innerText = `ม.${State.currentRoom} • ${s}`;
+            
+            switchView('view-action-selection');
         }
 
-        function openBehaviorView() { renderBehaviorList(); switchView('view-behavior'); }
+        // เพิ่มฟังก์ชันสำหรับการแยกเข้าสู่หน้าย่อย
+        function goToAttendance() {
+            renderAttendanceList();
+            switchView('view-attendance');
+        }
+
+        function goToBehavior() {
+            renderBehaviorList();
+            switchView('view-behavior');
+        }
 
         // ====== ระบบเรนเดอร์รายชื่อนักเรียน ======
         function renderAttendanceList() {
