@@ -172,11 +172,11 @@
             border: 1px solid #ffedd5;
         }
 
-        .fade-in { animation: fadeIn 0.5s ease-out; }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="flex flex-col items-center min-h-screen">
+<body class="flex flex-col items-center min-h-screen relative">
 
     <!-- Ambient Background Elements -->
     <div class="bg-sphere sphere-1"></div>
@@ -312,7 +312,7 @@
         </div>
     </div>
 
-    <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden">
+    <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden relative">
         
         <!-- ================= VIEW 1: LANDING ================= -->
         <section id="view-loading" class="transition-all duration-500 flex flex-col items-center justify-center flex-1">
@@ -375,72 +375,74 @@
         </section>
 
         <!-- ================= VIEW 2: CLASS SELECTION ================= -->
-        <section id="view-class" class="hidden transition-all duration-300">
-            <div class="flex items-center mb-8 px-1">
-                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm" onclick="switchView('view-loading')">
-                    <i class="fa-solid fa-arrow-left text-lg text-center"></i>
-                </button>
+        <section id="view-class" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden relative">
+            <button class="auto-fade-btn absolute top-0 left-1 w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-lg z-[100] transition-all duration-300 transform scale-100 opacity-100 text-center" onclick="switchView('view-loading')">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <div class="flex items-center mb-8 shrink-0 pl-[64px] pt-1">
                 <h2 class="text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none text-left">เลือกระดับชั้น</h2>
             </div>
-            <div id="class-list" class="space-y-4 px-1"></div>
+            <div id="class-list" class="space-y-4 px-1 overflow-y-auto scroll-fine flex-1 pb-6"></div>
         </section>
 
         <!-- ================= VIEW 3: ROOM SELECTION ================= -->
-        <section id="view-room" class="hidden transition-all duration-300">
-            <div class="flex items-center mb-10 px-1">
-                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-class')">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
-                </button>
+        <section id="view-room" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden relative">
+            <button class="auto-fade-btn absolute top-0 left-1 w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-lg z-[100] transition-all duration-300 transform scale-100 opacity-100 text-center" onclick="switchView('view-class')">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <div class="flex items-center mb-10 shrink-0 pl-[64px] pt-1">
                 <div>
                     <p class="text-[10px] font-black text-primaryDark uppercase tracking-[4px]" id="display-selected-class">...</p>
                     <h2 class="text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none mt-1">ห้องเรียน</h2>
                 </div>
             </div>
-            <div id="room-list" class="grid grid-cols-2 gap-5"></div>
+            <div id="room-list" class="grid grid-cols-2 gap-5 overflow-y-auto scroll-fine flex-1 pb-6 px-1"></div>
         </section>
 
         <!-- ================= VIEW 3.5: SETUP ================= -->
-        <section id="view-setup" class="hidden transition-all duration-300">
-            <div class="flex items-center mb-10 px-1">
-                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-room')">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
-                </button>
+        <section id="view-setup" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden relative">
+            <button class="auto-fade-btn absolute top-0 left-1 w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-lg z-[100] transition-all duration-300 transform scale-100 opacity-100 text-center" onclick="switchView('view-room')">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <div class="flex items-center mb-10 shrink-0 pl-[64px] pt-1">
                 <h2 class="text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none">ข้อมูลการสอน</h2>
             </div>
-            <div class="glass-panel p-8 mb-10 border-white/50 shadow-lg">
-                <div class="grid grid-cols-5 gap-4 mb-6">
-                    <div class="col-span-4">
-                        <label class="text-[10px] font-black uppercase text-orange-900/40 ml-2 mb-3 block tracking-widest">📚 วิชาที่สอน</label>
-                        <input type="text" id="input-subject" class="warm-field" placeholder="รายวิชาที่สอน..." autocomplete="off">
+            <div class="overflow-y-auto scroll-fine flex-1 pb-6 px-1">
+                <div class="glass-panel p-8 mb-10 border-white/50 shadow-lg">
+                    <div class="grid grid-cols-5 gap-4 mb-6">
+                        <div class="col-span-4">
+                            <label class="text-[10px] font-black uppercase text-orange-900/40 ml-2 mb-3 block tracking-widest">📚 วิชาที่สอน</label>
+                            <input type="text" id="input-subject" class="warm-field" placeholder="รายวิชาที่สอน..." autocomplete="off">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="text-[10px] font-black uppercase text-orange-900/40 ml-1 mb-3 block tracking-widest text-center">⏱️ คาบ</label>
+                            <select id="input-period" class="warm-field px-1 text-center">
+                                <option value="1">1</option><option value="2">2</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col-span-1">
-                        <label class="text-[10px] font-black uppercase text-orange-900/40 ml-1 mb-3 block tracking-widest text-center">⏱️ คาบ</label>
-                        <select id="input-period" class="warm-field px-1 text-center">
-                            <option value="1">1</option><option value="2">2</option>
-                        </select>
-                    </div>
+                    <label class="text-[10px] font-black uppercase text-orange-900/40 ml-2 mb-3 block tracking-widest">👨‍🏫 ชื่อครูผู้สอน</label>
+                    <input type="text" id="input-teacher" class="warm-field" placeholder="ครูอาณัติ เหล็มสะ" autocomplete="off">
                 </div>
-                <label class="text-[10px] font-black uppercase text-orange-900/40 ml-2 mb-3 block tracking-widest">👨‍🏫 ชื่อครูผู้สอน</label>
-                <input type="text" id="input-teacher" class="warm-field" placeholder="ครูอาณัติ เหล็มสะ" autocomplete="off">
+                <button onclick="proceedToAttendance()" class="btn-press w-full bg-gradient-to-r from-accent to-primaryDark text-white font-black text-xl py-5.5 rounded-[30px] shadow-2xl shadow-orange-950/20 flex items-center justify-center gap-3">
+                    📝 เริ่มต้นการบันทึก
+                </button>
             </div>
-            <button onclick="proceedToAttendance()" class="btn-press w-full bg-gradient-to-r from-accent to-primaryDark text-white font-black text-xl py-5.5 rounded-[30px] shadow-2xl shadow-orange-950/20 flex items-center justify-center gap-3">
-                📝 เริ่มต้นการบันทึก
-            </button>
         </section>
 
         <!-- ================= VIEW 3.8: ACTION SELECTION (NEW) ================= -->
-        <section id="view-action-selection" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
-            <div class="flex items-center mb-8 px-1 shrink-0">
-                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-setup')">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
-                </button>
+        <section id="view-action-selection" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden relative">
+            <button class="auto-fade-btn absolute top-0 left-1 w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-lg z-[100] transition-all duration-300 transform scale-100 opacity-100 text-center" onclick="switchView('view-setup')">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <div class="flex items-center mb-8 shrink-0 pl-[64px] pt-1">
                 <div>
                     <p class="text-[11px] font-black text-primaryDark uppercase tracking-[3px]" id="selection-subtitle">...</p>
                     <h2 class="text-[32px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none mt-1">เลือกการบันทึก</h2>
                 </div>
             </div>
 
-            <div class="flex-1 flex flex-col justify-center gap-6 pb-20 px-2">
+            <div class="flex-1 flex flex-col justify-center gap-6 pb-20 px-2 overflow-y-auto scroll-fine">
                 <!-- ปุ่มเช็คชื่อ -->
                 <button onclick="goToAttendance()" class="btn-press w-full glass-green py-10 rounded-[36px] shadow-xl flex flex-col items-center justify-center gap-4 relative overflow-hidden group border-2 border-emerald-100">
                     <div class="absolute inset-0 bg-gradient-to-br from-emerald-50/50 to-teal-100/50 opacity-80"></div>
@@ -464,16 +466,14 @@
         </section>
 
         <!-- ================= VIEW 4: ATTENDANCE ================= -->
-        <section id="view-attendance" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
-            <div class="flex justify-between items-end pb-6 shrink-0 px-1">
-                <div class="flex items-center gap-3">
-                    <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-action-selection')">
-                        <i class="fa-solid fa-arrow-left text-lg"></i>
-                    </button>
-                    <div>
-                        <h2 class="text-2xl font-black text-accent leading-none" id="header-subject-room">ห้อง</h2>
-                        <p class="text-[12px] font-bold text-primaryDark/60 mt-1.5 uppercase tracking-widest" id="header-student-count">...</p>
-                    </div>
+        <section id="view-attendance" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden relative">
+            <button class="auto-fade-btn absolute top-0 left-1 w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-lg z-[100] transition-all duration-300 transform scale-100 opacity-100 text-center" onclick="switchView('view-action-selection')">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <div class="flex justify-between items-end pb-6 shrink-0 pl-[64px] pt-1">
+                <div>
+                    <h2 class="text-2xl font-black text-accent leading-none" id="header-subject-room">ห้อง</h2>
+                    <p class="text-[12px] font-bold text-primaryDark/60 mt-1.5 uppercase tracking-widest" id="header-student-count">...</p>
                 </div>
             </div>
             
@@ -489,18 +489,15 @@
         </section>
 
         <!-- ================= VIEW 4.5: BEHAVIOR ================= -->
-        <section id="view-behavior" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
-            <div class="flex justify-between items-end pb-6 shrink-0 px-1">
-                <div class="flex items-center gap-4">
-                    <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-sm text-center" onclick="switchView('view-action-selection')">
-                        <i class="fa-solid fa-arrow-left text-lg"></i>
-                    </button>
-                    <div>
-                        <h2 class="text-2xl font-black text-accent leading-none">ความประพฤติ</h2>
-                        <p class="text-[13px] font-bold text-primaryDark/60 mt-1.5 uppercase tracking-widest" id="header-behavior-room">...</p>
-                    </div>
+        <section id="view-behavior" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden relative">
+            <button class="auto-fade-btn absolute top-0 left-1 w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-lg z-[100] transition-all duration-300 transform scale-100 opacity-100 text-center" onclick="switchView('view-action-selection')">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <div class="flex justify-between items-end pb-6 shrink-0 pl-[64px] pt-1">
+                <div>
+                    <h2 class="text-2xl font-black text-accent leading-none">ความประพฤติ</h2>
+                    <p class="text-[13px] font-bold text-primaryDark/60 mt-1.5 uppercase tracking-widest" id="header-behavior-room">...</p>
                 </div>
-                <div class="w-10"></div>
             </div>
             
             <div class="overflow-y-auto pr-1 flex-1 scroll-fine pb-6">
@@ -515,89 +512,92 @@
         </section>
 
         <!-- ================= VIEW 5: SUMMARY SLIP (ATTENDANCE) ================= -->
-        <section id="view-summary" class="hidden transition-all duration-300 overflow-y-auto scroll-fine h-full">
-            <div class="flex items-center mb-6 px-1">
-                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-attendance')">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
-                </button>
+        <section id="view-summary" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden relative">
+            <button class="auto-fade-btn absolute top-0 left-1 w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-lg z-[100] transition-all duration-300 transform scale-100 opacity-100 text-center" onclick="switchView('view-attendance')">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <div class="flex items-center mb-6 shrink-0 pl-[64px] pt-1">
                 <h2 class="text-[30px] font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-primaryDark tracking-tighter leading-none">ใบสรุปผล</h2>
             </div>
             
-            <div id="export-canvas" class="relative shadow-xl">
-                <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-primary via-peach to-info"></div>
-                
-                <div class="text-center mb-4 pt-2">
-                    <p class="font-black text-accent text-[16px] tracking-tight mb-1 text-center">🏫 โรงเรียนสันติธรรมวิทยามูลนิธิ</p>
-                    <div class="w-16 h-1 bg-primary mx-auto rounded-full mb-3"></div>
-                    <h2 class="text-[20px] font-black text-accent leading-tight text-center">รายงานการมาเรียน</h2>
-                    <div class="text-[11px] font-black text-orange-900 bg-orange-100/60 inline-block px-5 py-1 rounded-full mt-2 border border-orange-200 shadow-sm text-center" id="export-header-date"></div>
-                </div>
-                
-                <!-- ข้อมูลการสอน จัดให้ขนาดตัวอักษรเท่ากันและกะทัดรัด (Space-saving) -->
-                <div class="bg-white rounded-[20px] p-3.5 border-2 border-orange-50 space-y-1.5 mb-4 relative overflow-hidden">
-                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">วิชาที่สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-subject-val"></span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ครูผู้สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-teacher-val"></span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ชั้นเรียน</span><span class="font-bold text-accent text-[14px] text-right" id="export-room-only"></span></div>
-                </div>
+            <div class="overflow-y-auto scroll-fine flex-1 pb-6 px-1">
+                <div id="export-canvas" class="relative shadow-xl">
+                    <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-primary via-peach to-info"></div>
+                    
+                    <div class="text-center mb-4 pt-2">
+                        <p class="font-black text-accent text-[16px] tracking-tight mb-1 text-center">🏫 โรงเรียนสันติธรรมวิทยามูลนิธิ</p>
+                        <div class="w-16 h-1 bg-primary mx-auto rounded-full mb-3"></div>
+                        <h2 class="text-[20px] font-black text-accent leading-tight text-center">รายงานการมาเรียน</h2>
+                        <div class="text-[11px] font-black text-orange-900 bg-orange-100/60 inline-block px-5 py-1 rounded-full mt-2 border border-orange-200 shadow-sm text-center" id="export-header-date"></div>
+                    </div>
+                    
+                    <!-- ข้อมูลการสอน จัดให้ขนาดตัวอักษรเท่ากันและกะทัดรัด (Space-saving) -->
+                    <div class="bg-white rounded-[20px] p-3.5 border-2 border-orange-50 space-y-1.5 mb-4 relative overflow-hidden">
+                        <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">วิชาที่สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-subject-val"></span></div>
+                        <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ครูผู้สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-teacher-val"></span></div>
+                        <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ชั้นเรียน</span><span class="font-bold text-accent text-[14px] text-right" id="export-room-only"></span></div>
+                    </div>
 
-                <!-- สถิติ มา ลา ขาด อยู่บรรทัดเดียวกันกับข้อความ (Inline compact) -->
-                <div class="grid grid-cols-3 gap-2 mb-4 font-black">
-                    <div class="bg-emerald-50/80 text-emerald-700 py-2.5 rounded-[16px] border border-emerald-100 shadow-sm flex items-center justify-center gap-1.5">
-                        <span class="text-[14px]">มา 🟢</span><span id="export-count-มา" class="text-[14px]">0</span>
+                    <!-- สถิติ มา ลา ขาด อยู่บรรทัดเดียวกันกับข้อความ (Inline compact) -->
+                    <div class="grid grid-cols-3 gap-2 mb-4 font-black">
+                        <div class="bg-emerald-50/80 text-emerald-700 py-2.5 rounded-[16px] border border-emerald-100 shadow-sm flex items-center justify-center gap-1.5">
+                            <span class="text-[14px]">มา 🟢</span><span id="export-count-มา" class="text-[14px]">0</span>
+                        </div>
+                        <div class="bg-sky-50/80 text-sky-700 py-2.5 rounded-[16px] border border-sky-100 shadow-sm flex items-center justify-center gap-1.5">
+                            <span class="text-[14px]">ลา 🔵</span><span id="export-count-ลา" class="text-[14px]">0</span>
+                        </div>
+                        <div class="bg-red-50/80 text-red-700 py-2.5 rounded-[16px] border border-red-100 shadow-sm flex items-center justify-center gap-1.5">
+                            <span class="text-[14px]">ขาด 🔴</span><span id="export-count-ขาด" class="text-[14px]">0</span>
+                        </div>
                     </div>
-                    <div class="bg-sky-50/80 text-sky-700 py-2.5 rounded-[16px] border border-sky-100 shadow-sm flex items-center justify-center gap-1.5">
-                        <span class="text-[14px]">ลา 🔵</span><span id="export-count-ลา" class="text-[14px]">0</span>
-                    </div>
-                    <div class="bg-red-50/80 text-red-700 py-2.5 rounded-[16px] border border-red-100 shadow-sm flex items-center justify-center gap-1.5">
-                        <span class="text-[14px]">ขาด 🔴</span><span id="export-count-ขาด" class="text-[14px]">0</span>
-                    </div>
+                    
+                    <div id="export-absent-list" class="space-y-2"></div>
+                    
+                    <div class="mt-6 pt-4 border-t-2 border-dashed border-orange-100 text-center">
+                        <p class="text-[10px] font-bold text-orange-800/40 uppercase tracking-[3px]">บันทึกข้อมูลเมื่อ: <span id="export-timestamp"></span></p>
                 </div>
-                
-                <div id="export-absent-list" class="space-y-2"></div>
-                
-                <div class="mt-6 pt-4 border-t-2 border-dashed border-orange-100 text-center">
-                    <p class="text-[10px] font-bold text-orange-800/40 uppercase tracking-[3px]">บันทึกข้อมูลเมื่อ: <span id="export-timestamp"></span></p>
-                </div>
+                <button id="btn-save-image" class="mt-6 mb-12 btn-press w-full bg-peach text-white font-black py-5 rounded-[26px] shadow-2xl shadow-orange-500/30 text-xl flex items-center justify-center gap-3">
+                    📸 บันทึกสลิปลงมือถือ
+                </button>
             </div>
-            <button id="btn-save-image" class="mt-6 mb-12 btn-press w-full bg-peach text-white font-black py-5 rounded-[26px] shadow-2xl shadow-orange-500/30 text-xl flex items-center justify-center gap-3">
-                📸 บันทึกสลิปลงมือถือ
-            </button>
         </section>
 
         <!-- ================= VIEW 6: BEHAVIOR SLIP ================= -->
-        <section id="view-behavior-summary" class="hidden transition-all duration-300 overflow-y-auto scroll-fine h-full">
-            <div class="flex items-center mb-6 px-1">
-                <button class="w-12 h-12 glass-panel flex items-center justify-center text-primaryDark mr-5 btn-press shadow-sm text-center" onclick="switchView('view-behavior')">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
-                </button>
+        <section id="view-behavior-summary" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden relative">
+            <button class="auto-fade-btn absolute top-0 left-1 w-12 h-12 glass-panel flex items-center justify-center text-primaryDark btn-press shadow-lg z-[100] transition-all duration-300 transform scale-100 opacity-100 text-center" onclick="switchView('view-behavior')">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <div class="flex items-center mb-6 shrink-0 pl-[64px] pt-1">
                 <h2 class="text-[30px] font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-900 tracking-tighter leading-none">ผลประพฤติ</h2>
             </div>
-            <div id="export-behavior-canvas" class="relative shadow-xl">
-                <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-red-500 to-red-800"></div>
-                
-                <div class="text-center mb-4 pt-2">
-                    <p class="font-black text-accent text-[16px] tracking-tight mb-1 text-center">🏫 โรงเรียนสันติธรรมวิทยามูลนิธิ</p>
-                    <div class="w-16 h-1 bg-red-800/20 mx-auto rounded-full mb-3"></div>
-                    <h2 class="text-[20px] font-black text-red-600 leading-tight text-center">รายงานพฤติกรรม</h2>
-                    <div class="text-[11px] font-black text-red-900 bg-red-50 inline-block px-5 py-1 rounded-full mt-2 border border-red-100 shadow-sm text-center" id="export-behavior-header-date"></div>
-                </div>
+            
+            <div class="overflow-y-auto scroll-fine flex-1 pb-6 px-1">
+                <div id="export-behavior-canvas" class="relative shadow-xl">
+                    <div class="absolute top-0 left-0 w-full h-3 bg-gradient-to-r from-red-500 to-red-800"></div>
+                    
+                    <div class="text-center mb-4 pt-2">
+                        <p class="font-black text-accent text-[16px] tracking-tight mb-1 text-center">🏫 โรงเรียนสันติธรรมวิทยามูลนิธิ</p>
+                        <div class="w-16 h-1 bg-red-800/20 mx-auto rounded-full mb-3"></div>
+                        <h2 class="text-[20px] font-black text-red-600 leading-tight text-center">รายงานพฤติกรรม</h2>
+                        <div class="text-[11px] font-black text-red-900 bg-red-50 inline-block px-5 py-1 rounded-full mt-2 border border-red-100 shadow-sm text-center" id="export-behavior-header-date"></div>
+                    </div>
 
-                <!-- ข้อมูลการสอน จัดให้ขนาดตัวอักษรเท่ากันและกะทัดรัด (Space-saving) -->
-                <div class="bg-red-50/20 rounded-[20px] p-3.5 border-2 border-red-100 space-y-1.5 mb-4 relative overflow-hidden">
-                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">วิชาที่สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-behavior-subject-val"></span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ครูผู้สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-behavior-teacher-val"></span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ชั้นเรียน</span><span class="font-bold text-accent text-[14px] text-right" id="export-behavior-room-only"></span></div>
+                    <!-- ข้อมูลการสอน จัดให้ขนาดตัวอักษรเท่ากันและกะทัดรัด (Space-saving) -->
+                    <div class="bg-red-50/20 rounded-[20px] p-3.5 border-2 border-red-100 space-y-1.5 mb-4 relative overflow-hidden">
+                        <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">วิชาที่สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-behavior-subject-val"></span></div>
+                        <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ครูผู้สอน</span><span class="font-bold text-accent text-[14px] text-right" id="export-behavior-teacher-val"></span></div>
+                        <div class="flex justify-between items-center"><span class="font-bold text-accent text-[14px]">ชั้นเรียน</span><span class="font-bold text-accent text-[14px] text-right" id="export-behavior-room-only"></span></div>
+                    </div>
+                    
+                    <div id="export-behavior-list" class="space-y-1.5"></div>
+                    
+                    <div class="mt-6 pt-4 border-t-2 border-dashed border-red-100 text-center">
+                        <p class="text-[10px] font-bold text-red-800/40 uppercase tracking-[3px]">บันทึกข้อมูลเมื่อ: <span id="export-behavior-timestamp"></span></p>
                 </div>
-                
-                <div id="export-behavior-list" class="space-y-1.5"></div>
-                
-                <div class="mt-6 pt-4 border-t-2 border-dashed border-red-100 text-center">
-                    <p class="text-[10px] font-bold text-red-800/40 uppercase tracking-[3px]">บันทึกข้อมูลเมื่อ: <span id="export-behavior-timestamp"></span></p>
-                </div>
+                <button id="btn-save-behavior-image" class="mt-6 mb-12 btn-press w-full bg-accent text-white font-black py-5 rounded-[26px] shadow-2xl text-xl flex items-center justify-center gap-3">
+                    🚨 บันทึกรายงานพฤติกรรม
+                </button>
             </div>
-            <button id="btn-save-behavior-image" class="mt-6 mb-12 btn-press w-full bg-accent text-white font-black py-5 rounded-[26px] shadow-2xl text-xl flex items-center justify-center gap-3">
-                🚨 บันทึกรายงานพฤติกรรม
-            </button>
         </section>
     </main>
 
@@ -630,6 +630,22 @@
             currentClass: "", currentRoom: "", subjectName: "", teacherName: "", periodCount: "1"
         };
 
+        // Custom Alert UI เพื่อทดแทน window.alert() ดั้งเดิมของเบราว์เซอร์
+        function showNotification(msg, isError = true) {
+            const div = document.createElement('div');
+            const bgColor = isError ? 'bg-red-600' : 'bg-emerald-600';
+            div.className = `fixed top-6 left-1/2 transform -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-2xl shadow-2xl z-[9999] font-bold text-[14px] fade-in flex items-center gap-2`;
+            div.innerHTML = `<span>${isError ? '⚠️' : '✅'}</span> <span>${msg}</span>`;
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                div.style.opacity = '0';
+                div.style.transform = 'translate(-50%, -20px)';
+                div.style.transition = 'all 0.4s ease';
+                setTimeout(() => div.remove(), 400);
+            }, 3500);
+        }
+
         function initPWA() {
             const manifest = {
                 "name": "เช็คชื่อ ส.ธ.", "short_name": "เช็คชื่อ",
@@ -657,6 +673,7 @@
         function resetBackground() {
             localStorage.removeItem('s_custom_bg');
             initBackground();
+            showNotification('คืนค่ารูปภาพพื้นหลังเริ่มต้นแล้ว', false);
         }
 
         document.getElementById('bg-upload')?.addEventListener('change', function(e) {
@@ -687,8 +704,9 @@
                     try {
                         localStorage.setItem('s_custom_bg', dataUrl);
                         initBackground();
+                        showNotification('เปลี่ยนรูปภาพพื้นหลังเรียบร้อย', false);
                     } catch (err) {
-                        alert('รูปภาพมีขนาดใหญ่เกินไป ไม่สามารถบันทึกลงเครื่องได้ กรุณาเลือกรูปภาพที่มีขนาดเล็กลงครับ');
+                        showNotification('รูปภาพมีขนาดใหญ่เกินไป ไม่สามารถบันทึกลงเครื่องได้ กรุณาเลือกรูปภาพอื่นครับ', true);
                     }
                 }
                 img.src = event.target.result;
@@ -729,7 +747,6 @@
 
         // ====== ระบบควบคุมการเปลี่ยนหน้าจอ (Navigation) ======
         function switchView(viewId) {
-            // เพิ่ม 'view-action-selection' เข้าไปใน Array การจัดการหน้าจอ
             ['view-loading', 'view-class', 'view-room', 'view-setup', 'view-action-selection', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
@@ -785,23 +802,23 @@
             switchView('view-setup');
         }
 
-        // แก้ไขให้ปุ่ม "เริ่มต้นการบันทึก" นำทางไปยังหน้าเลือกรายการแทน
         function proceedToAttendance() {
             const s = document.getElementById('input-subject')?.value.trim();
             const t = document.getElementById('input-teacher')?.value.trim();
             const p = document.getElementById('input-period')?.value;
-            if(!s || !t) return;
+            if(!s || !t) {
+                showNotification('กรุณากรอกวิชาและชื่อครูผู้สอนให้ครบถ้วน', true);
+                return;
+            }
             localStorage.setItem('s_subj', s); localStorage.setItem('s_teach', t); localStorage.setItem('s_peri', p);
             State.subjectName = s; State.teacherName = t; State.periodCount = p;
             
-            // แสดงข้อมูลวิชาและห้องเรียนไว้ที่หัวข้อหน้าเลือกรายการ
             const subtitle = document.getElementById('selection-subtitle');
             if(subtitle) subtitle.innerText = `ม.${State.currentRoom} • ${s}`;
             
             switchView('view-action-selection');
         }
 
-        // เพิ่มฟังก์ชันสำหรับการแยกเข้าสู่หน้าย่อย
         function goToAttendance() {
             renderAttendanceList();
             switchView('view-attendance');
@@ -901,7 +918,10 @@
         // ====== ฟังก์ชันคำนวณและแสดงสลิปสรุปผล ======
         function prepareAndShowSummary() {
             const data = State.attendance[`${State.currentClass}-${State.currentRoom}`] || {};
-            if (Object.keys(data).length === 0) return;
+            if (Object.keys(data).length === 0) {
+                showNotification('ยังไม่มีการบันทึกข้อมูลเข้าเรียน', true);
+                return;
+            }
             const students = State.allStudents.filter(s => s.room === State.currentRoom);
             const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
             document.getElementById('export-subject-val').innerText = `${State.subjectName} (${State.periodCount} คาบ)`;
@@ -925,7 +945,10 @@
 
         function prepareAndShowBehaviorSummary() {
             const data = State.behavior[`${State.currentClass}-${State.currentRoom}`] || {};
-            if (!Object.values(data).some(d => d.tags.length > 0)) return;
+            if (!Object.values(data).some(d => d.tags.length > 0)) {
+                showNotification('ไม่มีการบันทึกหักคะแนนพฤติกรรม', true);
+                return;
+            }
             const students = State.allStudents.filter(s => s.room === State.currentRoom);
             const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
             document.getElementById('export-behavior-subject-val').innerText = State.subjectName;
@@ -960,6 +983,13 @@
         // ====== ฟังก์ชันดาวน์โหลดสลิปเป็นรูปภาพ ======
         function downloadImage(id, type) {
             window.scrollTo(0,0);
+            
+            // ใช้ Loading indicator เล็กๆ
+            const btnId = type === 'Attendance' ? 'btn-save-image' : 'btn-save-behavior-image';
+            const btn = document.getElementById(btnId);
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i> กำลังบันทึก...`;
+            
             setTimeout(() => {
                 const element = document.getElementById(id);
                 if (!element) return;
@@ -971,9 +1001,43 @@
                     const subject = State.subjectName ? State.subjectName : 'ไม่ระบุชื่อวิชา';
                     link.download = `${prefix}วิชา${subject}_ชั้นม.${State.currentRoom}_วันที่${dateStr}.png`;
                     link.href = canvas.toDataURL('image/png'); link.click();
+                    
+                    // คืนค่าปุ่ม
+                    btn.innerHTML = originalText;
+                    showNotification('บันทึกรูปภาพสำเร็จ', false);
+                }).catch(err => {
+                    btn.innerHTML = originalText;
+                    showNotification('เกิดข้อผิดพลาดในการบันทึกภาพ', true);
                 });
             }, 600);
         }
+
+        // ====== ระบบ Auto Fade ปุ่มย้อนกลับ ======
+        let scrollFadeTimeout;
+        // ใช้ useCapture = true เพื่อให้ดักจับ event จาก element ลูกๆ ที่ทำการ Scroll ได้
+        document.addEventListener('scroll', function(e) {
+            const visibleSection = document.querySelector('section:not(.hidden)');
+            if(!visibleSection) return;
+            
+            const backBtn = visibleSection.querySelector('.auto-fade-btn');
+            if (backBtn) {
+                // ซ่อนแบบจางเมื่อมีการเลื่อน (ย่อขนาดนิดนึง และทำให้จางหาย)
+                backBtn.classList.replace('opacity-100', 'opacity-0');
+                backBtn.classList.add('pointer-events-none');
+                backBtn.classList.replace('scale-100', 'scale-90');
+            }
+
+            clearTimeout(scrollFadeTimeout);
+            
+            // ตั้งเวลากลับมาแสดงใหม่หลังจากผู้ใช้ "หยุด" เลื่อนจอแล้ว
+            scrollFadeTimeout = setTimeout(() => {
+                if (backBtn) {
+                    backBtn.classList.replace('opacity-0', 'opacity-100');
+                    backBtn.classList.remove('pointer-events-none');
+                    backBtn.classList.replace('scale-90', 'scale-100');
+                }
+            }, 350); // โผล่มาหลังหยุดเลื่อน 350ms
+        }, true);
 
         // ====== Event Listeners หลักของแอป ======
         document.addEventListener('DOMContentLoaded', () => {
