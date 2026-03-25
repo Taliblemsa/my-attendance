@@ -76,6 +76,14 @@
             100% { transform: translate(10%, 5%) scale(1.1); }
         }
 
+        /* ป้องกันข้อความไล่สี (Gradient Text) กระพริบขณะเปลี่ยนหน้า (WebKit Bug Fix) */
+        .bg-clip-text {
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
         /* Glassmorphism Styles */
         .glass-panel {
             background: rgba(255, 255, 255, 0.55);
@@ -751,8 +759,20 @@
                 const el = document.getElementById(id);
                 if (el) {
                     if (id === viewId) { 
+                        // ตั้งค่าเริ่มต้นก่อนแสดง เพื่อป้องกันการกระพริบ (Instant pop flash)
+                        if (!el.style.opacity || el.style.opacity === '') {
+                            el.style.opacity = '0';
+                            el.style.transform = 'translateY(25px)';
+                        }
+                        
                         el.classList.remove('hidden'); 
-                        setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; }, 10); 
+                        
+                        // บังคับให้เบราว์เซอร์คำนวณ Layout ใหม่ (Reflow) ก่อนเล่นแอนิเมชัน
+                        void el.offsetWidth;
+                        
+                        // เริ่มเล่นแอนิเมชัน
+                        el.style.opacity = '1'; 
+                        el.style.transform = 'translateY(0)'; 
                     } else { 
                         el.classList.add('hidden'); 
                         el.style.opacity = '0'; 
