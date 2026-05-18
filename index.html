@@ -234,6 +234,21 @@
         </div>
     </div>
 
+    <!-- 📤 Share Confirm Dialog -->
+    <div id="share-modal" class="modal-bg">
+        <div class="modal-box shape-card flex flex-col text-center items-center">
+            <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-blue-100 !text-blue-500 !border-0">
+                <i class="fa-solid fa-share-nodes"></i>
+            </div>
+            <h3 class="text-2xl font-black text-accent mb-2">บันทึกรูปสำเร็จ!</h3>
+            <p class="text-[14px] text-slate-500 font-medium mb-6">รูปลงเครื่องแล้ว คุณต้องการแชร์รูปภาพนี้ต่อไปยังแอปอื่น (เช่น Line) หรือไม่?</p>
+            <div class="flex gap-3 w-full">
+                <button id="btn-share-cancel" class="flex-1 btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn">ปิด</button>
+                <button id="btn-share-ok" class="flex-1 btn-press bg-blue-500 text-white font-bold py-3.5 shape-btn shadow-lg shadow-blue-500/30">แชร์รูปภาพ</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content Area -->
     <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative">
         
@@ -672,6 +687,9 @@
             currentClass: "", currentRoom: "", subjectName: "", teacherName: "", periodCount: "1"
         };
 
+        // เริ่มการทำงานทันที (แก้ปัญหาจอกระพริบเสี้ยววิและแอปเด้ง)
+        applyPrefs();
+
         // Apply Preferences to UI
         function applyPrefs() {
             // Apply Theme Classes to Body
@@ -699,8 +717,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            applyPrefs();
-            
             // File input listener
             document.getElementById('set-bg-upload').addEventListener('change', handleImageUpload);
             
@@ -840,14 +856,15 @@
                 const data = await res.json();
                 if (data.values && data.values.length > 0) {
                     State.allStudents = data.values.map(r => ({ id: parseInt(r[0]), num: r[1], name: r[2], room: r[3] })).filter(s => !isNaN(s.id) && s.name && s.room);
-                    loadingSpinner.innerHTML = '<i class="fa-solid fa-shield-check text-7xl text-success animate-bounce"></i>';
+                    // เอา animate-bounce ออกและปรับสีให้ถูกต้อง เพื่อแก้แอปเด้ง
+                    loadingSpinner.innerHTML = '<i class="fa-solid fa-shield-check text-7xl text-emerald-500 fade-in"></i>';
                     document.getElementById('loading-title').innerText = "พร้อมเข้าสู่ระบบ";
                     document.getElementById('loading-desc').innerText = `ดาวน์โหลดรายชื่อแล้ว (${State.allStudents.length} คน)`;
                     document.getElementById('action-buttons-container').classList.remove('hidden');
                     document.getElementById('action-buttons-container').classList.add('flex');
                 } else throw new Error("ไฟล์ว่างเปล่า");
             } catch (err) {
-                loadingSpinner.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-danger text-7xl"></i>';
+                loadingSpinner.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-500 text-7xl"></i>';
                 errorContainer.classList.remove('hidden');
                 errorDetails.innerText = err.message;
             }
@@ -1035,13 +1052,54 @@
             switchView('view-behavior-summary');
         }
 
+        // --- ระบบแชร์รูปภาพ ---
+        let currentShareFile = null;
+        function showShareConfirm(canvas, fileName) {
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    currentShareFile = new File([blob], fileName, { type: 'image/png' });
+                    document.getElementById('share-modal').classList.add('active');
+                }
+            }, 'image/png');
+        }
+
+        document.getElementById('btn-share-cancel').onclick = () => {
+            document.getElementById('share-modal').classList.remove('active');
+            currentShareFile = null;
+        };
+
+        document.getElementById('btn-share-ok').onclick = async () => {
+            document.getElementById('share-modal').classList.remove('active');
+            if (currentShareFile && navigator.canShare && navigator.canShare({ files: [currentShareFile] })) {
+                try {
+                    await navigator.share({
+                        files: [currentShareFile],
+                        title: 'รายงานการเช็คชื่อ',
+                        text: 'รายงานการเช็คชื่อ ส.ธ.'
+                    });
+                    showToast('แชร์สำเร็จ', 'fa-solid fa-check text-emerald-400');
+                } catch (err) {
+                    console.log('Share canceled', err);
+                }
+            } else {
+                showToast('เบราว์เซอร์ไม่รองรับการแชร์ไฟล์ กรุณาส่งรูปจากอัลบั้มแทน', 'fa-solid fa-circle-info text-amber-500');
+            }
+            currentShareFile = null;
+        };
+
         function downloadImage(id, type) {
             window.scrollTo(0,0);
             setTimeout(() => {
                 html2canvas(document.getElementById(id), { scale: 3, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
+                    const dataUrl = canvas.toDataURL('image/png');
                     const link = document.createElement('a');
-                    link.download = `รายงาน_สธ_${type}_${State.currentRoom}_${new Date().getTime()}.png`;
-                    link.href = canvas.toDataURL('image/png'); link.click();
+                    const fileName = `รายงาน_สธ_${type}_${State.currentRoom}_${new Date().getTime()}.png`;
+                    link.download = fileName;
+                    link.href = dataUrl; 
+                    link.click();
+                    
+                    // เรียกป็อปอัปแชร์ขึ้นมาหลังจากบันทึกรูปเสร็จ
+                    showShareConfirm(canvas, fileName);
                 });
             }, 600);
         }
