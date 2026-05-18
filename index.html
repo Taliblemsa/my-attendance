@@ -207,6 +207,33 @@
         </div>
     </div>
 
+    <!-- 📲 App Install Prompt Modal -->
+    <div id="install-prompt-modal" class="modal-bg">
+        <div class="modal-box shape-card flex flex-col items-center text-center relative overflow-hidden p-6">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-primary"></div>
+            <button id="btn-close-install" class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-600 bg-slate-100 rounded-full transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-3xl mb-4 mt-2 shadow-inner border border-blue-100">
+                <i class="fa-solid fa-mobile-screen-button"></i>
+            </div>
+            <h3 class="text-xl font-black text-accent mb-1.5">ติดตั้งเป็นแอปพลิเคชัน</h3>
+            <p class="text-[13px] text-slate-500 font-medium mb-5 px-1 leading-relaxed">ติดตั้งแอปนี้ลงบนหน้าจอโฮมของคุณ เพื่อให้เปิดใช้งานได้สะดวกรวดเร็วและรองรับการทำงานแบบออฟไลน์</p>
+            
+            <div id="install-ios-msg" class="hidden w-full bg-slate-50 p-4 rounded-xl border border-slate-200 text-left mb-2 shadow-sm">
+                <p class="text-[13px] font-bold text-slate-600 leading-relaxed">
+                    🍎 <b>สำหรับผู้ใช้ iPhone/iPad:</b><br>
+                    1. แตะไอคอน <b>แชร์</b> <i class="fa-solid fa-arrow-up-from-bracket mx-1 text-blue-500"></i> ด้านล่างจอ<br>
+                    2. เลื่อนหาและเลือกคำว่า<br><b>"เพิ่มไปยังหน้าจอโฮม"</b> <i class="fa-regular fa-square-plus mx-1 text-slate-500"></i>
+                </p>
+            </div>
+            
+            <button id="btn-install-app" class="btn-press w-full btn-primary font-black py-4 shape-btn shadow-lg shadow-primary/30 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-download"></i> ติดตั้งแอปทันที
+            </button>
+        </div>
+    </div>
+
     <!-- Main Content Area -->
     <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative">
         
@@ -259,41 +286,101 @@
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm" onclick="switchView('view-loading')">
                     <i class="fa-solid fa-arrow-left text-lg"></i>
                 </button>
-                <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none">วิธีใช้งาน</h2>
+                <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none">คู่มือการใช้งาน</h2>
             </div>
-            <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-5">
-                <div class="glass-panel shape-card p-5">
-                    <h4 class="text-[13px] font-black text-primary uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-heart"></i> เจตนารมณ์
+            <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4">
+                
+                <!-- เจตนารมณ์ -->
+                <div class="glass-panel shape-card p-5 border-white/60">
+                    <h4 class="text-[14px] font-black text-primary uppercase tracking-widest mb-2.5 flex items-center gap-2">
+                        <i class="fa-solid fa-heart"></i> เจตนารมณ์ของผู้พัฒนา
                     </h4>
-                    <p class="text-[14px] leading-relaxed text-slate-600 font-medium">แอปพลิเคชันนี้ออกแบบมาเพื่อลดภาระงานครู ในการสรุปผลการเข้าเรียนให้เป็นระบบดิจิทัล</p>
-                </div>
-                <div class="glass-panel shape-card p-5 space-y-4">
-                    <h4 class="text-[13px] font-black text-primary uppercase tracking-widest flex items-center gap-2">
-                        <i class="fa-solid fa-compass"></i> 3 ขั้นตอนง่ายๆ
-                    </h4>
-                    <div class="flex gap-3">
-                        <div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0">1</div>
-                        <p class="text-[13px] font-bold text-accent">เลือกระดับชั้นและห้อง ข้อมูลจะดึงอัตโนมัติ</p>
-                    </div>
-                    <div class="flex gap-3">
-                        <div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0">2</div>
-                        <p class="text-[13px] font-bold text-accent">เช็คชื่อ (มา ลา ขาด) และบันทึกพฤติกรรม</p>
-                    </div>
-                    <div class="flex gap-3">
-                        <div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0">3</div>
-                        <p class="text-[13px] font-bold text-accent">เลื่อนล่างสุดเพื่อกด "สรุปผล" และบันทึกรูปภาพ</p>
-                    </div>
-                </div>
-                <div class="glass-panel shape-card p-5 bg-blue-50/40">
-                    <h4 class="text-[13px] font-black text-blue-600 uppercase tracking-widest mb-3 flex items-center gap-2">
-                        <i class="fa-solid fa-mobile-screen-button"></i> การติดตั้งเป็นแอป
-                    </h4>
-                    <p class="text-[12px] font-bold text-slate-600 leading-relaxed">
-                        • <b>iOS:</b> กดแชร์ <i class="fa-solid fa-arrow-up-from-bracket mx-0.5"></i> > <b>เพิ่มไปยังหน้าจอโฮม</b><br>
-                        • <b>Android:</b> จุด 3 จุด <i class="fa-solid fa-ellipsis-vertical mx-0.5"></i> > <b>เพิ่มลงในหน้าจอหลัก</b>
+                    <p class="text-[13px] leading-relaxed text-slate-600 font-medium indent-4">
+                        แอปพลิเคชันนี้ถูกออกแบบและพัฒนาขึ้นมาด้วยความตั้งใจที่จะช่วยลดภาระงานเอกสารของคุณครู 
+                        เปลี่ยนการเช็คชื่อและการจดบันทึกพฤติกรรมหน้าชั้นเรียนที่ยุ่งยาก ให้กลายเป็นระบบดิจิทัลที่ใช้งานง่าย รวดเร็ว 
+                        และสามารถสรุปผลเพื่อส่งต่อรายงานได้อย่างมีประสิทธิภาพในไม่กี่วินาที
                     </p>
                 </div>
+
+                <!-- ดุอาอ์ -->
+                <div class="glass-panel shape-card p-5 bg-emerald-50/50 border border-emerald-100">
+                    <h4 class="text-[14px] font-black text-emerald-600 uppercase tracking-widest mb-2.5 flex items-center gap-2">
+                        <i class="fa-solid fa-hands-praying"></i> ดุอาอ์แด่ผู้สร้างและผู้ใช้งาน
+                    </h4>
+                    <p class="text-[13px] leading-relaxed text-emerald-800 font-bold">
+                        "ญะซากัลลอฮุ ค็อยร็อน" (ขออัลลอฮ์ทรงตอบแทนความดีงาม)<br><br>
+                        <span class="font-medium">ขออัลลอฮ์ ซุบฮานะฮูวะตะอาลา ทรงประทานความบารอกัต (ความจำเริญ) ในริซกี สุขภาพ และเวลา 
+                        ทั้งแก่ผู้พัฒนาแอปพลิเคชันนี้และคุณครูผู้ใช้งานทุกท่าน ขอให้ผลงานชิ้นนี้เป็นศอดะเกาะฮ์ญาริยะฮ์ 
+                        (ทานที่ผลบุญไหลเวียนอย่างต่อเนื่อง) ที่ช่วยเหลือสังคมการศึกษาตราบนานเท่านาน อามีน</span>
+                    </p>
+                </div>
+
+                <!-- ขั้นตอนการใช้งานแบบละเอียด -->
+                <div class="glass-panel shape-card p-5 space-y-4 border-white/60">
+                    <h4 class="text-[14px] font-black text-primary uppercase tracking-widest flex items-center gap-2 mb-1">
+                        <i class="fa-solid fa-list-check"></i> ขั้นตอนการใช้งานแอป
+                    </h4>
+                    
+                    <div class="flex gap-3">
+                        <div class="w-7 h-7 icon-box flex items-center justify-center text-[12px] font-black shrink-0 shadow-sm text-primary bg-primary/10">1</div>
+                        <div>
+                            <p class="text-[14px] font-black text-accent mb-0.5">ตั้งค่าโปรไฟล์ (ครั้งแรก)</p>
+                            <p class="text-[12px] font-medium text-slate-500 leading-relaxed">แตะที่ไอคอนรูปเฟือง (⚙️) มุมขวาบน เพื่อกำหนดชื่อโรงเรียน ชื่อคุณครู และเพิ่มรายวิชาที่สอน เพื่อให้ใบรายงานผลออกมายอดเยี่ยมที่สุด</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <div class="w-7 h-7 icon-box flex items-center justify-center text-[12px] font-black shrink-0 shadow-sm text-primary bg-primary/10">2</div>
+                        <div>
+                            <p class="text-[14px] font-black text-accent mb-0.5">เลือกห้องเรียน</p>
+                            <p class="text-[12px] font-medium text-slate-500 leading-relaxed">กด "เข้าสู่ระบบ" เลือกระดับชั้น และเลือกห้องเรียน ระบบจะดึงรายชื่อจากฐานข้อมูล (Google Sheets) มาแสดงให้อัตโนมัติ</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <div class="w-7 h-7 icon-box flex items-center justify-center text-[12px] font-black shrink-0 shadow-sm text-primary bg-primary/10">3</div>
+                        <div>
+                            <p class="text-[14px] font-black text-accent mb-0.5">เช็คชื่อและพฤติกรรม</p>
+                            <p class="text-[12px] font-medium text-slate-500 leading-relaxed">แตะที่สถานะ "มา / ลา / ขาด" หรือหากต้องการตัดคะแนนความประพฤติ ให้กดปุ่ม "พฤติกรรม" (มุมขวาบน) เพื่อระบุความผิดได้ทันที</p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <div class="w-7 h-7 icon-box flex items-center justify-center text-[12px] font-black shrink-0 shadow-sm text-primary bg-primary/10">4</div>
+                        <div>
+                            <p class="text-[14px] font-black text-accent mb-0.5">สรุปผลและแชร์</p>
+                            <p class="text-[12px] font-medium text-slate-500 leading-relaxed">เมื่อเช็คเสร็จ เลื่อนลงล่างสุดแล้วกดปุ่ม "สรุปยอดเข้าเรียน" ตรวจสอบความถูกต้องและกด "บันทึกรูปภาพ" เพื่อนำรูปส่งรายงานในไลน์ได้เลย</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- การติดตั้งแบบละเอียด -->
+                <div class="glass-panel shape-card p-5 bg-blue-50/40 border-blue-100/50">
+                    <h4 class="text-[14px] font-black text-blue-600 uppercase tracking-widest mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> วิธีติดตั้งแอปไว้ในมือถือ
+                    </h4>
+                    
+                    <div class="mb-4">
+                        <p class="text-[13px] font-black text-accent mb-1"><i class="fa-brands fa-apple mr-1"></i> สำหรับระบบ iOS (iPhone/iPad)</p>
+                        <p class="text-[12px] font-medium text-slate-600 leading-relaxed pl-4">
+                            1. เปิดลิงก์นี้ด้วยแอป <b>Safari</b> เท่านั้น<br>
+                            2. แตะปุ่ม <b>แชร์</b> (ไอคอนสี่เหลี่ยมมีลูกศรชี้ขึ้น) ที่แถบด้านล่างจอ<br>
+                            3. เลื่อนหาและแตะคำว่า <b>"เพิ่มไปยังหน้าจอโฮม"</b><br>
+                            4. แตะคำว่า <b>"เพิ่ม"</b> ที่มุมขวาบน
+                        </p>
+                    </div>
+
+                    <div>
+                        <p class="text-[13px] font-black text-accent mb-1"><i class="fa-brands fa-android mr-1 text-emerald-500"></i> สำหรับระบบ Android</p>
+                        <p class="text-[12px] font-medium text-slate-600 leading-relaxed pl-4">
+                            1. เปิดลิงก์นี้ด้วยแอป <b>Google Chrome</b><br>
+                            2. แตะไอคอน <b>จุด 3 จุด</b> ที่มุมขวาบนสุดของจอ<br>
+                            3. เลือกเมนู <b>"เพิ่มลงในหน้าจอหลัก"</b> หรือ "ติดตั้งแอป"<br>
+                            4. กดยืนยันการติดตั้ง
+                        </p>
+                    </div>
+                </div>
+                
             </div>
         </section>
 
@@ -958,6 +1045,77 @@
                 });
             }, 600);
         }
+
+        // ==========================================
+        // PWA & INSTALLATION PROMPT LOGIC
+        // ==========================================
+        let deferredPrompt;
+        const installModal = document.getElementById('install-prompt-modal');
+        const btnInstallApp = document.getElementById('btn-install-app');
+        
+        // เช็คว่าเปิดใช้งานผ่านแอปที่ติดตั้งแล้ว (Standalone) หรือยัง?
+        const isStandalone = () => {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        };
+
+        // เช็คว่าเป็นอุปกรณ์ iOS หรือไม่
+        const isIos = () => {
+            const userAgent = window.navigator.userAgent.toLowerCase();
+            return /iphone|ipad|ipod/.test(userAgent);
+        };
+
+        // ดักจับ Event สำหรับ Android/Chrome
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // ป้องกันไม่ให้ Chrome เด้งแถบเล็กๆ อัตโนมัติ (จะใช้ Modal ของเราเอง)
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // เช็คว่าผู้ใช้เคยกดปิดหน้านี้ไปแล้วหรือยัง (ซ่อน 1 วัน)
+            const hidePrompt = sessionStorage.getItem('hide_install_prompt');
+            
+            // ถ้ายังไม่ติดตั้ง และยังไม่เคยกดปิด ให้โชว์ Modal
+            if (!isStandalone() && !hidePrompt) {
+                setTimeout(() => showInstallModal(), 2000);
+            }
+        });
+
+        // สำหรับ iOS ซึ่งไม่รองรับ beforeinstallprompt แบบอัตโนมัติ
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const hidePrompt = sessionStorage.getItem('hide_install_prompt');
+                if (isIos() && !isStandalone() && !hidePrompt) {
+                    showInstallModal();
+                }
+            }, 2500); // ดีเลย์ให้หน้าเว็บโหลดเสร็จก่อนค่อยเด้ง
+        });
+
+        function showInstallModal() {
+            installModal.classList.add('active');
+            if(isIos()) {
+                document.getElementById('install-ios-msg').classList.remove('hidden');
+                btnInstallApp.classList.add('hidden'); // ซ่อนปุ่มติดตั้งอัตโนมัติ เพราะ iOS ทำไม่ได้
+            } else {
+                document.getElementById('install-ios-msg').classList.add('hidden');
+                btnInstallApp.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('btn-close-install').onclick = () => {
+            installModal.classList.remove('active');
+            // จำไว้ใน Session ว่าผู้ใช้กดปิด จะไม่เด้งกวนใจอีกจนกว่าจะเปิดแท็บใหม่
+            sessionStorage.setItem('hide_install_prompt', 'true');
+        };
+
+        btnInstallApp.onclick = async () => {
+            installModal.classList.remove('active');
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User installation choice: ${outcome}`);
+                deferredPrompt = null;
+            }
+        };
+
     </script>
 
     <!-- Script สำหรับลงทะเบียน Service Worker (Offline Mode) -->
