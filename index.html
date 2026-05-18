@@ -959,5 +959,21 @@
             }, 600);
         }
     </script>
+
+    <!-- Script สำหรับลงทะเบียน Service Worker (Offline Mode) -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // ใช้ ./sw.js เพื่อให้รองรับพาร์ทของ GitHub Pages ได้อย่างถูกต้อง
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
