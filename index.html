@@ -2,15 +2,17 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- เพิ่ม viewport-fit=cover เพื่อให้พื้นหลังแสดงผลเต็มขอบจอทะลุรอยบาก -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ระบบเช็คชื่อ ส.ธ. | Professional</title>
     
     <!-- PWA & iOS Meta Tags -->
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- เปลี่ยนสถานะบาร์ด้านบนให้โปร่งใสเพื่อให้ภาพพื้นหลังโชว์เต็ม -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ส.ธ. เช็คชื่อ">
-    <link rel="manifest" href="./manifest.json">
+    <link id="dynamic-manifest" rel="manifest" href="./manifest.json">
     
     <!-- External Resources -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,59 +27,87 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Sarabun', 'sans-serif'] },
-                    colors: {
-                        accent: '#1e293b', 
-                        surface: '#f8fafc',
-                    }
+                    colors: { accent: '#1e293b', surface: '#f8fafc' }
                 }
             }
         }
     </script>
     
     <style>
+        /* ตัวแปรสำหรับปรับความใสของการ์ด */
+        :root {
+            --glass-opacity: 0.45;
+        }
+
         * { -webkit-tap-highlight-color: transparent; font-family: 'Sarabun', sans-serif; text-align: left; }
         body { color: #1e293b; background-color: #f8fafc; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
 
         /* Background System */
-        .bg-container { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background-size: cover; background-position: center; background-attachment: fixed; transition: background-image 0.5s ease; }
+        .bg-container { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background-size: cover; background-position: center; background-attachment: fixed; transition: background-image 0.5s ease; width: 100vw; height: 100vh; }
         .bg-sphere { position: absolute; filter: blur(90px); opacity: 0.65; border-radius: 50%; animation: pulse 15s infinite alternate ease-in-out; }
         
-        /* Themes */
+        /* === Themes System === */
+        /* 1. Amber (โค้งมน) */
         .theme-amber .sphere-1 { top: -10%; right: -5%; width: 75vw; height: 75vw; background: radial-gradient(circle, #fef3c7, #f59e0b); }
         .theme-amber .sphere-2 { bottom: -15%; left: -10%; width: 85vw; height: 85vw; background: radial-gradient(circle, #ffedd5, #ea580c); animation-delay: -5s; }
         .theme-amber .btn-primary { background-color: #f59e0b; color: white; }
-        .theme-amber .text-primary { color: #f59e0b; }
-        .theme-amber .border-primary { border-color: #f59e0b; }
-        .theme-amber .shape-card { border-radius: 32px; }
-        .theme-amber .shape-btn { border-radius: 9999px; }
-        .theme-amber .shape-input { border-radius: 9999px; }
+        .theme-amber .text-primary { color: #f59e0b; } .theme-amber .border-primary { border-color: #f59e0b; }
+        .theme-amber .shape-card { border-radius: 32px; } .theme-amber .shape-btn { border-radius: 9999px; } .theme-amber .shape-input { border-radius: 9999px; }
         .theme-amber .icon-box { border-radius: 50%; background: rgba(245, 158, 11, 0.15); color: #ea580c; }
 
+        /* 2. Blue (สี่เหลี่ยมมน) */
         .theme-blue .sphere-1 { top: -10%; right: -5%; width: 75vw; height: 75vw; background: radial-gradient(circle, #e0f2fe, #3b82f6); }
         .theme-blue .sphere-2 { bottom: -15%; left: -10%; width: 85vw; height: 85vw; background: radial-gradient(circle, #dbeafe, #0284c7); animation-delay: -5s; }
         .theme-blue .btn-primary { background-color: #3b82f6; color: white; }
-        .theme-blue .text-primary { color: #3b82f6; }
-        .theme-blue .border-primary { border-color: #3b82f6; }
-        .theme-blue .shape-card { border-radius: 16px; }
-        .theme-blue .shape-btn { border-radius: 12px; }
-        .theme-blue .shape-input { border-radius: 12px; }
+        .theme-blue .text-primary { color: #3b82f6; } .theme-blue .border-primary { border-color: #3b82f6; }
+        .theme-blue .shape-card { border-radius: 16px; } .theme-blue .shape-btn { border-radius: 12px; } .theme-blue .shape-input { border-radius: 12px; }
         .theme-blue .icon-box { border-radius: 12px; background: rgba(59, 130, 246, 0.15); color: #0284c7; }
 
+        /* 3. Emerald (เหลี่ยมเฉียบ) */
         .theme-emerald .sphere-1 { top: -10%; right: -5%; width: 75vw; height: 75vw; background: radial-gradient(circle, #dcfce7, #10b981); }
         .theme-emerald .sphere-2 { bottom: -15%; left: -10%; width: 85vw; height: 85vw; background: radial-gradient(circle, #ecfdf5, #059669); animation-delay: -5s; }
         .theme-emerald .btn-primary { background-color: #10b981; color: white; }
-        .theme-emerald .text-primary { color: #10b981; }
-        .theme-emerald .border-primary { border-color: #10b981; }
-        .theme-emerald .shape-card { border-radius: 4px; }
-        .theme-emerald .shape-btn { border-radius: 4px; }
-        .theme-emerald .shape-input { border-radius: 4px; }
+        .theme-emerald .text-primary { color: #10b981; } .theme-emerald .border-primary { border-color: #10b981; }
+        .theme-emerald .shape-card { border-radius: 4px; } .theme-emerald .shape-btn { border-radius: 4px; } .theme-emerald .shape-input { border-radius: 4px; }
         .theme-emerald .icon-box { border-radius: 0px; background: transparent; color: #059669; border: 1.5px solid #10b981; }
+
+        /* 4. Rose (ทรงแคปซูล ชมพูแดง) */
+        .theme-rose .sphere-1 { top: -10%; right: -5%; width: 75vw; height: 75vw; background: radial-gradient(circle, #ffe4e6, #f43f5e); }
+        .theme-rose .sphere-2 { bottom: -15%; left: -10%; width: 85vw; height: 85vw; background: radial-gradient(circle, #fecdd3, #e11d48); animation-delay: -5s; }
+        .theme-rose .btn-primary { background-color: #f43f5e; color: white; }
+        .theme-rose .text-primary { color: #f43f5e; } .theme-rose .border-primary { border-color: #f43f5e; }
+        .theme-rose .shape-card { border-radius: 24px; } .theme-rose .shape-btn { border-radius: 16px; } .theme-rose .shape-input { border-radius: 16px; }
+        .theme-rose .icon-box { border-radius: 16px; background: rgba(244, 63, 94, 0.15); color: #e11d48; }
+
+        /* 5. Violet (ทรงหยดน้ำ ม่วง) */
+        .theme-violet .sphere-1 { top: -10%; right: -5%; width: 75vw; height: 75vw; background: radial-gradient(circle, #ede9fe, #8b5cf6); }
+        .theme-violet .sphere-2 { bottom: -15%; left: -10%; width: 85vw; height: 85vw; background: radial-gradient(circle, #ddd6fe, #7c3aed); animation-delay: -5s; }
+        .theme-violet .btn-primary { background-color: #8b5cf6; color: white; }
+        .theme-violet .text-primary { color: #8b5cf6; } .theme-violet .border-primary { border-color: #8b5cf6; }
+        .theme-violet .shape-card { border-radius: 20px; } .theme-violet .shape-btn { border-radius: 20px; } .theme-violet .shape-input { border-radius: 20px; }
+        .theme-violet .icon-box { border-radius: 50%; background: rgba(139, 92, 246, 0.15); color: #7c3aed; }
+
+        /* 6. Slate (เทาเข้ม เรียบหรู) */
+        .theme-slate .sphere-1 { top: -10%; right: -5%; width: 75vw; height: 75vw; background: radial-gradient(circle, #f1f5f9, #475569); }
+        .theme-slate .sphere-2 { bottom: -15%; left: -10%; width: 85vw; height: 85vw; background: radial-gradient(circle, #e2e8f0, #334155); animation-delay: -5s; }
+        .theme-slate .btn-primary { background-color: #475569; color: white; }
+        .theme-slate .text-primary { color: #475569; } .theme-slate .border-primary { border-color: #475569; }
+        .theme-slate .shape-card { border-radius: 8px; } .theme-slate .shape-btn { border-radius: 8px; } .theme-slate .shape-input { border-radius: 8px; }
+        .theme-slate .icon-box { border-radius: 8px; background: rgba(71, 85, 105, 0.15); color: #334155; }
+
+        /* 7. Cyan (ฟ้าอมเขียว สดใส) */
+        .theme-cyan .sphere-1 { top: -10%; right: -5%; width: 75vw; height: 75vw; background: radial-gradient(circle, #cffafe, #06b6d4); }
+        .theme-cyan .sphere-2 { bottom: -15%; left: -10%; width: 85vw; height: 85vw; background: radial-gradient(circle, #a5f3fc, #0891b2); animation-delay: -5s; }
+        .theme-cyan .btn-primary { background-color: #06b6d4; color: white; }
+        .theme-cyan .text-primary { color: #06b6d4; } .theme-cyan .border-primary { border-color: #06b6d4; }
+        .theme-cyan .shape-card { border-radius: 28px; } .theme-cyan .shape-btn { border-radius: 9999px; } .theme-cyan .shape-input { border-radius: 9999px; }
+        .theme-cyan .icon-box { border-radius: 28px; background: rgba(6, 182, 212, 0.15); color: #0891b2; }
 
         .custom-bg-overlay { position: absolute; inset: 0; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         @keyframes pulse { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(10%, 5%) scale(1.1); } }
 
-        /* Glassmorphism */
-        .glass-panel { background: rgba(255, 255, 255, 0.45); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); border: 1.5px solid rgba(255, 255, 255, 0.85); box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08), inset 0 2px 20px rgba(255,255,255,0.4); transition: border-radius 0.4s ease; }
+        /* Glassmorphism (ประยุกต์ใช้ตัวแปร CSS เพื่อปรับความใสได้) */
+        .glass-panel { background: rgba(255, 255, 255, var(--glass-opacity)); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); border: 1.5px solid rgba(255, 255, 255, 0.85); box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08), inset 0 2px 20px rgba(255,255,255,0.4); transition: border-radius 0.4s ease, background 0.3s ease; }
         .btn-press { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .btn-press:active { transform: scale(0.95); filter: brightness(0.9); }
 
@@ -112,12 +142,30 @@
     </style>
     
     <script>
-        const DEFAULT_PREFS = { schoolName: "โรงเรียนสันติธรรมวิทยามูลนิธิ", schoolLogo: "ส.ธ.", teacherName: "", subjects: [], theme: "theme-amber", customBg: null };
+        const DEFAULT_PREFS = { 
+            schoolName: "โรงเรียนสันติธรรมวิทยามูลนิธิ", 
+            schoolLogo: "ส.ธ.", 
+            teacherName: "", 
+            subjects: [], 
+            theme: "theme-amber", 
+            customBg: null,
+            customBgBlur: 50,
+            cardOpacity: 45 // ค่าความโปร่งใสของการ์ดเริ่มต้น (45%)
+        };
         let earlyPrefs = JSON.parse(localStorage.getItem('stAttendance_prefs')) || DEFAULT_PREFS;
+        
+        // แก้ไขโครงสร้าง prefs เดิมให้มีค่า cardOpacity ถ้ายังไม่มี
+        if(earlyPrefs.cardOpacity === undefined) earlyPrefs.cardOpacity = 45;
     </script>
 </head>
-<body class="flex flex-col items-center min-h-screen" id="app-body">
-    <script>document.getElementById('app-body').className = `flex flex-col items-center min-h-screen ${earlyPrefs.theme}`;</script>
+<!-- ใช้ pt-[env(safe-area-inset-top)] เพื่อหลบขอบติ่งหน้าจอมือถืออย่างแนบเนียน -->
+<body class="flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)]" id="app-body">
+    
+    <script>
+        // Apply CSS Variables สำหรับความใส และ ธีมทันทีก่อนโหลดโครงสร้าง
+        document.documentElement.style.setProperty('--glass-opacity', earlyPrefs.cardOpacity / 100);
+        document.getElementById('app-body').className = `flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)] ${earlyPrefs.theme}`;
+    </script>
 
     <!-- Ambient Background Engine -->
     <div class="bg-container" id="bg-container">
@@ -159,7 +207,7 @@
     <div id="install-modal" class="modal-bg">
         <div class="modal-box shape-card flex flex-col text-center items-center">
             <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-3xl mb-4 border border-blue-200 shadow-sm"><i class="fa-solid fa-mobile-screen"></i></div>
-            <h3 class="text-2xl font-black text-accent mb-2">ติดตั้งแตะแอป</h3>
+            <h3 class="text-2xl font-black text-accent mb-2">ติดตั้งเป็นแอป</h3>
             <p class="text-[14px] text-slate-500 font-medium mb-6 leading-relaxed" id="install-desc">ติดตั้งระบบนี้ลงบนหน้าจอหลักของคุณ<br>เพื่อความสะดวกและรวดเร็วในการเช็คชื่อ</p>
             <div class="flex gap-3 w-full">
                 <button id="btn-install-cancel" class="flex-1 btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn flex justify-center items-center">ไว้ทีหลัง</button>
@@ -181,7 +229,7 @@
         </div>
     </div>
 
-    <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative">
+    <main class="container mx-auto max-w-md px-7 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative z-10 pt-6">
         
         <!-- ================= VIEW 1: LANDING ================= -->
         <section id="view-loading" class="transition-all duration-500 flex flex-col items-center justify-center flex-1">
@@ -233,7 +281,7 @@
                 <div class="glass-panel shape-card p-5 bg-primary/5 border-primary/20">
                     <h4 class="text-[13px] font-black text-primary uppercase tracking-widest mb-2 flex items-center justify-center gap-2"><i class="fa-solid fa-hands-praying"></i> ดุอาอ์ก่อนเริ่มงาน</h4>
                     <p class="text-[15px] leading-relaxed text-accent font-bold text-center mb-1">رَبِّ زِدْنِي عِلْمًا وَارْزُقْنِي فَهْمًا</p>
-                    <p class="text-[13px] leading-relaxed text-slate-600 font-medium text-center">"ร็อบบิซิ๊ดนี อิลมัน วัรซุกนี ฟะฮ์มัน"</p>
+                    <p class="text-[13px] leading-relaxed text-slate-600 font-medium text-center">"ร็อบบิ ซิดนี อิลมัน วัรซุกนี ฟะฮ์มัน"</p>
                     <p class="text-[11px] text-slate-500 mt-2 text-center">(โอ้พระผู้อภิบาลของฉัน โปรดเพิ่มพูนความรู้ และประทานความเข้าใจให้แก่ฉันด้วยเถิด)</p>
                 </div>
                 <div class="glass-panel shape-card p-5">
@@ -258,7 +306,6 @@
         <!-- ================= VIEW: SETTINGS ================= -->
         <section id="view-settings" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
             <div class="flex items-center mb-6 shrink-0">
-                <!-- แก้ไขปุ่มย้อนกลับ เพื่อให้ดึงค่าเดิมกลับมาหากไม่ได้กดบันทึก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm" onclick="applyPrefs(); switchView('view-loading')"><i class="fa-solid fa-arrow-left text-lg"></i></button>
                 <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none">ตั้งค่าระบบ</h2>
             </div>
@@ -286,8 +333,6 @@
 
                 <div class="glass-panel shape-card p-5 border-white/50">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-image"></i> ภาพพื้นหลัง</h3>
-                    
-                    <!-- ซ่อน Input ธรรมดา และแทนที่ด้วยแถบปรับความเบลอ -->
                     <input type="file" id="set-bg-upload" accept="image/*" class="hidden">
                     
                     <div class="mb-5">
@@ -295,7 +340,16 @@
                             <label class="text-[12px] font-bold text-slate-600">ระดับความเบลอของภาพ</label>
                             <span id="display-bg-blur" class="text-[12px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md">50%</span>
                         </div>
-                        <input type="range" id="set-bg-blur" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" oninput="previewBgBlur(this.value); document.getElementById('display-bg-blur').innerText = this.value + '%'">
+                        <input type="range" id="set-bg-blur" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" oninput="previewBgBlur(this.value)">
+                    </div>
+
+                    <div class="mb-5 mt-4 pt-4 border-t border-white/40">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-[12px] font-bold text-slate-600">ความทึบของการ์ด (Card Opacity)</label>
+                            <span id="display-card-opacity" class="text-[12px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md">45%</span>
+                        </div>
+                        <!-- Slider สำหรับปรับความใสของการ์ด -->
+                        <input type="range" id="set-card-opacity" min="0" max="100" value="45" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" oninput="previewCardOpacity(this.value)">
                     </div>
 
                     <div class="flex gap-2">
@@ -307,7 +361,13 @@
                 <div class="glass-panel shape-card p-5 border-white/50">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-palette"></i> ธีมแอปพลิเคชัน</h3>
                     <select id="set-bg-theme" class="input-field shape-input cursor-pointer">
-                        <option value="theme-amber">Amber Glow (โค้งมน - สีอำพัน)</option><option value="theme-blue">Ocean Blue (สี่เหลี่ยมมน - สีฟ้า)</option><option value="theme-emerald">Emerald Fresh (เหลี่ยม - สีเขียว)</option>
+                        <option value="theme-amber">Amber Glow (โค้งมน - สีอำพัน)</option>
+                        <option value="theme-blue">Ocean Blue (สี่เหลี่ยมมน - สีฟ้า)</option>
+                        <option value="theme-emerald">Emerald Fresh (เหลี่ยม - สีเขียว)</option>
+                        <option value="theme-rose">Rose Petal (แคปซูล - สีชมพูแดง)</option>
+                        <option value="theme-violet">Amethyst (หยดน้ำ - สีม่วง)</option>
+                        <option value="theme-slate">Slate Monochrome (เหลี่ยมมน - เทาเข้ม)</option>
+                        <option value="theme-cyan">Cyan Breeze (กลม - ฟ้าอมเขียว)</option>
                     </select>
                 </div>
                 
@@ -367,7 +427,7 @@
                     </div>
                 </div>
                 <label class="text-[10px] font-black uppercase text-slate-500 ml-2 mb-2 block tracking-widest">ชื่อครูผู้สอน</label>
-                <input type="text" id="input-teacher" class="input-field shape-input bg-white/80" placeholder="ระบุชื่อครู..." autocomplete="off">
+                <input type="text" id="input-teacher" class="input-field shape-input bg-white/80" placeholder="ระบุชื่อครู..." autocomplete="off" readonly>
             </div>
             <button onclick="proceedToAttendance()" class="btn-press w-full btn-primary font-black text-xl py-4.5 shape-btn shadow-xl flex items-center justify-center gap-3"><i class="fa-solid fa-clipboard-check"></i> เริ่มบันทึกข้อมูล</button>
         </section>
@@ -476,10 +536,14 @@
         };
 
         let AppPrefs = JSON.parse(localStorage.getItem('stAttendance_prefs')) || DEFAULT_PREFS;
+        if(AppPrefs.cardOpacity === undefined) AppPrefs.cardOpacity = 45;
+
         const State = { allStudents: [], attendance: {}, behavior: {}, currentClass: "", currentRoom: "", subjectName: "", teacherName: "", periodCount: "1" };
 
         function applyPrefs() {
-            document.body.className = `flex flex-col items-center min-h-screen ${AppPrefs.theme}`;
+            document.body.className = `flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)] ${AppPrefs.theme}`;
+            document.documentElement.style.setProperty('--glass-opacity', AppPrefs.cardOpacity / 100);
+            
             document.querySelectorAll('.app-school-name-display').forEach(el => el.innerText = AppPrefs.schoolName);
             document.querySelectorAll('.app-logo-display').forEach(el => el.innerText = AppPrefs.schoolLogo);
             const bg = document.getElementById('bg-container'); const overlay = document.getElementById('custom-bg-overlay');
@@ -490,25 +554,19 @@
                 overlay.classList.remove('hidden'); 
                 s1.style.display = 'none'; s2.style.display = 'none';
                 
-                // คำนวณความเบลอและความสว่าง
                 let blurVal = AppPrefs.customBgBlur !== undefined ? AppPrefs.customBgBlur : 50;
-                let pxBlur = (blurVal / 100) * 20; 
-                let alpha = (blurVal / 100) * 0.5;
-                overlay.style.backdropFilter = `blur(${pxBlur}px)`; 
-                overlay.style.webkitBackdropFilter = `blur(${pxBlur}px)`; 
-                overlay.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
+                let pxBlur = (blurVal / 100) * 20; let alpha = (blurVal / 100) * 0.5;
+                overlay.style.backdropFilter = `blur(${pxBlur}px)`; overlay.style.webkitBackdropFilter = `blur(${pxBlur}px)`; overlay.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
             } else {
                 bg.style.backgroundImage = 'none'; overlay.classList.add('hidden'); s1.style.display = 'block'; s2.style.display = 'block';
             }
         }
-        applyPrefs(); // Execute early UI styling
 
-        // Service Worker Installation
+        // Offline Mode Service Worker
         if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
-            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Setup skipped:', err)));
+            window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Setup skipped')));
         }
 
-        // Install App Prompt Logic
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; showInstallPopup(); });
         function showInstallPopup() {
@@ -528,26 +586,26 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            applyPrefs();
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+            if (isIOS && !isStandalone) { showInstallPopup(); }
+
             document.getElementById('set-bg-upload').addEventListener('change', handleImageUpload);
             document.getElementById('btn-view-summary').onclick = prepareAndShowSummary;
             document.getElementById('btn-save-image').onclick = () => downloadImage('export-canvas', 'เช็คชื่อ');
             document.getElementById('btn-view-behavior-summary').onclick = prepareAndShowBehaviorSummary;
             document.getElementById('btn-save-behavior-image').onclick = () => downloadImage('export-behavior-canvas', 'ความประพฤติ');
             
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-            if (isIOS && !isStandalone) { showInstallPopup(); }
-
             fetchStudentData();
             loadDailyHistory();
         });
 
-        // Today's History Engine
+        // History Management
         function getTodayStr() { return new Date().toLocaleDateString('th-TH'); }
         function saveDailyHistory() {
             const hist = { date: getTodayStr(), attendance: State.attendance, behavior: State.behavior };
-            localStorage.setItem('stAttendance_history', JSON.stringify(hist));
-            checkHistoryVisibility();
+            localStorage.setItem('stAttendance_history', JSON.stringify(hist)); checkHistoryVisibility();
         }
         function loadDailyHistory() {
             try {
@@ -582,26 +640,23 @@
             switchView('view-history');
         }
 
+        // Dialogs & Toasts
         let confirmCallback = null;
         function showConfirm(title, message, callback) { document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-msg').innerText = message; confirmCallback = callback; document.getElementById('confirm-modal').classList.add('active'); }
         function closeConfirm() { document.getElementById('confirm-modal').classList.remove('active'); confirmCallback = null; }
         document.getElementById('btn-confirm-ok').onclick = () => { if(confirmCallback) confirmCallback(); closeConfirm(); };
         document.getElementById('btn-confirm-cancel').onclick = closeConfirm;
 
-        function checkSetupAndProceed() {
-            if (!AppPrefs.teacherName || AppPrefs.teacherName.trim() === "" || AppPrefs.subjects.length === 0) {
-                document.getElementById('setup-modal').classList.add('active');
-            } else {
-                switchView('view-class');
-            }
-        }
-        document.getElementById('btn-setup-close').onclick = () => document.getElementById('setup-modal').classList.remove('active');
-        document.getElementById('btn-setup-go').onclick = () => { document.getElementById('setup-modal').classList.remove('active'); openSettingsView(); };
-
         function showToast(msg, iconClass) {
             const t = document.getElementById('toast'); document.getElementById('toast-message').innerText = msg; document.getElementById('toast-icon').innerHTML = `<i class="${iconClass}"></i>`;
             t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
         }
+
+        function checkSetupAndProceed() {
+            if (!AppPrefs.teacherName || AppPrefs.teacherName.trim() === "" || AppPrefs.subjects.length === 0) { document.getElementById('setup-modal').classList.add('active'); } else { switchView('view-class'); }
+        }
+        document.getElementById('btn-setup-close').onclick = () => document.getElementById('setup-modal').classList.remove('active');
+        document.getElementById('btn-setup-go').onclick = () => { document.getElementById('setup-modal').classList.remove('active'); openSettingsView(); };
 
         function switchView(viewId) {
             ['view-loading', 'view-settings', 'view-guide', 'view-history', 'view-class', 'view-room', 'view-setup', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary'].forEach(id => {
@@ -613,6 +668,7 @@
             if(viewId === 'view-settings') loadSettingsToForm();
         }
 
+        // Settings Logic
         function openSettingsView() { switchView('view-settings'); }
         function loadSettingsToForm() {
             if(document.getElementById('set-school-name')) document.getElementById('set-school-name').value = AppPrefs.schoolName; 
@@ -621,10 +677,11 @@
             if(document.getElementById('set-bg-theme')) document.getElementById('set-bg-theme').value = AppPrefs.theme;
             
             let blurVal = AppPrefs.customBgBlur !== undefined ? AppPrefs.customBgBlur : 50;
-            if(document.getElementById('set-bg-blur')) {
-                document.getElementById('set-bg-blur').value = blurVal; 
-                document.getElementById('display-bg-blur').innerText = blurVal + '%';
-            }
+            if(document.getElementById('set-bg-blur')) { document.getElementById('set-bg-blur').value = blurVal; document.getElementById('display-bg-blur').innerText = blurVal + '%'; }
+            
+            let opVal = AppPrefs.cardOpacity !== undefined ? AppPrefs.cardOpacity : 45;
+            if(document.getElementById('set-card-opacity')) { document.getElementById('set-card-opacity').value = opVal; document.getElementById('display-card-opacity').innerText = opVal + '%'; }
+            
             renderSettingsSubjectList();
         }
         function previewBgBlur(val) {
@@ -632,6 +689,11 @@
             let pxBlur = (val / 100) * 20; let alpha = (val / 100) * 0.5;
             overlay.style.backdropFilter = `blur(${pxBlur}px)`; overlay.style.webkitBackdropFilter = `blur(${pxBlur}px)`; overlay.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
         }
+        function previewCardOpacity(val) {
+            document.documentElement.style.setProperty('--glass-opacity', val / 100);
+            document.getElementById('display-card-opacity').innerText = val + '%';
+        }
+        
         function renderSettingsSubjectList() {
             const ul = document.getElementById('set-subject-list'); ul.innerHTML = '';
             AppPrefs.subjects.forEach((sub, i) => {
@@ -663,10 +725,8 @@
             if(document.getElementById('set-school-logo')) AppPrefs.schoolLogo = document.getElementById('set-school-logo').value.trim() || DEFAULT_PREFS.schoolLogo; 
             if(document.getElementById('set-teacher-name')) AppPrefs.teacherName = document.getElementById('set-teacher-name').value.trim(); 
             if(document.getElementById('set-bg-theme')) AppPrefs.theme = document.getElementById('set-bg-theme').value;
-            
-            if(document.getElementById('set-bg-blur')) {
-                AppPrefs.customBgBlur = parseInt(document.getElementById('set-bg-blur').value);
-            }
+            if(document.getElementById('set-bg-blur')) AppPrefs.customBgBlur = parseInt(document.getElementById('set-bg-blur').value);
+            if(document.getElementById('set-card-opacity')) AppPrefs.cardOpacity = parseInt(document.getElementById('set-card-opacity').value);
             
             try { localStorage.setItem('stAttendance_prefs', JSON.stringify(AppPrefs)); applyPrefs(); showToast('บันทึกการตั้งค่าสำเร็จ', 'fa-solid fa-check text-emerald-400'); switchView('view-loading'); } 
             catch (e) { showToast('หน่วยความจำเต็ม รูปอาจใหญ่เกินไป', 'fa-solid fa-triangle-exclamation text-red-400'); clearCustomBackground(); }
@@ -712,7 +772,7 @@
             const subjSel = document.getElementById('input-subject'); subjSel.innerHTML = '';
             AppPrefs.subjects.forEach(sub => { const opt = document.createElement('option'); opt.value = sub; opt.innerText = sub; subjSel.appendChild(opt); });
             subjSel.value = State.subjectName || AppPrefs.subjects[0];
-            document.getElementById('input-teacher').value = State.teacherName || AppPrefs.teacherName;
+            document.getElementById('input-teacher').value = AppPrefs.teacherName;
             document.getElementById('input-period').value = State.periodCount || "1";
             switchView('view-setup');
         }
