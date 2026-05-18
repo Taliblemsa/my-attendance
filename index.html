@@ -41,15 +41,15 @@
             --glass-blur: 25px;
         }
 
-        /* 🧹 Cleaned global text-align */
+        /* Global Reset */
         * { -webkit-tap-highlight-color: transparent; font-family: 'Sarabun', sans-serif; }
         body { color: #1e293b; background-color: #f8fafc; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
 
-        /* 🖼️ Background System */
+        /* Background System */
         .bg-container { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background-size: cover; background-position: center; background-attachment: fixed; transition: background-image 0.5s ease; }
         .bg-sphere { position: absolute; filter: blur(90px); opacity: 0.65; border-radius: 50%; animation: pulse 15s infinite alternate ease-in-out; }
         
-        /* 🎨 Theme System: 7 Themes */
+        /* Theme System: 7 Themes */
         .theme-amber .sphere-1 { top: -10%; right: -5%; width: 75vw; height: 75vw; background: radial-gradient(circle, #fef3c7, #f59e0b); }
         .theme-amber .sphere-2 { bottom: -15%; left: -10%; width: 85vw; height: 85vw; background: radial-gradient(circle, #ffedd5, #ea580c); animation-delay: -5s; }
         .theme-amber .btn-primary { background-color: #f59e0b; color: #1e293b; }
@@ -111,7 +111,7 @@
         .custom-bg-overlay { position: absolute; inset: 0; background: rgba(255, 255, 255, 0); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: 0.3s; }
         @keyframes pulse { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(10%, 5%) scale(1.1); } }
 
-        /* ✨ Liquid Clear Glassmorphism & Lens Effect */
+        /* Liquid Clear Glassmorphism */
         .glass-panel { 
             background: rgba(255, 255, 255, var(--glass-opacity)); 
             backdrop-filter: blur(var(--glass-blur)) saturate(180%) brightness(1.05) contrast(1.05); 
@@ -131,20 +131,19 @@
 
         /* Status Tabs */
         .status-container { background: rgba(255, 255, 255, 0.35); padding: 4px; display: flex; gap: 4px; border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); }
-        .status-tab { flex: 1; padding: 10px 0; font-size: 14px; font-weight: 800; color: #64748b; transition: 0.3s; text-align: center; text-shadow: none; display: flex; justify-content: center; align-items: center; }
+        .status-tab { flex: 1; padding: 10px 0; font-size: 14px; font-weight: 800; color: #64748b; transition: 0.3s; text-align: center; display: flex; justify-content: center; align-items: center; }
         .status-tab.active[data-status="มา"] { background: #10b981; color: white; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
         .status-tab.active[data-status="ลา"] { background: #0ea5e9; color: white; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3); }
         .status-tab.active[data-status="ขาด"] { background: #ef4444; color: white; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); }
 
+        /* Input Elements */
         .input-field { 
             width: 100%; padding: 14px 18px; 
-            border: 1px solid rgba(255,255,255,0.4); 
-            border-top: 1px solid rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255,255,255,0.4); border-top: 1px solid rgba(255, 255, 255, 0.7);
             background: rgba(255, 255, 255, 0.15); 
             backdrop-filter: blur(calc(var(--glass-blur) * 0.6)) saturate(150%);
             -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.6)) saturate(150%);
-            color: #1e293b; font-weight: 600; transition: 0.2s; text-shadow: none;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); text-align: left;
+            color: #1e293b; font-weight: 600; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); text-align: left;
         }
         .input-field:focus { outline: none; background: rgba(255, 255, 255, 0.5); border-color: rgba(255,255,255,0.9); }
         .input-field option { background: #ffffff; color: #1e293b; }
@@ -160,9 +159,6 @@
         .modal-bg.active { opacity: 1; pointer-events: auto; }
         .modal-box { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(30px); width: 100%; max-width: 420px; padding: 28px; transform: translateY(30px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); border: 1px solid rgba(255, 255, 255, 1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
         .modal-bg.active .modal-box { transform: translateY(0); }
-
-        #export-canvas, #export-behavior-canvas { background: #ffffff; padding: 25px; border: 1px solid #f1f5f9; text-shadow: none !important; }
-        #export-canvas *, #export-behavior-canvas * { text-shadow: none !important; }
 
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -181,21 +177,29 @@
             cardOpacity: 15,
             cardBlur: 25
         };
+        
         let earlyPrefs = JSON.parse(localStorage.getItem('stAttendance_prefs')) || DEFAULT_PREFS;
+        // Data Integrity Check
         if(earlyPrefs.cardOpacity === undefined) earlyPrefs.cardOpacity = 15;
         if(earlyPrefs.cardBlur === undefined) earlyPrefs.cardBlur = 25;
         if(earlyPrefs.customBgBlur === undefined) earlyPrefs.customBgBlur = 50;
+        if(!earlyPrefs.schoolName) earlyPrefs.schoolName = DEFAULT_PREFS.schoolName;
+        if(!earlyPrefs.schoolLogo) earlyPrefs.schoolLogo = DEFAULT_PREFS.schoolLogo;
 
         function applyPrefs() {
+            // 1. Set CSS Variables for Glassmorphism
             document.documentElement.style.setProperty('--glass-opacity', earlyPrefs.cardOpacity / 100);
             document.documentElement.style.setProperty('--glass-blur', earlyPrefs.cardBlur + 'px');
             
+            // 2. Set App Theme
             const appBody = document.getElementById('app-body');
             if(appBody) appBody.className = `flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)] ${earlyPrefs.theme}`;
             
+            // 3. Update Texts (If Elements Exist)
             document.querySelectorAll('.app-school-name-display').forEach(el => el.innerText = earlyPrefs.schoolName);
             document.querySelectorAll('.app-logo-display').forEach(el => el.innerText = earlyPrefs.schoolLogo);
             
+            // 4. Update Custom Background (If Elements Exist)
             const bgContainer = document.getElementById('bg-container');
             const overlay = document.getElementById('custom-bg-overlay');
             const s1 = document.getElementById('def-sphere-1');
@@ -204,7 +208,7 @@
             if(bgContainer && overlay && s1 && s2) {
                 if(earlyPrefs.customBg) {
                     bgContainer.style.backgroundImage = `url(${earlyPrefs.customBg})`;
-                    let blurVal = earlyPrefs.customBgBlur;
+                    let blurVal = earlyPrefs.customBgBlur !== undefined ? earlyPrefs.customBgBlur : 50;
                     overlay.style.backdropFilter = `blur(${blurVal / 5}px)`;
                     overlay.style.webkitBackdropFilter = `blur(${blurVal / 5}px)`;
                     overlay.style.background = `rgba(255,255,255,${(blurVal / 100) * 0.4})`;
@@ -221,10 +225,8 @@
 </head>
 <body class="flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)]" id="app-body">
     
-    <script>
-        // Apply Variables immediately to prevent FOUC
-        applyPrefs();
-    </script>
+    <!-- Apply Theme Instantly to Body -->
+    <script>applyPrefs();</script>
 
     <!-- Ambient Background Engine -->
     <div class="bg-container" id="bg-container">
@@ -238,12 +240,12 @@
 
     <!-- PWA Install Modal -->
     <div id="pwa-install-modal" class="modal-bg">
-        <div class="modal-box shape-card flex flex-col text-center items-center">
+        <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-blue-100 !text-blue-500 !border-0 text-shadow-none">
                 <i class="fa-solid fa-mobile-screen-button"></i>
             </div>
-            <h3 class="text-2xl font-black text-accent mb-2 glow-text text-center">ติดตั้งเป็นแอป</h3>
-            <p class="text-[14px] text-slate-600 font-medium mb-6 text-shadow-none leading-relaxed text-center" id="pwa-install-desc">
+            <h3 class="text-2xl font-black text-accent mb-2 glow-text text-center w-full">ติดตั้งเป็นแอป</h3>
+            <p class="text-[14px] text-slate-600 font-medium mb-6 text-shadow-none leading-relaxed text-center w-full" id="pwa-install-desc">
                 คุณสามารถติดตั้งแอปนี้ลงในเครื่องเพื่อให้เรียกใช้งานง่ายขึ้น และรองรับการทำงานแบบออฟไลน์
             </p>
             <div class="flex gap-3 w-full">
@@ -255,12 +257,12 @@
 
     <!-- Custom Confirm Dialog -->
     <div id="confirm-modal" class="modal-bg">
-        <div class="modal-box shape-card flex flex-col text-center items-center">
+        <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-red-100 !text-red-500 !border-0 text-shadow-none">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h3 class="text-2xl font-black text-accent mb-2 glow-text text-center" id="confirm-title">ยืนยัน</h3>
-            <p class="text-[14px] text-slate-600 font-medium mb-6 text-shadow-none text-center" id="confirm-msg">แน่ใจหรือไม่?</p>
+            <h3 class="text-2xl font-black text-accent mb-2 glow-text text-center w-full" id="confirm-title">ยืนยัน</h3>
+            <p class="text-[14px] text-slate-600 font-medium mb-6 text-shadow-none text-center w-full" id="confirm-msg">แน่ใจหรือไม่?</p>
             <div class="flex gap-3 w-full text-shadow-none">
                 <button id="btn-confirm-cancel" class="flex-1 flex items-center justify-center btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn">ยกเลิก</button>
                 <button id="btn-confirm-ok" class="flex-1 flex items-center justify-center btn-press bg-red-500 text-white font-bold py-3.5 shape-btn shadow-lg shadow-red-500/30">ยืนยัน</button>
@@ -268,7 +270,6 @@
         </div>
     </div>
 
-    <!-- Main Content Area -->
     <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative z-10">
         
         <!-- ================= VIEW 1: LANDING ================= -->
@@ -277,7 +278,6 @@
                 <div class="w-24 h-24 glass-panel shape-card shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group">
                     <span class="text-[40px] font-black text-primary tracking-tighter relative z-10 app-logo-display text-shadow-none">ส.ธ.</span>
                 </div>
-                <!-- 🛠️ BUG FIX: Perfectly centered texts -->
                 <h1 class="text-[38px] font-black text-accent leading-none tracking-tight glow-text text-center w-full">ระบบเช็คชื่อ</h1>
                 <p class="text-[15px] font-bold text-slate-600 mt-2 tracking-wide app-school-name-display opacity-90 glow-text text-center w-full">โรงเรียน</p>
             </header>
@@ -286,12 +286,11 @@
                 <div id="loading-spinner" class="mb-6 flex justify-center w-full">
                     <i class="fa-solid fa-compact-disc fa-spin text-5xl text-primary opacity-90 text-shadow-none"></i>
                 </div>
-                <!-- 🛠️ BUG FIX: Perfectly centered texts -->
                 <h2 class="text-xl font-black text-accent mb-1.5 glow-text text-center w-full" id="loading-title">กำลังประสานงาน...</h2>
                 <p class="text-[14px] text-slate-600 mb-8 font-medium glow-text text-center w-full" id="loading-desc">เชื่อมต่อฐานข้อมูล Google Sheets</p>
                 
                 <div id="action-buttons-container" class="hidden flex-col gap-3 w-full">
-                    <button id="btn-history-today" onclick="loadHistoryView()" class="hidden btn-press w-full bg-emerald-500 text-white font-black text-lg py-4.5 shape-btn shadow-xl flex items-center justify-center gap-3 text-shadow-none">
+                    <button id="btn-history-today" onclick="loadHistoryView()" class="hidden btn-press w-full bg-emerald-500 text-white font-black text-lg py-4.5 shape-btn shadow-xl items-center justify-center gap-3 text-shadow-none">
                         <i class="fa-solid fa-clock-rotate-left"></i> ประวัติเช็คชื่อวันนี้
                     </button>
                     <button id="btn-start" onclick="checkSetupAndStart()" class="btn-press w-full btn-primary font-black text-lg py-4.5 shape-btn shadow-xl flex items-center justify-center gap-3 text-shadow-none">
@@ -574,30 +573,32 @@
                 </button>
                 <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ใบสรุปผล</h2>
             </div>
-            <div id="export-canvas" class="relative shape-card shadow-sm text-left">
+            <div id="export-canvas" class="relative shape-card shadow-sm text-left bg-white p-6 border border-slate-100 overflow-hidden text-shadow-none">
                 <div class="absolute top-0 left-0 w-full h-2 btn-primary rounded-t-[24px]"></div>
+                
                 <div class="text-center mb-5 mt-2">
                     <p class="font-black text-accent text-[15px] app-school-name-display text-center w-full">โรงเรียน</p>
                     <div class="w-12 h-0.5 bg-slate-200 mx-auto my-2"></div>
-                    <h2 class="text-[22px] font-black text-accent leading-tight text-center w-full">รายงานการเข้าเรียน</h2>
-                    <div class="text-[11px] font-black text-slate-600 bg-slate-100 inline-block px-5 py-1 rounded-full mt-2 text-center" id="export-header-date"></div>
+                    <h2 class="text-[22px] font-black text-primary leading-tight text-center w-full">รายงานการเข้าเรียน</h2>
+                    <div class="text-[11px] font-black text-slate-600 bg-slate-100 inline-block px-5 py-1 rounded-full mt-2 text-center shadow-sm border border-slate-200" id="export-header-date"></div>
                 </div>
                 
-                <div class="bg-white rounded-2xl p-3 border border-slate-100 space-y-1.5 mb-5 shadow-sm">
-                    <div class="flex justify-between items-center"><span class="font-bold text-slate-400 text-[14px]">วิชาที่สอน:</span><span class="font-black text-accent text-[14px]" id="export-subject-val"></span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-slate-400 text-[14px]">ครูผู้สอน:</span><span class="font-black text-accent text-[14px]" id="export-teacher-val"></span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-slate-400 text-[14px]">ชั้นเรียน:</span><span class="font-black text-primary text-[14px]" id="export-room-only"></span></div>
+                <div class="bg-surface rounded-2xl p-4 border border-slate-200 space-y-2 mb-5 shadow-inner">
+                    <div class="flex justify-between items-center"><span class="font-bold text-slate-500 text-[14px]">วิชาที่สอน:</span><span class="font-black text-accent text-[14px]" id="export-subject-val"></span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-slate-500 text-[14px]">ครูผู้สอน:</span><span class="font-black text-accent text-[14px]" id="export-teacher-val"></span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-slate-500 text-[14px]">ชั้นเรียน:</span><span class="font-black text-primary text-[14px] bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100" id="export-room-only"></span></div>
                 </div>
 
                 <div class="flex justify-center gap-2 mb-5 font-black">
-                    <div class="flex-1 bg-emerald-50 text-emerald-600 py-2 rounded-[14px] border border-emerald-100 flex items-center justify-center gap-1.5"><span class="text-[13px] uppercase">มา</span><span id="export-count-มา" class="text-[14px]">0</span></div>
-                    <div class="flex-1 bg-sky-50 text-sky-600 py-2 rounded-[14px] border border-sky-100 flex items-center justify-center gap-1.5"><span class="text-[13px] uppercase">ลา</span><span id="export-count-ลา" class="text-[14px]">0</span></div>
-                    <div class="flex-1 bg-red-50 text-red-600 py-2 rounded-[14px] border border-red-100 flex items-center justify-center gap-1.5"><span class="text-[13px] uppercase">ขาด</span><span id="export-count-ขาด" class="text-[14px]">0</span></div>
+                    <div class="flex-1 bg-emerald-50 text-emerald-600 py-2.5 rounded-[16px] border border-emerald-100 flex items-center justify-center gap-1.5 shadow-sm"><span class="text-[13px] uppercase">มา</span><span id="export-count-มา" class="text-[15px]">0</span></div>
+                    <div class="flex-1 bg-sky-50 text-sky-600 py-2.5 rounded-[16px] border border-sky-100 flex items-center justify-center gap-1.5 shadow-sm"><span class="text-[13px] uppercase">ลา</span><span id="export-count-ลา" class="text-[15px]">0</span></div>
+                    <div class="flex-1 bg-red-50 text-red-600 py-2.5 rounded-[16px] border border-red-100 flex items-center justify-center gap-1.5 shadow-sm"><span class="text-[13px] uppercase">ขาด</span><span id="export-count-ขาด" class="text-[15px]">0</span></div>
                 </div>
-                <div id="export-absent-list" class="space-y-2"></div>
+                <div id="export-absent-list" class="space-y-3"></div>
                 
-                <div class="mt-6 pt-3 border-t border-dashed border-slate-200 text-center">
+                <div class="mt-6 pt-4 border-t border-dashed border-slate-300 text-center relative">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center w-full">บันทึกเมื่อ: <span id="export-timestamp"></span></p>
+                    <i class="fa-solid fa-shield-check absolute right-0 top-3 text-3xl text-slate-100"></i>
                 </div>
             </div>
             
@@ -619,24 +620,27 @@
                 </button>
                 <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ผลประพฤติ</h2>
             </div>
-            <div id="export-behavior-canvas" class="relative shape-card shadow-sm text-left">
+            <div id="export-behavior-canvas" class="relative shape-card shadow-sm text-left bg-white p-6 border border-slate-100 overflow-hidden text-shadow-none">
                 <div class="absolute top-0 left-0 w-full h-2 bg-red-500 rounded-t-[24px]"></div>
+                
                 <div class="text-center mb-5 pt-2">
                     <p class="font-black text-accent text-[15px] app-school-name-display text-center w-full">โรงเรียน</p>
                     <div class="w-12 h-0.5 bg-slate-200 mx-auto my-2"></div>
                     <h2 class="text-[22px] font-black text-red-600 leading-tight text-center w-full">รายงานพฤติกรรม</h2>
-                    <div class="text-[11px] font-black text-red-900 bg-red-50 inline-block px-5 py-1 rounded-full mt-2 border border-red-100 text-center" id="export-behavior-header-date"></div>
+                    <div class="text-[11px] font-black text-red-900 bg-red-50 inline-block px-5 py-1 rounded-full mt-2 border border-red-100 text-center shadow-sm" id="export-behavior-header-date"></div>
                 </div>
                 
-                <div class="bg-white rounded-2xl p-3.5 border border-slate-100 space-y-1.5 mb-5 shadow-sm">
-                    <div class="flex justify-between items-center"><span class="font-bold text-slate-400 text-[14px]">วิชาที่สอน:</span><span class="font-black text-accent text-[14px]" id="export-behavior-subject-val"></span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-slate-400 text-[14px]">ครูผู้สอน:</span><span class="font-black text-accent text-[14px]" id="export-behavior-teacher-val"></span></div>
-                    <div class="flex justify-between items-center"><span class="font-bold text-slate-400 text-[14px]">ชั้นเรียน:</span><span class="font-black text-accent text-[14px]" id="export-behavior-room-only"></span></div>
+                <div class="bg-surface rounded-2xl p-4 border border-slate-200 space-y-2 mb-5 shadow-inner">
+                    <div class="flex justify-between items-center"><span class="font-bold text-slate-500 text-[14px]">วิชาที่สอน:</span><span class="font-black text-accent text-[14px]" id="export-behavior-subject-val"></span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-slate-500 text-[14px]">ครูผู้สอน:</span><span class="font-black text-accent text-[14px]" id="export-behavior-teacher-val"></span></div>
+                    <div class="flex justify-between items-center"><span class="font-bold text-slate-500 text-[14px]">ชั้นเรียน:</span><span class="font-black text-accent text-[14px] bg-white px-2 py-0.5 rounded shadow-sm border border-slate-100" id="export-behavior-room-only"></span></div>
                 </div>
                 
-                <div id="export-behavior-list" class="space-y-2"></div>
-                <div class="mt-6 pt-3 border-t border-dashed border-slate-200 text-center">
+                <div id="export-behavior-list" class="space-y-3"></div>
+                
+                <div class="mt-6 pt-4 border-t border-dashed border-slate-300 text-center relative">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center w-full">บันทึกเมื่อ: <span id="export-behavior-timestamp"></span></p>
+                    <i class="fa-solid fa-triangle-exclamation absolute right-0 top-3 text-3xl text-slate-100"></i>
                 </div>
             </div>
             
@@ -673,14 +677,17 @@
         let historyData = null;
 
         document.addEventListener('DOMContentLoaded', () => {
+            applyPrefs(); // Guarantee application of UI elements after DOM is completely ready.
+
             const uploadEl = document.getElementById('set-bg-upload');
             if(uploadEl) uploadEl.addEventListener('change', handleImageUpload);
             
             checkPwaInstall();
             fetchStudentData();
+            loadDailyHistory();
         });
 
-        // Offline Service Worker
+        // Offline Service Worker Validation
         if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW registered')).catch(err => console.error('SW Error:', err));
@@ -829,7 +836,6 @@
                     const d = document.getElementById('loading-desc'); if(d) d.innerText = `ดาวน์โหลดรายชื่อแล้ว (${State.allStudents.length} คน)`;
                     const btnC = document.getElementById('action-buttons-container');
                     if(btnC) { btnC.classList.remove('hidden'); btnC.classList.add('flex'); }
-                    loadDailyHistory();
                 } else throw new Error("ไฟล์ว่าง");
             } catch (err) {
                 const spin = document.getElementById('loading-spinner');
@@ -847,7 +853,10 @@
                 State.attendance = stored.data;
                 State.behavior = stored.behavior || {};
                 const btn = document.getElementById('btn-history-today');
-                if(btn) btn.classList.remove('hidden');
+                if(btn) {
+                    btn.classList.remove('hidden');
+                    btn.classList.add('flex'); // Ensure it becomes visible correctly
+                }
             } else { localStorage.removeItem('st_daily_history'); }
         }
 
