@@ -600,9 +600,15 @@
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center w-full">บันทึกเมื่อ: <span id="export-timestamp"></span></p>
                 </div>
             </div>
-            <button id="btn-save-image" onclick="downloadAndShareImage('export-canvas', 'เช็คชื่อ')" class="mt-6 mb-12 btn-press w-full btn-primary font-black py-4.5 shape-btn shadow-xl text-lg flex items-center justify-center gap-3 text-shadow-none">
-                <i class="fa-solid fa-image"></i> บันทึกและแชร์
-            </button>
+            
+            <div class="flex gap-3 mt-6 mb-12">
+                <button onclick="processImageExport('export-canvas', 'เช็คชื่อ', 'download')" class="flex-1 btn-press bg-emerald-500 text-white font-black py-4 shape-btn shadow-xl shadow-emerald-500/30 text-lg flex items-center justify-center gap-2 text-shadow-none">
+                    <i class="fa-solid fa-download"></i> บันทึก
+                </button>
+                <button onclick="processImageExport('export-canvas', 'เช็คชื่อ', 'share')" class="flex-1 btn-press btn-primary font-black py-4 shape-btn shadow-xl text-lg flex items-center justify-center gap-2 text-shadow-none">
+                    <i class="fa-solid fa-share-nodes"></i> แชร์ต่อ
+                </button>
+            </div>
         </section>
 
         <!-- ================= VIEW 6: BEHAVIOR SUMMARY ================= -->
@@ -633,9 +639,15 @@
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center w-full">บันทึกเมื่อ: <span id="export-behavior-timestamp"></span></p>
                 </div>
             </div>
-            <button id="btn-save-behavior-image" onclick="downloadAndShareImage('export-behavior-canvas', 'ความประพฤติ')" class="mt-6 mb-12 btn-press w-full bg-accent text-white font-black py-4.5 shape-btn shadow-xl text-lg flex items-center justify-center gap-3 text-shadow-none">
-                <i class="fa-solid fa-file-image text-primary"></i> บันทึกและแชร์
-            </button>
+            
+            <div class="flex gap-3 mt-6 mb-12">
+                <button onclick="processImageExport('export-behavior-canvas', 'ความประพฤติ', 'download')" class="flex-1 btn-press bg-emerald-500 text-white font-black py-4 shape-btn shadow-xl shadow-emerald-500/30 text-lg flex items-center justify-center gap-2 text-shadow-none">
+                    <i class="fa-solid fa-download"></i> บันทึก
+                </button>
+                <button onclick="processImageExport('export-behavior-canvas', 'ความประพฤติ', 'share')" class="flex-1 btn-press btn-primary font-black py-4 shape-btn shadow-xl text-lg flex items-center justify-center gap-2 text-shadow-none">
+                    <i class="fa-solid fa-share-nodes"></i> แชร์ต่อ
+                </button>
+            </div>
         </section>
     </main>
 
@@ -956,71 +968,130 @@
         function prepareAndShowSummary() {
             const data = State.attendance[`${State.currentClass}-${State.currentRoom}`] || {};
             if (Object.keys(data).length === 0) return showToast('ยังไม่ได้เช็คชื่อเลยครับ', 'fa-solid fa-circle-exclamation text-amber-400');
+            
             const students = State.allStudents.filter(s => s.room === State.currentRoom);
-            const subV = document.getElementById('export-subject-val'); if(subV) subV.innerText = `${State.subjectName} (${State.periodCount} คาบ)`;
-            const teaV = document.getElementById('export-teacher-val'); if(teaV) teaV.innerText = State.teacherName;
-            const hdD = document.getElementById('export-header-date'); if(hdD) hdD.innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-            const rmV = document.getElementById('export-room-only'); if(rmV) rmV.innerText = `ม.${State.currentRoom}`;
-            const counts = { "มา": 0, "ลา": 0, "ขาด": 0 }; const statusNames = { "ลา": [], "ขาด": [] };
-            students.forEach(st => { const s = data[st.id]; if(s) { counts[s]++; if(s !== "มา") statusNames[s].push(st.name); } });
-            CONFIG.STATUSES.forEach(s => { const el = document.getElementById(`export-count-${s}`); if(el) el.innerText = counts[s]; });
-            let html = ''; ["ลา", "ขาด"].forEach(s => {
+            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            
+            document.getElementById('export-subject-val').innerText = `${State.subjectName} (${State.periodCount} คาบ)`;
+            document.getElementById('export-teacher-val').innerText = State.teacherName;
+            document.getElementById('export-header-date').innerHTML = `<i class="fa-regular fa-calendar text-slate-400"></i> <span class="ml-1">${dateStr}</span>`;
+            document.getElementById('export-room-only').innerText = `ม.${State.currentRoom}`;
+            
+            const counts = { "มา": 0, "ลา": 0, "ขาด": 0 }; 
+            const statusNames = { "ลา": [], "ขาด": [] };
+            
+            students.forEach(st => { 
+                const s = data[st.id]; 
+                if(s) { 
+                    counts[s]++; 
+                    if(s !== "มา") statusNames[s].push(st.name); 
+                } 
+            });
+            
+            CONFIG.STATUSES.forEach(s => document.getElementById(`export-count-${s}`).innerText = counts[s]);
+            
+            let html = ''; 
+            ["ลา", "ขาด"].forEach(s => {
                 if(statusNames[s].length > 0) {
                     let c = s === 'ลา' ? 'sky' : 'red';
-                    html += `<div class="bg-${c}-50/50 p-3 shape-card border border-${c}-100 text-left"><div class="font-black text-${c}-700 mb-1 border-b border-${c}-100 pb-1 flex justify-between items-center text-[13px]"><span>สถานะ: ${s}</span><span class="bg-white px-2.5 py-0.5 shape-btn shadow-sm text-[10px] font-black">${statusNames[s].length} คน</span></div><div class="grid grid-cols-1 gap-0.5">${statusNames[s].map((n, i) => `<div class="text-[12px] font-bold text-slate-600 pl-1 text-left"><span class="opacity-40 mr-1 text-[10px]">${i+1}.</span> ${n}</div>`).join('')}</div></div>`;
+                    html += `<div class="bg-${c}-50/60 p-4 rounded-[20px] border border-${c}-100 shadow-sm relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-${c}-400"></div>
+                        <div class="font-black text-${c}-700 mb-2 pb-2 border-b border-${c}-200/50 flex justify-between items-center text-[14px]">
+                            <span><i class="fa-solid ${s === 'ลา' ? 'fa-user-clock' : 'fa-user-xmark'} mr-1.5 opacity-70"></i> สถานะ: ${s}</span>
+                            <span class="bg-white px-3 py-1 rounded-lg shadow-sm text-[11px] font-black">${statusNames[s].length} คน</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-1.5">
+                            ${statusNames[s].map((n, i) => `<div class="text-[13px] font-bold text-slate-600 pl-2 flex items-center"><span class="w-5 text-[10px] opacity-40">${i+1}.</span> <span class="text-accent">${n}</span></div>`).join('')}
+                        </div>
+                    </div>`;
                 }
             });
-            const abL = document.getElementById('export-absent-list'); if(abL) abL.innerHTML = html || '<div class="text-center py-6 border border-emerald-100 bg-emerald-50/50 shape-card"><i class="fa-solid fa-check-circle text-3xl text-emerald-400 mb-2 block"></i><p class="font-black text-emerald-600 text-sm">มาเรียนครบทุกคนครับ!</p></div>';
-            const tsP = document.getElementById('export-timestamp'); if(tsP) tsP.innerText = new Date().toLocaleTimeString('th-TH'); 
+            
+            document.getElementById('export-absent-list').innerHTML = html || `<div class="text-center py-8 border-2 border-dashed border-emerald-200 bg-emerald-50 rounded-[24px]">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl shadow-sm"><i class="fa-solid fa-check"></i></div>
+                <p class="font-black text-emerald-600 text-[16px]">มาเรียนครบทุกคน!</p>
+                <p class="text-emerald-500/80 text-xs font-bold mt-1">ยอดเยี่ยมมากครับ</p>
+            </div>`;
+            
+            document.getElementById('export-timestamp').innerText = new Date().toLocaleTimeString('th-TH');
             switchView('view-summary');
         }
 
         function prepareAndShowBehaviorSummary() {
             const data = State.behavior[`${State.currentClass}-${State.currentRoom}`] || {};
-            if (!Object.values(data).some(d => d.tags.length > 0)) return showToast('ไม่มีบันทึกพฤติกรรมห้องนี้ครับ', 'fa-solid fa-shield text-amber-400');
+            if (!Object.values(data).some(d => d.tags.length > 0)) return showToast('ยังไม่มีบันทึกพฤติกรรมครับ', 'fa-solid fa-shield text-amber-400');
+            
             const students = State.allStudents.filter(s => s.room === State.currentRoom);
-            const subV = document.getElementById('export-behavior-subject-val'); if(subV) subV.innerText = State.subjectName;
-            const teaV = document.getElementById('export-behavior-teacher-val'); if(teaV) teaV.innerText = State.teacherName;
-            const hdD = document.getElementById('export-behavior-header-date'); if(hdD) hdD.innerText = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
-            const rmV = document.getElementById('export-behavior-room-only'); if(rmV) rmV.innerText = `ม.${State.currentRoom}`;
+            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            
+            document.getElementById('export-behavior-subject-val').innerText = State.subjectName;
+            document.getElementById('export-behavior-teacher-val').innerText = State.teacherName;
+            document.getElementById('export-behavior-header-date').innerHTML = `<i class="fa-regular fa-calendar text-slate-400"></i> <span class="ml-1">${dateStr}</span>`;
+            document.getElementById('export-behavior-room-only').innerText = `ม.${State.currentRoom}`;
+            
             let html = '', count = 0;
             students.forEach(st => {
                 const d = data[st.id];
                 if(d && d.tags.length > 0) {
                     count++; let pts = 0, issues = [];
-                    d.tags.forEach(t => { if(t === 'อื่นๆ') { let s = parseInt(d.otherScore)||0; pts += s; issues.push(`${d.other||"อื่นๆ"} (-${s})`); } else { pts += CONFIG.BEHAVIORS[t]; issues.push(`${t} (-${CONFIG.BEHAVIORS[t]})`); } });
-                    html += `<div class="bg-white border-l-[4px] border-red-500 p-3 shape-card shadow-sm mb-2 text-left"><div class="flex justify-between items-start mb-0.5"><div class="font-black text-accent text-[14px] tracking-tight text-left">${count}. ${st.name} <span class="text-accent/30 font-bold ml-1 text-[10px]">(เลขที่ ${st.id})</span></div><div class="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 shape-btn shadow-sm uppercase shrink-0 ml-2">หัก ${pts} คะแนน</div></div><div class="text-[11px] font-bold text-red-600/80 flex items-center gap-1.5 pl-1 leading-tight text-left"><i class="fa-solid fa-triangle-exclamation text-[8px]"></i> ${issues.join(' • ')}</div></div>`;
+                    d.tags.forEach(t => {
+                        if(t === 'อื่นๆ') { 
+                            let s = parseInt(d.otherScore)||0; pts += s; 
+                            issues.push(`${d.other||"อื่นๆ"} (-${s})`); 
+                        } else { 
+                            pts += CONFIG.BEHAVIORS[t]; 
+                            issues.push(`${t} (-${CONFIG.BEHAVIORS[t]})`); 
+                        }
+                    });
+                    html += `<div class="bg-white border border-slate-100 rounded-[20px] p-4 shadow-sm mb-3 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500"></div>
+                        <div class="flex justify-between items-start mb-2.5">
+                            <div class="font-black text-accent text-[15px] tracking-tight leading-tight">${count}. ${st.name} <br><span class="text-slate-400 font-bold text-[11px]">(เลขที่ ${st.id})</span></div>
+                            <div class="bg-red-50 text-red-600 text-[11px] font-black px-2.5 py-1 rounded-lg border border-red-100 shadow-sm uppercase shrink-0 mt-0.5">หัก ${pts} คะแนน</div>
+                        </div>
+                        <div class="text-[12px] font-bold text-slate-500 flex items-start gap-2 pl-1 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100/50">
+                            <i class="fa-solid fa-triangle-exclamation text-red-400 mt-1"></i> <span>${issues.join(', ')}</span>
+                        </div>
+                    </div>`;
                 }
             });
-            const bhL = document.getElementById('export-behavior-list'); if(bhL) bhL.innerHTML = html;
-            const tsP = document.getElementById('export-behavior-timestamp'); if(tsP) tsP.innerText = new Date().toLocaleTimeString('th-TH'); 
+            
+            document.getElementById('export-behavior-list').innerHTML = html;
+            document.getElementById('export-behavior-timestamp').innerText = new Date().toLocaleTimeString('th-TH');
             switchView('view-behavior-summary');
         }
 
-        function downloadAndShareImage(id, type) {
+        function processImageExport(id, type, action) {
             window.scrollTo(0,0); showToast('กำลังประมวลผลรูปภาพ...', 'fa-solid fa-camera text-primary');
             setTimeout(() => {
                 const target = document.getElementById(id);
                 if(target) {
                     html2canvas(target, { scale: 3, backgroundColor: '#ffffff', useCORS: true }).then(canvas => {
                         const imgUrl = canvas.toDataURL('image/png');
-                        showConfirm('บันทึกสำเร็จ', 'คุณต้องการบันทึกลงเครื่องหรือแชร์ต่อไปยังแอปอื่น?', () => {
+                        const fileName = `รายงาน_${type}_ม${State.currentRoom}.png`;
+                        
+                        if (action === 'download') {
+                            const link = document.createElement('a');
+                            link.download = fileName;
+                            link.href = imgUrl;
+                            link.click();
+                            showToast('บันทึกลงแกลลอรี่เรียบร้อย', 'fa-solid fa-check text-emerald-500');
+                        } else if (action === 'share') {
                             canvas.toBlob(blob => {
-                                const file = new File([blob], `รายงาน_${type}_ม${State.currentRoom}.png`, { type: 'image/png' });
+                                const file = new File([blob], fileName, { type: 'image/png' });
                                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                                    navigator.share({ files: [file], title: `รายงาน${type} ม.${State.currentRoom}`, text: `สรุป${type} ม.${State.currentRoom} วิชา ${State.subjectName}` }).catch(console.error);
+                                    navigator.share({ 
+                                        files: [file], 
+                                        title: `รายงาน${type} ม.${State.currentRoom}`, 
+                                        text: `สรุป${type} ม.${State.currentRoom} วิชา ${State.subjectName}` 
+                                    }).catch(err => { console.log('Share cancelled or failed'); });
                                 } else {
-                                    const link = document.createElement('a'); link.download = `รายงาน_${type}_ม${State.currentRoom}.png`; link.href = imgUrl; link.click();
+                                    showToast('เบราว์เซอร์ไม่รองรับการแชร์โดยตรง', 'fa-solid fa-circle-info text-amber-500');
                                 }
                             });
-                        });
-                        
-                        const btnCancel = document.getElementById('btn-confirm-cancel'); if(btnCancel) btnCancel.innerText = 'ปิด';
-                        const btnOk = document.getElementById('btn-confirm-ok'); 
-                        if(btnOk) {
-                            btnOk.innerHTML = '<i class="fa-solid fa-share-nodes"></i> แชร์รูปภาพ';
-                            btnOk.classList.add('flex', 'justify-center');
                         }
+                    }).catch(err => {
+                        showToast('เกิดข้อผิดพลาดในการเซฟรูป', 'fa-solid fa-triangle-exclamation text-red-500');
                     });
                 }
             }, 600);
