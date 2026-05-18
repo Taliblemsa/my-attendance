@@ -258,7 +258,8 @@
         <!-- ================= VIEW: SETTINGS ================= -->
         <section id="view-settings" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
             <div class="flex items-center mb-6 shrink-0">
-                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm" onclick="switchView('view-loading')"><i class="fa-solid fa-arrow-left text-lg"></i></button>
+                <!-- แก้ไขปุ่มย้อนกลับ เพื่อให้ดึงค่าเดิมกลับมาหากไม่ได้กดบันทึก -->
+                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm" onclick="applyPrefs(); switchView('view-loading')"><i class="fa-solid fa-arrow-left text-lg"></i></button>
                 <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none">ตั้งค่าระบบ</h2>
             </div>
             <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4">
@@ -285,7 +286,18 @@
 
                 <div class="glass-panel shape-card p-5 border-white/50">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-image"></i> ภาพพื้นหลัง</h3>
-                    <input type="file" id="set-bg-upload" accept="image/*" class="w-full text-sm text-slate-500 mb-3">
+                    
+                    <!-- ซ่อน Input ธรรมดา และแทนที่ด้วยแถบปรับความเบลอ -->
+                    <input type="file" id="set-bg-upload" accept="image/*" class="hidden">
+                    
+                    <div class="mb-5">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-[12px] font-bold text-slate-600">ระดับความเบลอของภาพ</label>
+                            <span id="display-bg-blur" class="text-[12px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md">50%</span>
+                        </div>
+                        <input type="range" id="set-bg-blur" min="0" max="100" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" oninput="previewBgBlur(this.value); document.getElementById('display-bg-blur').innerText = this.value + '%'">
+                    </div>
+
                     <div class="flex gap-2">
                         <button onclick="clearCustomBackground()" class="bg-red-50 text-red-500 font-bold px-4 py-2 shape-btn text-xs flex-1 border border-red-100"><i class="fa-solid fa-trash mr-1"></i> นำรูปออก</button>
                         <button onclick="document.getElementById('set-bg-upload').click()" class="bg-slate-100 text-slate-700 font-bold px-4 py-2 shape-btn text-xs flex-1 border border-slate-200"><i class="fa-solid fa-upload mr-1"></i> เลือกรูปใหม่</button>
@@ -474,7 +486,17 @@
             const s1 = document.getElementById('def-sphere-1'); const s2 = document.getElementById('def-sphere-2');
             
             if(AppPrefs.customBg) {
-                bg.style.backgroundImage = `url(${AppPrefs.customBg})`; overlay.classList.remove('hidden'); s1.style.display = 'none'; s2.style.display = 'none';
+                bg.style.backgroundImage = `url(${AppPrefs.customBg})`; 
+                overlay.classList.remove('hidden'); 
+                s1.style.display = 'none'; s2.style.display = 'none';
+                
+                // คำนวณความเบลอและความสว่าง
+                let blurVal = AppPrefs.customBgBlur !== undefined ? AppPrefs.customBgBlur : 50;
+                let pxBlur = (blurVal / 100) * 20; 
+                let alpha = (blurVal / 100) * 0.5;
+                overlay.style.backdropFilter = `blur(${pxBlur}px)`; 
+                overlay.style.webkitBackdropFilter = `blur(${pxBlur}px)`; 
+                overlay.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
             } else {
                 bg.style.backgroundImage = 'none'; overlay.classList.add('hidden'); s1.style.display = 'block'; s2.style.display = 'block';
             }
@@ -593,7 +615,22 @@
 
         function openSettingsView() { switchView('view-settings'); }
         function loadSettingsToForm() {
-            document.getElementById('set-school-name').value = AppPrefs.schoolName; document.getElementById('set-school-logo').value = AppPrefs.schoolLogo; document.getElementById('set-teacher-name').value = AppPrefs.teacherName; document.getElementById('set-bg-theme').value = AppPrefs.theme; renderSettingsSubjectList();
+            if(document.getElementById('set-school-name')) document.getElementById('set-school-name').value = AppPrefs.schoolName; 
+            if(document.getElementById('set-school-logo')) document.getElementById('set-school-logo').value = AppPrefs.schoolLogo; 
+            if(document.getElementById('set-teacher-name')) document.getElementById('set-teacher-name').value = AppPrefs.teacherName; 
+            if(document.getElementById('set-bg-theme')) document.getElementById('set-bg-theme').value = AppPrefs.theme;
+            
+            let blurVal = AppPrefs.customBgBlur !== undefined ? AppPrefs.customBgBlur : 50;
+            if(document.getElementById('set-bg-blur')) {
+                document.getElementById('set-bg-blur').value = blurVal; 
+                document.getElementById('display-bg-blur').innerText = blurVal + '%';
+            }
+            renderSettingsSubjectList();
+        }
+        function previewBgBlur(val) {
+            const overlay = document.getElementById('custom-bg-overlay');
+            let pxBlur = (val / 100) * 20; let alpha = (val / 100) * 0.5;
+            overlay.style.backdropFilter = `blur(${pxBlur}px)`; overlay.style.webkitBackdropFilter = `blur(${pxBlur}px)`; overlay.style.backgroundColor = `rgba(255, 255, 255, ${alpha})`;
         }
         function renderSettingsSubjectList() {
             const ul = document.getElementById('set-subject-list'); ul.innerHTML = '';
@@ -622,7 +659,15 @@
         function clearCustomBackground() { AppPrefs.customBg = null; document.getElementById('set-bg-upload').value = ''; applyPrefs(); showToast('ลบรูปพื้นหลังสำเร็จ', 'fa-solid fa-trash text-emerald-400'); }
 
         function saveSettings() {
-            AppPrefs.schoolName = document.getElementById('set-school-name').value.trim() || DEFAULT_PREFS.schoolName; AppPrefs.schoolLogo = document.getElementById('set-school-logo').value.trim() || DEFAULT_PREFS.schoolLogo; AppPrefs.teacherName = document.getElementById('set-teacher-name').value.trim(); AppPrefs.theme = document.getElementById('set-bg-theme').value;
+            if(document.getElementById('set-school-name')) AppPrefs.schoolName = document.getElementById('set-school-name').value.trim() || DEFAULT_PREFS.schoolName; 
+            if(document.getElementById('set-school-logo')) AppPrefs.schoolLogo = document.getElementById('set-school-logo').value.trim() || DEFAULT_PREFS.schoolLogo; 
+            if(document.getElementById('set-teacher-name')) AppPrefs.teacherName = document.getElementById('set-teacher-name').value.trim(); 
+            if(document.getElementById('set-bg-theme')) AppPrefs.theme = document.getElementById('set-bg-theme').value;
+            
+            if(document.getElementById('set-bg-blur')) {
+                AppPrefs.customBgBlur = parseInt(document.getElementById('set-bg-blur').value);
+            }
+            
             try { localStorage.setItem('stAttendance_prefs', JSON.stringify(AppPrefs)); applyPrefs(); showToast('บันทึกการตั้งค่าสำเร็จ', 'fa-solid fa-check text-emerald-400'); switchView('view-loading'); } 
             catch (e) { showToast('หน่วยความจำเต็ม รูปอาจใหญ่เกินไป', 'fa-solid fa-triangle-exclamation text-red-400'); clearCustomBackground(); }
         }
