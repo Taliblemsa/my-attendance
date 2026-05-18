@@ -112,7 +112,7 @@
     </style>
     
     <script>
-        const DEFAULT_PREFS = { schoolName: "โรงเรียนสันติธรรมวิทยามูลนิธิ", schoolLogo: "ส.ธ.", teacherName: "ครูอาณัติ เหล็มสะ", subjects: ["อัลกุรอาน", "ฟิกฮ์", "ตัฟซีร", "คณิตศาสตร์", "วิทยาศาสตร์"], theme: "theme-amber", customBg: null };
+        const DEFAULT_PREFS = { schoolName: "โรงเรียนสันติธรรมวิทยามูลนิธิ", schoolLogo: "ส.ธ.", teacherName: "", subjects: [], theme: "theme-amber", customBg: null };
         let earlyPrefs = JSON.parse(localStorage.getItem('stAttendance_prefs')) || DEFAULT_PREFS;
     </script>
 </head>
@@ -138,6 +138,19 @@
             <div class="flex gap-3 w-full">
                 <button id="btn-confirm-cancel" class="flex-1 btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn">ยกเลิก</button>
                 <button id="btn-confirm-ok" class="flex-1 btn-press bg-red-500 text-white font-bold py-3.5 shape-btn shadow-lg shadow-red-500/30">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Setup Alert Modal -->
+    <div id="setup-modal" class="modal-bg">
+        <div class="modal-box shape-card flex flex-col text-center items-center">
+            <div class="w-16 h-16 bg-amber-100 text-amber-500 rounded-2xl flex items-center justify-center text-3xl mb-4 border border-amber-200 shadow-sm"><i class="fa-solid fa-user-gear"></i></div>
+            <h3 class="text-2xl font-black text-accent mb-2">ตั้งค่าก่อนใช้งาน</h3>
+            <p class="text-[14px] text-slate-500 font-medium mb-6 leading-relaxed">กรุณาตั้งค่า <b>"ชื่อครูผู้สอน"</b> และ <b>"รายวิชาที่สอน"</b><br>ให้เรียบร้อยก่อนกดเข้าสู่ระบบครับ</p>
+            <div class="flex gap-3 w-full">
+                <button id="btn-setup-close" class="flex-1 btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn flex justify-center items-center">ปิด</button>
+                <button id="btn-setup-go" class="flex-1 btn-press btn-primary font-bold py-3.5 shape-btn shadow-lg flex justify-center items-center gap-2"><i class="fa-solid fa-gear"></i> ไปตั้งค่า</button>
             </div>
         </div>
     </div>
@@ -191,7 +204,7 @@
                     <button id="btn-history" onclick="openHistoryView()" class="hidden btn-press w-full bg-emerald-500 text-white font-black text-lg py-4 shape-btn shadow-lg shadow-emerald-500/30 items-center justify-center gap-3">
                         <i class="fa-solid fa-clock-rotate-left"></i> ประวัติเช็คชื่อวันนี้
                     </button>
-                    <button onclick="switchView('view-class')" class="btn-press w-full btn-primary font-black text-lg py-4.5 shape-btn shadow-xl flex items-center justify-center gap-3">
+                    <button onclick="checkSetupAndProceed()" class="btn-press w-full btn-primary font-black text-lg py-4.5 shape-btn shadow-xl flex items-center justify-center gap-3">
                         <i class="fa-solid fa-right-to-bracket text-base"></i> เข้าสู่ระบบ
                     </button>
                     <button onclick="openSettingsView()" class="btn-press w-full bg-white/90 text-accent font-black py-3.5 shape-btn border border-slate-200 shadow-sm flex items-center justify-center gap-2">
@@ -220,7 +233,7 @@
                 <div class="glass-panel shape-card p-5 bg-primary/5 border-primary/20">
                     <h4 class="text-[13px] font-black text-primary uppercase tracking-widest mb-2 flex items-center justify-center gap-2"><i class="fa-solid fa-hands-praying"></i> ดุอาอ์ก่อนเริ่มงาน</h4>
                     <p class="text-[15px] leading-relaxed text-accent font-bold text-center mb-1">رَبِّ زِدْنِي عِلْمًا وَارْزُقْنِي فَهْمًا</p>
-                    <p class="text-[13px] leading-relaxed text-slate-600 font-medium text-center">"ร็อบบิซิ๊ดนี อิลมัน วรัซซุกนี ฟะฮ์มัน"</p>
+                    <p class="text-[13px] leading-relaxed text-slate-600 font-medium text-center">"ร็อบบิซิ๊ดนี อิลมัน วัรซุกนี ฟะอ์มัน"</p>
                     <p class="text-[11px] text-slate-500 mt-2 text-center">(โอ้พระผู้อภิบาลของฉัน โปรดเพิ่มพูนความรู้ และประทานความเข้าใจให้แก่ฉันด้วยเถิด)</p>
                 </div>
                 <div class="glass-panel shape-card p-5">
@@ -229,10 +242,11 @@
                 </div>
                 <div class="glass-panel shape-card p-5 space-y-4">
                     <h4 class="text-[13px] font-black text-primary uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-compass"></i> ขั้นตอนการใช้งาน</h4>
-                    <div class="flex gap-3 items-start"><div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">1</div><p class="text-[13px] font-bold text-accent leading-relaxed">เข้าแอปแล้วกด <b>เข้าสู่ระบบ</b> เลือกระดับชั้น และห้อง</p></div>
-                    <div class="flex gap-3 items-start"><div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">2</div><p class="text-[13px] font-bold text-accent leading-relaxed">เลือกวิชาและคาบ (ตั้งค่าวิชาได้ที่หน้าตั้งค่าระบบ)</p></div>
-                    <div class="flex gap-3 items-start"><div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">3</div><p class="text-[13px] font-bold text-accent leading-relaxed">เช็คชื่อ มา, ลา, ขาด (ตัดคะแนนพฤติกรรมได้ที่ปุ่มบนขวา)</p></div>
-                    <div class="flex gap-3 items-start"><div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">4</div><p class="text-[13px] font-bold text-accent leading-relaxed">เลื่อนล่างสุดเพื่อกด <b>สรุปยอดเข้าเรียน</b> บันทึกรูปและแชร์</p></div>
+                    <div class="flex gap-3 items-start"><div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">1</div><p class="text-[13px] font-bold text-accent leading-relaxed">กดที่ <b>ตั้งค่าระบบ</b> เพื่อระบุชื่อผู้สอนและรายวิชาให้เรียบร้อย</p></div>
+                    <div class="flex gap-3 items-start"><div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">2</div><p class="text-[13px] font-bold text-accent leading-relaxed">มาที่หน้าแรก กด <b>เข้าสู่ระบบ</b> เลือกระดับชั้น และห้องเรียน</p></div>
+                    <div class="flex gap-3 items-start"><div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">3</div><p class="text-[13px] font-bold text-accent leading-relaxed">เลือกวิชาและคาบ</p></div>
+                    <div class="flex gap-3 items-start"><div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">4</div><p class="text-[13px] font-bold text-accent leading-relaxed">เช็คชื่อ มา, ลา, ขาด (ตัดคะแนนพฤติกรรมได้ที่ปุ่มบนขวา)</p></div>
+                    <div class="flex gap-3 items-start"><div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 mt-0.5">5</div><p class="text-[13px] font-bold text-accent leading-relaxed">เลื่อนล่างสุดเพื่อกด <b>สรุปยอดเข้าเรียน</b> บันทึกรูปและแชร์</p></div>
                 </div>
                 <div class="glass-panel shape-card p-5 bg-blue-50/40">
                     <h4 class="text-[13px] font-black text-blue-600 uppercase tracking-widest mb-3 flex items-center gap-2"><i class="fa-solid fa-mobile-screen-button"></i> การติดตั้งแอปในมือถือ</h4>
@@ -248,29 +262,18 @@
                 <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none">ตั้งค่าระบบ</h2>
             </div>
             <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4">
-                <div class="glass-panel shape-card p-5 border-white/50">
-                    <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-image"></i> ภาพพื้นหลัง</h3>
-                    <input type="file" id="set-bg-upload" accept="image/*" class="w-full text-sm text-slate-500 mb-3">
-                    <div class="flex gap-2">
-                        <button onclick="clearCustomBackground()" class="bg-red-50 text-red-500 font-bold px-4 py-2 shape-btn text-xs flex-1 border border-red-100"><i class="fa-solid fa-trash mr-1"></i> นำรูปออก</button>
-                        <button onclick="document.getElementById('set-bg-upload').click()" class="bg-slate-100 text-slate-700 font-bold px-4 py-2 shape-btn text-xs flex-1 border border-slate-200"><i class="fa-solid fa-upload mr-1"></i> เลือกรูปใหม่</button>
-                    </div>
-                </div>
-                <div class="glass-panel shape-card p-5 border-white/50">
-                    <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-palette"></i> ธีมแอปพลิเคชัน</h3>
-                    <select id="set-bg-theme" class="input-field shape-input cursor-pointer">
-                        <option value="theme-amber">Amber Glow (โค้งมน - สีอำพัน)</option><option value="theme-blue">Ocean Blue (สี่เหลี่ยมมน - สีฟ้า)</option><option value="theme-emerald">Emerald Fresh (เหลี่ยม - สีเขียว)</option>
-                    </select>
-                </div>
+                
                 <div class="glass-panel shape-card p-5 border-white/50">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-school"></i> ข้อมูลโรงเรียน</h3>
                     <input type="text" id="set-school-name" class="input-field shape-input mb-3" placeholder="ชื่อโรงเรียนเต็ม">
                     <input type="text" id="set-school-logo" class="input-field shape-input" placeholder="อักษรย่อ / โลโก้ (เช่น ส.ธ.)">
                 </div>
+                
                 <div class="glass-panel shape-card p-5 border-white/50">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-chalkboard-user"></i> ข้อมูลผู้สอนตั้งต้น</h3>
                     <input type="text" id="set-teacher-name" class="input-field shape-input" placeholder="ชื่อคุณครู">
                 </div>
+                
                 <div class="glass-panel shape-card p-5 border-white/50">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-book"></i> รายวิชาที่สอน</h3>
                     <ul id="set-subject-list" class="space-y-2 mb-3"></ul>
@@ -279,6 +282,23 @@
                         <button onclick="addSubjectToSettings()" class="bg-accent text-white font-bold px-4 shape-btn text-sm btn-press"><i class="fa-solid fa-plus"></i></button>
                     </div>
                 </div>
+
+                <div class="glass-panel shape-card p-5 border-white/50">
+                    <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-image"></i> ภาพพื้นหลัง</h3>
+                    <input type="file" id="set-bg-upload" accept="image/*" class="w-full text-sm text-slate-500 mb-3">
+                    <div class="flex gap-2">
+                        <button onclick="clearCustomBackground()" class="bg-red-50 text-red-500 font-bold px-4 py-2 shape-btn text-xs flex-1 border border-red-100"><i class="fa-solid fa-trash mr-1"></i> นำรูปออก</button>
+                        <button onclick="document.getElementById('set-bg-upload').click()" class="bg-slate-100 text-slate-700 font-bold px-4 py-2 shape-btn text-xs flex-1 border border-slate-200"><i class="fa-solid fa-upload mr-1"></i> เลือกรูปใหม่</button>
+                    </div>
+                </div>
+                
+                <div class="glass-panel shape-card p-5 border-white/50">
+                    <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fa-solid fa-palette"></i> ธีมแอปพลิเคชัน</h3>
+                    <select id="set-bg-theme" class="input-field shape-input cursor-pointer">
+                        <option value="theme-amber">Amber Glow (โค้งมน - สีอำพัน)</option><option value="theme-blue">Ocean Blue (สี่เหลี่ยมมน - สีฟ้า)</option><option value="theme-emerald">Emerald Fresh (เหลี่ยม - สีเขียว)</option>
+                    </select>
+                </div>
+                
             </div>
             <div class="pt-4 shrink-0">
                 <button onclick="saveSettings()" class="btn-press w-full btn-primary font-black py-4.5 shape-btn shadow-xl text-lg flex items-center justify-center gap-2"><i class="fa-solid fa-floppy-disk"></i> บันทึกการตั้งค่า</button>
@@ -545,6 +565,16 @@
         function closeConfirm() { document.getElementById('confirm-modal').classList.remove('active'); confirmCallback = null; }
         document.getElementById('btn-confirm-ok').onclick = () => { if(confirmCallback) confirmCallback(); closeConfirm(); };
         document.getElementById('btn-confirm-cancel').onclick = closeConfirm;
+
+        function checkSetupAndProceed() {
+            if (!AppPrefs.teacherName || AppPrefs.teacherName.trim() === "" || AppPrefs.subjects.length === 0) {
+                document.getElementById('setup-modal').classList.add('active');
+            } else {
+                switchView('view-class');
+            }
+        }
+        document.getElementById('btn-setup-close').onclick = () => document.getElementById('setup-modal').classList.remove('active');
+        document.getElementById('btn-setup-go').onclick = () => { document.getElementById('setup-modal').classList.remove('active'); openSettingsView(); };
 
         function showToast(msg, iconClass) {
             const t = document.getElementById('toast'); document.getElementById('toast-message').innerText = msg; document.getElementById('toast-icon').innerHTML = `<i class="${iconClass}"></i>`;
