@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ระบบเช็คชื่อ ส.ธ. | Professional</title>
     
-    <!-- PWA & iOS Meta Tags -->
+    <!-- PWA & iOS Meta Tags (ทำให้ Status Bar โปร่งใส) -->
     <link rel="manifest" href="./manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- กำหนด ID ให้ theme-color เพื่อใช้ JS อัปเดตสีให้กลืนกับฉากหลังแบบ Real-time -->
-    <meta name="theme-color" content="#1e3a8a" id="meta-theme-color">
+    <meta name="theme-color" content="transparent" id="meta-theme-color">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ส.ธ. เช็คชื่อ">
     <link rel="apple-touch-icon" href="./logo.png">
@@ -19,7 +18,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Fonts: Amiri for Arabic, Sarabun for Thai -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Sarabun:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -45,7 +43,6 @@
         }
 
         * { -webkit-tap-highlight-color: transparent; font-family: 'Sarabun', sans-serif; }
-        /* เปลี่ยนสีพื้นหลัง body เป็นสีเข้ม เพื่อไม่ให้มีขอบขาวโผล่เวลารูดจอ */
         body { color: #1e293b; background-color: #0f172a; overflow-x: hidden; -webkit-user-select: none; user-select: none; }
 
         /* Background System */
@@ -218,23 +215,18 @@
             const appBody = document.getElementById('app-body');
             if(appBody) appBody.className = `flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)] ${earlyPrefs.theme}`;
             
-            // อัปเดตสีของแถบสถานะ (Status Bar) ให้กลืนกับส่วนบนของจออัตโนมัติ
-            const THEME_COLORS = {
-                "theme-amber": "#fef3c7",
-                "theme-blue": "#e0f2fe",
-                "theme-emerald": "#dcfce7",
-                "theme-rose": "#ffe4e6",
-                "theme-violet": "#f3e8ff",
-                "theme-slate": "#cbd5e1",
-                "theme-cyan": "#cffafe",
-                "theme-school": "#fef08a" // สีเหลืองอ่อนกลืนกับขอบบน
-            };
+            // อัปเดต Theme Color เป็นโปร่งใสเพื่อดัน Status bar (ถ้าเครื่องรองรับ)
             const metaTheme = document.getElementById('meta-theme-color');
             if (metaTheme) {
                 if (earlyPrefs.customBg) {
-                    metaTheme.setAttribute('content', '#0f172a'); // สีโปร่งแสงเข้ม เพื่อให้อ่านตัวหนังสือสถานะออกเวลาใช้ภาพ
+                    metaTheme.setAttribute('content', 'transparent'); 
                 } else {
-                    metaTheme.setAttribute('content', THEME_COLORS[earlyPrefs.theme] || '#fef08a');
+                    const THEME_COLORS = {
+                        "theme-amber": "#fef3c7", "theme-blue": "#e0f2fe", "theme-emerald": "#dcfce7",
+                        "theme-rose": "#ffe4e6", "theme-violet": "#f3e8ff", "theme-slate": "#cbd5e1",
+                        "theme-cyan": "#cffafe", "theme-school": "#fef08a"
+                    };
+                    metaTheme.setAttribute('content', THEME_COLORS[earlyPrefs.theme] || 'transparent');
                 }
             }
 
@@ -289,6 +281,7 @@
 
     <div id="toast"><span id="toast-icon"></span><span id="toast-message" class="font-extrabold tracking-wide text-shadow-none"></span></div>
 
+    <!-- PWA Install Modal -->
     <div id="pwa-install-modal" class="modal-bg">
         <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-blue-100 !text-blue-500 !border-0 text-shadow-none">
@@ -321,6 +314,7 @@
 
     <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative z-10">
         
+        <!-- ================= VIEW 1: LANDING ================= -->
         <section id="view-loading" class="transition-all duration-500 flex flex-col items-center justify-center flex-1">
             <header class="text-center mb-10 w-full flex flex-col items-center">
                 <div class="w-24 h-24 glass-panel shape-card shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container"></div>
@@ -363,6 +357,7 @@
             </div>
         </section>
 
+        <!-- ================= VIEW: GUIDE ================= -->
         <section id="view-guide" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
@@ -416,6 +411,7 @@
             </div>
         </section>
 
+        <!-- ================= VIEW: SETTINGS ================= -->
         <section id="view-settings" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
@@ -1217,7 +1213,6 @@
             });
         }
         
-        // ฟังก์ชันใหม่: เช็คมาให้ทุกคน
         function markAllPresent() {
             const key = `${State.currentClass}-${State.currentRoom}`;
             const students = State.allStudents.filter(s => s.room === State.currentRoom);
