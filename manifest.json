@@ -4,8 +4,8 @@
     "description": "แอปพลิเคชันระบบเช็คชื่อและบันทึกพฤติกรรม โรงเรียนสันติธรรมวิทยามูลนิธิ",
     "start_url": "./index.html",
     "display": "standalone",
-    "background_color": "#f8fafc",
-    "theme_color": "#ffffff",
+    "background_color": "#1e3a8a",
+    "theme_color": "#1e3a8a",
     "orientation": "portrait-primary",
     "icons": [
         {
