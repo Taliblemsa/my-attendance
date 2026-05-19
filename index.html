@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ส.ธ. เช็คชื่อ">
+    <link rel="apple-touch-icon" href="./logo.png">
     <link id="dynamic-manifest" rel="manifest" href="./manifest.json">
     
     <!-- External Resources -->
@@ -113,7 +114,7 @@
         .theme-cyan .shape-card, .theme-cyan .shape-btn, .theme-cyan .shape-input { border-radius: 30px; }
         .theme-cyan .icon-box { border-radius: 50%; background: rgba(6, 182, 212, 0.15); color: #0891b2; }
 
-        /* NEW Theme 8: School (Blue & Yellow) */
+        /* Theme 8: School (Blue & Yellow) */
         .theme-school .sphere-1 { top: -10%; right: -5%; width: 75vw; height: 75vw; background: radial-gradient(circle, #fef08a, #eab308); } 
         .theme-school .sphere-2 { bottom: -15%; left: -10%; width: 85vw; height: 85vw; background: radial-gradient(circle, #bfdbfe, #1e3a8a); animation-delay: -5s; }
         .theme-school .btn-primary { background-color: #1e3a8a; color: #fef08a; border: 1px solid #1e3a8a; } 
@@ -185,6 +186,7 @@
         const DEFAULT_PREFS = { 
             schoolName: "โรงเรียนสันติธรรมวิทยามูลนิธิ", 
             schoolLogo: "ส.ธ.", 
+            customLogo: "./logo.png", // บังคับดึงไฟล์ logo.png มาใช้เป็นค่าเริ่มต้นทันที
             teacherName: "", 
             subjects: [], 
             theme: "theme-amber", 
@@ -195,11 +197,15 @@
         };
         
         let earlyPrefs = JSON.parse(localStorage.getItem('stAttendance_prefs')) || DEFAULT_PREFS;
+        
+        // ล็อกชื่อโรงเรียนแบบ Hardcoded
+        earlyPrefs.schoolName = "โรงเรียนสันติธรรมวิทยามูลนิธิ";
+        earlyPrefs.schoolLogo = "ส.ธ.";
+        if(earlyPrefs.customLogo === undefined || earlyPrefs.customLogo === null) earlyPrefs.customLogo = "./logo.png";
+
         if(earlyPrefs.cardOpacity === undefined) earlyPrefs.cardOpacity = 15;
         if(earlyPrefs.cardBlur === undefined) earlyPrefs.cardBlur = 25;
         if(earlyPrefs.customBgBlur === undefined) earlyPrefs.customBgBlur = 50;
-        if(!earlyPrefs.schoolName) earlyPrefs.schoolName = DEFAULT_PREFS.schoolName;
-        if(!earlyPrefs.schoolLogo) earlyPrefs.schoolLogo = DEFAULT_PREFS.schoolLogo;
         if(!earlyPrefs.subjects) earlyPrefs.subjects = [];
 
         function applyPrefs() {
@@ -210,7 +216,23 @@
             if(appBody) appBody.className = `flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)] ${earlyPrefs.theme}`;
             
             document.querySelectorAll('.app-school-name-display').forEach(el => el.innerText = earlyPrefs.schoolName);
-            document.querySelectorAll('.app-logo-display').forEach(el => el.innerText = earlyPrefs.schoolLogo);
+            
+            // Dynamic Logo Container Injection
+            document.querySelectorAll('.app-logo-container').forEach(container => {
+                if(earlyPrefs.customLogo) {
+                    container.innerHTML = `<img src="${earlyPrefs.customLogo}" class="w-20 h-20 object-contain rounded-full relative z-10 shadow-sm bg-white" alt="logo">`;
+                } else {
+                    container.innerHTML = `<span class="text-[40px] font-black text-primary tracking-tighter relative z-10 app-logo-display text-shadow-none">${earlyPrefs.schoolLogo}</span>`;
+                }
+            });
+
+            document.querySelectorAll('.app-slip-logo-container').forEach(container => {
+                if(earlyPrefs.customLogo) {
+                    container.innerHTML = `<img src="${earlyPrefs.customLogo}" class="w-16 h-16 object-contain rounded-full mx-auto shadow-sm" alt="logo">`;
+                } else {
+                    container.innerHTML = `<div class="w-12 h-12 rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center mx-auto"><span class="text-xs font-black text-primary">${earlyPrefs.schoolLogo}</span></div>`;
+                }
+            });
             
             const bgContainer = document.getElementById('bg-container');
             const overlay = document.getElementById('custom-bg-overlay');
@@ -284,8 +306,8 @@
         <!-- ================= VIEW 1: LANDING ================= -->
         <section id="view-loading" class="transition-all duration-500 flex flex-col items-center justify-center flex-1">
             <header class="text-center mb-10 w-full flex flex-col items-center">
-                <div class="w-24 h-24 glass-panel shape-card shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group">
-                    <span class="text-[40px] font-black text-primary tracking-tighter relative z-10 app-logo-display text-shadow-none">ส.ธ.</span>
+                <div class="w-24 h-24 glass-panel shape-card shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container">
+                    <!-- Dynamic Logo rendering -->
                 </div>
                 <h1 class="text-[38px] font-black text-accent leading-none tracking-tight glow-text text-center w-full">ระบบเช็คชื่อ</h1>
                 <p class="text-[15px] font-bold text-slate-600 mt-2 tracking-wide app-school-name-display opacity-90 glow-text text-center w-full">โรงเรียน</p>
@@ -299,7 +321,7 @@
                 <p class="text-[14px] text-slate-600 mb-8 font-medium glow-text text-center w-full" id="loading-desc">เชื่อมต่อฐานข้อมูล Google Sheets</p>
                 
                 <div id="action-buttons-container" class="hidden flex-col gap-3 w-full">
-                    <!-- History Button (ALWAYS VISIBLE NOW) -->
+                    <!-- History Button -->
                     <button id="btn-history-today" onclick="switchView('view-history')" class="flex btn-press w-full bg-emerald-500 text-white font-black text-lg py-4.5 shape-btn shadow-xl items-center justify-center gap-3 text-shadow-none mb-2">
                         <i class="fa-solid fa-clock-rotate-left"></i> ประวัติเช็คชื่อวันนี้
                     </button>
@@ -396,11 +418,23 @@
             
             <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4">
                 
-                <!-- School Info -->
+                <!-- School Info with Locked Identity -->
                 <div class="glass-panel shape-card p-5">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2 text-shadow-none"><i class="fa-solid fa-school"></i> ข้อมูลโรงเรียน</h3>
-                    <input type="text" id="set-school-name" class="input-field shape-input mb-3" placeholder="ชื่อโรงเรียนเต็ม">
-                    <input type="text" id="set-school-logo" class="input-field shape-input" placeholder="อักษรย่อ / โลโก้ (เช่น ส.ธ.)">
+                    
+                    <div class="bg-white/50 p-4 rounded-[16px] border border-white mb-4 text-center shadow-inner">
+                        <p class="text-[16px] font-black text-accent glow-text">โรงเรียนสันติธรรมวิทยามูลนิธิ</p>
+                        <p class="text-[11px] font-bold text-slate-500 mt-1">แอปพลิเคชันเฉพาะบุคลากร (ล็อกระบบ)</p>
+                    </div>
+                    
+                    <div class="border-t border-white/30 pt-4">
+                        <label class="text-[12px] font-bold text-slate-700 glow-text mb-2 block">เปลี่ยนตราโลโก้ (กรณีอัปเดตโลโก้ใหม่)</label>
+                        <input type="file" id="set-logo-upload" accept="image/*" class="hidden">
+                        <div class="flex gap-2">
+                            <button onclick="document.getElementById('set-logo-upload').click()" class="bg-white text-slate-700 font-bold px-3 py-2.5 shape-btn text-xs flex-1 border border-slate-200 shadow-sm text-shadow-none flex items-center justify-center"><i class="fa-solid fa-upload mr-1"></i> อัปโหลดใหม่</button>
+                            <button onclick="clearCustomLogo()" class="bg-red-50 text-red-500 font-bold px-3 py-2.5 shape-btn text-xs flex-1 border border-red-100 text-shadow-none flex items-center justify-center"><i class="fa-solid fa-rotate-left mr-1"></i> ใช้รูปเริ่มต้น</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Teacher Info -->
@@ -439,8 +473,8 @@
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2 text-shadow-none"><i class="fa-solid fa-image"></i> ภาพพื้นหลัง (Wallpaper)</h3>
                     <input type="file" id="set-bg-upload" accept="image/*" class="hidden">
                     <div class="flex gap-2 mb-4">
-                        <button onclick="clearCustomBackground()" class="bg-red-50 text-red-500 font-bold px-4 py-2 shape-btn text-xs flex-1 border border-red-100 text-shadow-none flex items-center justify-center"><i class="fa-solid fa-trash mr-1"></i> นำรูปออก</button>
                         <button onclick="document.getElementById('set-bg-upload').click()" class="bg-white text-slate-700 font-bold px-4 py-2 shape-btn text-xs flex-1 border border-slate-200 shadow-sm text-shadow-none flex items-center justify-center"><i class="fa-solid fa-image mr-1"></i> เลือกรูป</button>
+                        <button onclick="clearCustomBackground()" class="bg-red-50 text-red-500 font-bold px-4 py-2 shape-btn text-xs flex-1 border border-red-100 text-shadow-none flex items-center justify-center"><i class="fa-solid fa-trash mr-1"></i> นำรูปออก</button>
                     </div>
 
                     <div class="mb-4 pt-4 border-t border-white/30">
@@ -651,7 +685,9 @@
                 <div class="absolute top-0 left-0 w-full h-2 btn-primary"></div>
                 <i class="fa-solid fa-school absolute -right-6 -bottom-6 text-9xl opacity-5 text-slate-900 pointer-events-none"></i>
                 
-                <div class="text-center mb-5 mt-2">
+                <div class="text-center mb-5 mt-2 flex flex-col items-center justify-center">
+                    <!-- Dynamic Slip Logo -->
+                    <div class="app-slip-logo-container mb-3.5"></div>
                     <p class="font-black text-accent/70 text-[13px] app-school-name-display text-center w-full uppercase tracking-wider">โรงเรียน</p>
                     <h2 class="text-[24px] font-black text-primary leading-tight text-center w-full mt-1">รายงานการเข้าเรียน</h2>
                     <div class="text-[11px] font-black text-slate-600 bg-slate-100 inline-block px-4 py-1 rounded-full mt-2 text-center shadow-inner border border-slate-200" id="export-header-date"></div>
@@ -703,7 +739,9 @@
                 <div class="absolute top-0 left-0 w-full h-2 bg-red-500"></div>
                 <i class="fa-solid fa-shield-halved absolute -right-6 -bottom-6 text-9xl opacity-5 text-slate-900 pointer-events-none"></i>
                 
-                <div class="text-center mb-5 pt-2">
+                <div class="text-center mb-5 pt-2 flex flex-col items-center justify-center">
+                    <!-- Dynamic Slip Logo -->
+                    <div class="app-slip-logo-container mb-3.5"></div>
                     <p class="font-black text-accent/70 text-[13px] app-school-name-display text-center w-full uppercase tracking-wider">โรงเรียน</p>
                     <h2 class="text-[24px] font-black text-red-600 leading-tight text-center w-full mt-1">รายงานพฤติกรรม</h2>
                     <div class="text-[11px] font-black text-red-900 bg-red-50 inline-block px-4 py-1 rounded-full mt-2 border border-red-100 text-center shadow-inner" id="export-behavior-header-date"></div>
@@ -755,6 +793,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             const uploadEl = document.getElementById('set-bg-upload');
             if(uploadEl) uploadEl.addEventListener('change', handleImageUpload);
+
+            const logoUploadEl = document.getElementById('set-logo-upload');
+            if(logoUploadEl) logoUploadEl.addEventListener('change', handleLogoUpload);
             
             checkPwaInstall();
             fetchStudentData();
@@ -828,8 +869,6 @@
         }
         
         function loadSettingsToForm() {
-            if(document.getElementById('set-school-name')) document.getElementById('set-school-name').value = earlyPrefs.schoolName; 
-            if(document.getElementById('set-school-logo')) document.getElementById('set-school-logo').value = earlyPrefs.schoolLogo; 
             if(document.getElementById('set-teacher-name')) document.getElementById('set-teacher-name').value = earlyPrefs.teacherName; 
             if(document.getElementById('set-bg-theme')) document.getElementById('set-bg-theme').value = earlyPrefs.theme;
             
@@ -886,10 +925,28 @@
             };
         }
         function clearCustomBackground() { earlyPrefs.customBg = null; const u = document.getElementById('set-bg-upload'); if(u) u.value = ''; applyPrefs(); showToast('นำรูปออกสำเร็จ', 'fa-solid fa-trash text-emerald-400'); }
+
+        // School Logo Image Upload Handler
+        function handleLogoUpload(event) {
+            const file = event.target.files[0]; if (!file) return;
+            if (!file.type.startsWith('image/')) { showToast('เฉพาะไฟล์รูปภาพเท่านั้น', 'fa-solid fa-triangle-exclamation text-red-400'); return; }
+            const reader = new FileReader(); reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image(); img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                    const MAX = 400; let width = img.width, height = img.height;
+                    if (width > height) { if (width > MAX) { height *= MAX / width; width = MAX; } } else { if (height > MAX) { width *= MAX / height; height = MAX; } }
+                    canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
+                    earlyPrefs.customLogo = canvas.toDataURL('image/png'); applyPrefs(); showToast('อัปเดตโลโก้สำเร็จ', 'fa-solid fa-check text-emerald-400');
+                };
+            };
+        }
+        function clearCustomLogo() { earlyPrefs.customLogo = "./logo.png"; const u = document.getElementById('set-logo-upload'); if(u) u.value = ''; applyPrefs(); showToast('ใช้รูปเริ่มต้นของโรงเรียน', 'fa-solid fa-rotate-left text-emerald-400'); }
         
         function saveSettings() {
-            if(document.getElementById('set-school-name')) earlyPrefs.schoolName = document.getElementById('set-school-name').value.trim() || DEFAULT_PREFS.schoolName; 
-            if(document.getElementById('set-school-logo')) earlyPrefs.schoolLogo = document.getElementById('set-school-logo').value.trim() || DEFAULT_PREFS.schoolLogo; 
+            earlyPrefs.schoolName = DEFAULT_PREFS.schoolName; 
+            earlyPrefs.schoolLogo = DEFAULT_PREFS.schoolLogo; 
             if(document.getElementById('set-teacher-name')) earlyPrefs.teacherName = document.getElementById('set-teacher-name').value.trim(); 
             if(document.getElementById('set-bg-theme')) earlyPrefs.theme = document.getElementById('set-bg-theme').value;
             if(document.getElementById('set-bg-blur')) earlyPrefs.customBgBlur = parseInt(document.getElementById('set-bg-blur').value);
