@@ -276,11 +276,11 @@
                 <i class="fa-solid fa-mobile-screen-button"></i>
             </div>
             <h3 class="text-2xl font-black text-accent mb-2 glow-text text-center w-full">ติดตั้งเป็นแอป</h3>
-            <p class="text-[14px] text-slate-600 font-medium mb-6 text-shadow-none leading-relaxed text-center w-full" id="pwa-install-desc">
+            <div class="text-[14px] text-slate-600 font-medium mb-6 text-shadow-none leading-relaxed text-center w-full" id="pwa-install-desc">
                 คุณสามารถติดตั้งแอปนี้ลงในเครื่องเพื่อให้เรียกใช้งานง่ายขึ้น และรองรับการทำงานแบบออฟไลน์
-            </p>
+            </div>
             <div class="flex gap-3 w-full">
-                <button onclick="document.getElementById('pwa-install-modal').classList.remove('active')" class="flex-1 flex items-center justify-center btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn text-shadow-none">ไว้คราวหน้า</button>
+                <button id="btn-pwa-cancel" onclick="document.getElementById('pwa-install-modal').classList.remove('active')" class="flex-1 flex items-center justify-center btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn text-shadow-none">ไว้คราวหน้า</button>
                 <button id="btn-pwa-install" class="flex-1 flex items-center justify-center btn-press bg-blue-500 text-white font-bold py-3.5 shape-btn shadow-lg shadow-blue-500/30 text-shadow-none">ติดตั้งแอป</button>
             </div>
         </div>
@@ -811,15 +811,102 @@
             });
         }
 
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // ป้องกันไม่ให้ Chrome แสดง Mini-infobar อัตโนมัติ
+            e.preventDefault();
+            // เก็บ event ไว้เพื่อใช้งานเมื่อกดปุ่ม
+            deferredPrompt = e;
+            
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            if(!isStandalone) {
+                setTimeout(() => {
+                    const modal = document.getElementById('pwa-install-modal');
+                    const desc = document.getElementById('pwa-install-desc');
+                    const btnInstall = document.getElementById('btn-pwa-install');
+                    const btnCancel = document.getElementById('btn-pwa-cancel');
+                    
+                    if(desc) desc.innerHTML = 'คุณสามารถติดตั้งแอปนี้ลงในเครื่องเพื่อให้เรียกใช้งานง่ายขึ้น และรองรับการทำงานแบบออฟไลน์';
+                    
+                    if(btnInstall) {
+                        btnInstall.style.display = 'flex';
+                        btnInstall.onclick = async () => {
+                            modal.classList.remove('active');
+                            if(deferredPrompt) {
+                                deferredPrompt.prompt();
+                                const { outcome } = await deferredPrompt.userChoice;
+                                deferredPrompt = null;
+                            }
+                        };
+                    }
+                    if(btnCancel) {
+                        btnCancel.innerText = 'ไว้คราวหน้า';
+                        btnCancel.className = "flex-1 flex items-center justify-center btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn text-shadow-none";
+                    }
+                    if(modal) modal.classList.add('active');
+                }, 2500);
+            }
+        });
+
         function checkPwaInstall() {
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             if (!isStandalone) {
                 const isIos = () => { const userAgent = window.navigator.userAgent.toLowerCase(); return /iphone|ipad|ipod/.test( userAgent ); };
-                const desc = document.getElementById('pwa-install-desc');
-                if(desc && isIos()) desc.innerHTML = 'การติดตั้งบน iOS:<br>กดปุ่ม <b>แชร์ <i class="fa-solid fa-arrow-up-from-bracket"></i></b> ด้านล่างจอ แล้วเลือก<br><b>เพิ่มไปยังหน้าจอโฮม <i class="fa-solid fa-square-plus"></i></b>';
-                const btnInstall = document.getElementById('btn-pwa-install');
-                if(btnInstall) btnInstall.onclick = () => { document.getElementById('pwa-install-modal').classList.remove('active'); showToast('ทำตามขั้นตอนที่แนะนำได้เลยครับ', 'fa-solid fa-mobile'); };
-                setTimeout(() => { const modal = document.getElementById('pwa-install-modal'); if(modal) modal.classList.add('active'); }, 2500);
+                
+                if (isIos()) {
+                    // หากเป็น iOS จะไม่มีปุ่มติดตั้งแบบกดได้ (ต้องบอกให้ทำเอง)
+                    setTimeout(() => {
+                        const modal = document.getElementById('pwa-install-modal');
+                        const desc = document.getElementById('pwa-install-desc');
+                        const btnInstall = document.getElementById('btn-pwa-install');
+                        const btnCancel = document.getElementById('btn-pwa-cancel');
+                        
+                        if(desc) desc.innerHTML = `
+                            <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2 text-shadow-none shadow-inner w-full">
+                                <p class="font-black text-slate-800 mb-2 text-[15px]"><i class="fa-brands fa-apple text-slate-600"></i> วิธีติดตั้งบน iOS (iPhone/iPad)</p>
+                                <ol class="list-decimal ml-5 text-slate-600 text-[13px] space-y-2 font-bold leading-relaxed">
+                                    <li>กดปุ่ม <b>แชร์</b> <i class="fa-solid fa-arrow-up-from-bracket mx-1 text-blue-500"></i> แถบเมนูด้านล่างจอ</li>
+                                    <li>เลื่อนลงมา เลือก <b>เพิ่มไปยังหน้าจอโฮม</b> <i class="fa-solid fa-square-plus mx-1 text-slate-400"></i></li>
+                                    <li>กดคำว่า <b>เพิ่ม (Add)</b> ที่มุมขวาบน</li>
+                                </ol>
+                            </div>`;
+                        
+                        if(btnInstall) btnInstall.style.display = 'none'; 
+                        if(btnCancel) {
+                            btnCancel.innerText = 'รับทราบ / ปิดหน้าต่าง';
+                            btnCancel.className = "w-full flex items-center justify-center btn-press bg-blue-50 text-blue-600 font-black py-3.5 shape-btn border border-blue-200 text-shadow-none";
+                        }
+                        if(modal) modal.classList.add('active');
+                    }, 2500);
+                } else {
+                    // หากเป็น Android/PC แต่ Event beforeinstallprompt ไม่ถูกยิงออกมา
+                    setTimeout(() => {
+                        if(!deferredPrompt) {
+                            const modal = document.getElementById('pwa-install-modal');
+                            const desc = document.getElementById('pwa-install-desc');
+                            const btnInstall = document.getElementById('btn-pwa-install');
+                            const btnCancel = document.getElementById('btn-pwa-cancel');
+                            
+                            if(desc) desc.innerHTML = `
+                                <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2 text-shadow-none shadow-inner w-full">
+                                    <p class="font-black text-slate-800 mb-2 text-[15px]"><i class="fa-brands fa-android text-emerald-500"></i> วิธีติดตั้งแอปพลิเคชัน</p>
+                                    <ol class="list-decimal ml-5 text-slate-600 text-[13px] space-y-2 font-bold leading-relaxed">
+                                        <li>กดเมนู <b>3 จุด</b> มุมขวาบนของเบราว์เซอร์</li>
+                                        <li>เลือก <b>เพิ่มลงในหน้าจอโฮม</b> หรือ <b>ติดตั้งแอปพลิเคชัน</b></li>
+                                        <li>กดยืนยันการติดตั้ง</li>
+                                    </ol>
+                                </div>`;
+                            
+                            if(btnInstall) btnInstall.style.display = 'none'; 
+                            if(btnCancel) {
+                                btnCancel.innerText = 'รับทราบ / ปิดหน้าต่าง';
+                                btnCancel.className = "w-full flex items-center justify-center btn-press bg-blue-50 text-blue-600 font-black py-3.5 shape-btn border border-blue-200 text-shadow-none";
+                            }
+                            if(modal) modal.classList.add('active');
+                        }
+                    }, 3000); // รอสักนิดให้แน่ใจว่า Event ไม่มาจริงๆ ค่อยโชว์
+                }
             }
         }
 
