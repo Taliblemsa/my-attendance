@@ -4,22 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ระบบเช็คชื่อ ส.ธ. | Professional</title>
+    
     <link rel="manifest" href="./manifest.json">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-    <!-- PWA & iOS Meta Tags -->
-    <meta name="theme-color" content="#ffffff">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ส.ธ. เช็คชื่อ">
     <link rel="apple-touch-icon" href="./logo.png">
-    <link id="dynamic-manifest" rel="manifest" href="./manifest.json">
     
-    <!-- External Resources -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Fonts: Amiri for Arabic, Sarabun for Thai -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Sarabun:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -188,7 +184,7 @@
         const DEFAULT_PREFS = { 
             schoolName: "โรงเรียนสันติธรรมวิทยามูลนิธิ", 
             schoolLogo: "ส.ธ.", 
-            customLogo: "./logo.png", // บังคับดึงไฟล์ logo.png มาใช้เป็นค่าเริ่มต้นทันที
+            customLogo: "./logo.png", 
             teacherName: "", 
             subjects: [], 
             theme: "theme-amber", 
@@ -199,12 +195,9 @@
         };
         
         let earlyPrefs = JSON.parse(localStorage.getItem('stAttendance_prefs')) || DEFAULT_PREFS;
-        
-        // ล็อกชื่อโรงเรียนแบบ Hardcoded
         earlyPrefs.schoolName = "โรงเรียนสันติธรรมวิทยามูลนิธิ";
         earlyPrefs.schoolLogo = "ส.ธ.";
         if(earlyPrefs.customLogo === undefined || earlyPrefs.customLogo === null) earlyPrefs.customLogo = "./logo.png";
-
         if(earlyPrefs.cardOpacity === undefined) earlyPrefs.cardOpacity = 15;
         if(earlyPrefs.cardBlur === undefined) earlyPrefs.cardBlur = 25;
         if(earlyPrefs.customBgBlur === undefined) earlyPrefs.customBgBlur = 50;
@@ -219,7 +212,6 @@
             
             document.querySelectorAll('.app-school-name-display').forEach(el => el.innerText = earlyPrefs.schoolName);
             
-            // Dynamic Logo Container Injection
             document.querySelectorAll('.app-logo-container').forEach(container => {
                 if(earlyPrefs.customLogo) {
                     container.innerHTML = `<img src="${earlyPrefs.customLogo}" class="w-20 h-20 object-contain rounded-full relative z-10 shadow-sm bg-white" alt="logo">`;
@@ -261,17 +253,14 @@
 </head>
 <body class="flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)]" id="app-body">
     
-    <!-- Ambient Background Engine -->
     <div class="bg-container" id="bg-container">
         <div class="bg-sphere sphere-1" id="def-sphere-1"></div>
         <div class="bg-sphere sphere-2" id="def-sphere-2"></div>
         <div id="custom-bg-overlay" class="custom-bg-overlay hidden"></div>
     </div>
 
-    <!-- Global Toast -->
     <div id="toast"><span id="toast-icon"></span><span id="toast-message" class="font-extrabold tracking-wide text-shadow-none"></span></div>
 
-    <!-- PWA Install Modal -->
     <div id="pwa-install-modal" class="modal-bg">
         <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-blue-100 !text-blue-500 !border-0 text-shadow-none">
@@ -288,7 +277,6 @@
         </div>
     </div>
 
-    <!-- Custom Confirm Dialog -->
     <div id="confirm-modal" class="modal-bg">
         <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-red-100 !text-red-500 !border-0 text-shadow-none">
@@ -305,12 +293,9 @@
 
     <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative z-10">
         
-        <!-- ================= VIEW 1: LANDING ================= -->
         <section id="view-loading" class="transition-all duration-500 flex flex-col items-center justify-center flex-1">
             <header class="text-center mb-10 w-full flex flex-col items-center">
-                <div class="w-24 h-24 glass-panel shape-card shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container">
-                    <!-- Dynamic Logo rendering -->
-                </div>
+                <div class="w-24 h-24 glass-panel shape-card shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container"></div>
                 <h1 class="text-[38px] font-black text-accent leading-none tracking-tight glow-text text-center w-full">ระบบเช็คชื่อ</h1>
                 <p class="text-[15px] font-bold text-slate-600 mt-2 tracking-wide app-school-name-display opacity-90 glow-text text-center w-full">โรงเรียน</p>
             </header>
@@ -323,11 +308,9 @@
                 <p class="text-[14px] text-slate-600 mb-8 font-medium glow-text text-center w-full" id="loading-desc">เชื่อมต่อฐานข้อมูล Google Sheets</p>
                 
                 <div id="action-buttons-container" class="hidden flex-col gap-3 w-full">
-                    <!-- History Button -->
                     <button id="btn-history-today" onclick="switchView('view-history')" class="flex btn-press w-full bg-emerald-500 text-white font-black text-lg py-4.5 shape-btn shadow-xl items-center justify-center gap-3 text-shadow-none mb-2">
                         <i class="fa-solid fa-clock-rotate-left"></i> ประวัติเช็คชื่อวันนี้
                     </button>
-
                     <button id="btn-start" onclick="checkSetupAndStart()" class="btn-press w-full btn-primary font-black text-lg py-4.5 shape-btn shadow-xl flex items-center justify-center gap-3 text-shadow-none">
                         <i class="fa-solid fa-right-to-bracket text-base"></i> เข้าสู่ระบบ
                     </button>
@@ -350,7 +333,6 @@
             </div>
         </section>
 
-        <!-- ================= VIEW: GUIDE ================= -->
         <section id="view-guide" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
@@ -404,7 +386,6 @@
             </div>
         </section>
 
-        <!-- ================= VIEW: SETTINGS ================= -->
         <section id="view-settings" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
@@ -420,7 +401,6 @@
             
             <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4">
                 
-                <!-- School Info with Locked Identity -->
                 <div class="glass-panel shape-card p-5">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2 text-shadow-none"><i class="fa-solid fa-school"></i> ข้อมูลโรงเรียน</h3>
                     
@@ -439,13 +419,11 @@
                     </div>
                 </div>
 
-                <!-- Teacher Info -->
                 <div class="glass-panel shape-card p-5">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2 text-shadow-none"><i class="fa-solid fa-chalkboard-user"></i> ชื่อครูผู้สอน</h3>
                     <input type="text" id="set-teacher-name" class="input-field shape-input" placeholder="เช่น ครูอาณัติ เหล็มสะ">
                 </div>
 
-                <!-- Subject List -->
                 <div class="glass-panel shape-card p-5">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2 text-shadow-none"><i class="fa-solid fa-book"></i> รายวิชาที่สอน</h3>
                     <ul id="set-subject-list" class="space-y-2 mb-3"></ul>
@@ -455,7 +433,6 @@
                     </div>
                 </div>
 
-                <!-- Theme Selection -->
                 <div class="glass-panel shape-card p-5">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2 text-shadow-none"><i class="fa-solid fa-palette"></i> ธีมแอปพลิเคชัน</h3>
                     <select id="set-bg-theme" class="input-field shape-input cursor-pointer">
@@ -470,7 +447,6 @@
                     </select>
                 </div>
 
-                <!-- Background Image & Lens Setting -->
                 <div class="glass-panel shape-card p-5">
                     <h3 class="text-[13px] font-black text-primary uppercase tracking-widest mb-4 flex items-center gap-2 text-shadow-none"><i class="fa-solid fa-image"></i> ภาพพื้นหลัง (Wallpaper)</h3>
                     <input type="file" id="set-bg-upload" accept="image/*" class="hidden">
@@ -512,7 +488,6 @@
             </div>
         </section>
         
-        <!-- ================= VIEW: HISTORY (TODAY) ================= -->
         <section id="view-history" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
@@ -525,13 +500,9 @@
                     <i class="fa-solid fa-house"></i>
                 </button>
             </div>
-            
-            <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4" id="history-list-container">
-                <!-- History Cards will be injected here -->
-            </div>
+            <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4" id="history-list-container"></div>
         </section>
 
-        <!-- ================= VIEW 2: CLASS SELECTION ================= -->
         <section id="view-class" class="hidden transition-all duration-300">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center">
@@ -547,7 +518,6 @@
             <div id="class-list" class="space-y-3 px-1"></div>
         </section>
 
-        <!-- ================= VIEW 3: ROOM SELECTION ================= -->
         <section id="view-room" class="hidden transition-all duration-300">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
@@ -566,7 +536,6 @@
             <div id="room-list" class="grid grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- ================= VIEW 3.5: TEACHING DATA ================= -->
         <section id="view-setup" class="hidden transition-all duration-300">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
@@ -603,7 +572,6 @@
             </button>
         </section>
 
-        <!-- ================= VIEW 4: ATTENDANCE CHECK ================= -->
         <section id="view-attendance" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-center pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
@@ -641,7 +609,6 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 4.5: BEHAVIOR CHECK ================= -->
         <section id="view-behavior" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-center pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
@@ -669,7 +636,6 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 5: ATTENDANCE SUMMARY ================= -->
         <section id="view-summary" class="hidden transition-all duration-300 overflow-y-auto scroll-fine h-full">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
@@ -688,7 +654,6 @@
                 <i class="fa-solid fa-school absolute -right-6 -bottom-6 text-9xl opacity-5 text-slate-900 pointer-events-none"></i>
                 
                 <div class="text-center mb-5 mt-2 flex flex-col items-center justify-center">
-                    <!-- Dynamic Slip Logo -->
                     <div class="app-slip-logo-container mb-3.5"></div>
                     <p class="font-black text-accent/70 text-[13px] app-school-name-display text-center w-full uppercase tracking-wider">โรงเรียน</p>
                     <h2 class="text-[24px] font-black text-primary leading-tight text-center w-full mt-1">รายงานการเข้าเรียน</h2>
@@ -723,7 +688,6 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 6: BEHAVIOR SUMMARY ================= -->
         <section id="view-behavior-summary" class="hidden transition-all duration-300 overflow-y-auto scroll-fine h-full">
             <div class="flex items-center justify-between mb-6 px-1">
                 <div class="flex items-center">
@@ -742,7 +706,6 @@
                 <i class="fa-solid fa-shield-halved absolute -right-6 -bottom-6 text-9xl opacity-5 text-slate-900 pointer-events-none"></i>
                 
                 <div class="text-center mb-5 pt-2 flex flex-col items-center justify-center">
-                    <!-- Dynamic Slip Logo -->
                     <div class="app-slip-logo-container mb-3.5"></div>
                     <p class="font-black text-accent/70 text-[13px] app-school-name-display text-center w-full uppercase tracking-wider">โรงเรียน</p>
                     <h2 class="text-[24px] font-black text-red-600 leading-tight text-center w-full mt-1">รายงานพฤติกรรม</h2>
@@ -816,9 +779,7 @@
         let deferredPrompt = null;
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            // ป้องกันไม่ให้ Chrome แสดง Mini-infobar อัตโนมัติ
             e.preventDefault();
-            // เก็บ event ไว้เพื่อใช้งานเมื่อกดปุ่ม
             deferredPrompt = e;
         });
 
@@ -836,7 +797,6 @@
                 if(!modal) return;
 
                 if (isIos()) {
-                    // หากเป็น iOS จะไม่มีปุ่มติดตั้งแบบกดได้ (ต้องบอกให้ทำเอง)
                     if(desc) desc.innerHTML = `
                         <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2 text-shadow-none shadow-inner w-full">
                             <p class="font-black text-slate-800 mb-2 text-[15px]"><i class="fa-brands fa-apple text-slate-600"></i> วิธีติดตั้งบน iOS (iPhone/iPad)</p>
@@ -854,18 +814,15 @@
                     }
                     modal.classList.add('active');
                 } else {
-                    // หากเป็น Android/PC ให้แสดงปุ่มติดตั้งไว้ก่อน
                     if(btnInstall) {
                         btnInstall.style.display = 'flex';
                         btnInstall.onclick = async () => {
                             if (deferredPrompt) {
-                                // กดแล้วติดตั้งอัตโนมัติสำเร็จ
                                 deferredPrompt.prompt();
                                 const { outcome } = await deferredPrompt.userChoice;
                                 deferredPrompt = null;
                                 modal.classList.remove('active');
                             } else {
-                                // กดแล้ว Event ไม่ทำงาน (เช่น เบราว์เซอร์บล็อก หรือโหลดไม่เสร็จ) ให้เปลี่ยนหน้าต่างโชว์วิธีทำมือ
                                 if(desc) desc.innerHTML = `
                                     <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200 mt-2 text-shadow-none shadow-inner w-full">
                                         <p class="font-black text-slate-800 mb-2 text-[15px]"><i class="fa-brands fa-android text-emerald-500"></i> เบราว์เซอร์บล็อกปุ่มอัตโนมัติ</p>
@@ -991,7 +948,6 @@
         }
         function clearCustomBackground() { earlyPrefs.customBg = null; const u = document.getElementById('set-bg-upload'); if(u) u.value = ''; applyPrefs(); showToast('นำรูปออกสำเร็จ', 'fa-solid fa-trash text-emerald-400'); }
 
-        // School Logo Image Upload Handler
         function handleLogoUpload(event) {
             const file = event.target.files[0]; if (!file) return;
             if (!file.type.startsWith('image/')) { showToast('เฉพาะไฟล์รูปภาพเท่านั้น', 'fa-solid fa-triangle-exclamation text-red-400'); return; }
@@ -1074,10 +1030,7 @@
             
             const keys = Object.keys(State.historyMeta);
             if(keys.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 glass-panel shape-card border-dashed">
-                    <i class="fa-solid fa-folder-open text-4xl text-slate-400 mb-3 opacity-50"></i>
-                    <p class="text-slate-500 font-bold glow-text">ยังไม่มีประวัติการเช็คชื่อวันนี้</p>
-                </div>`;
+                container.innerHTML = `<div class="text-center py-10 glass-panel shape-card border-dashed"><i class="fa-solid fa-folder-open text-4xl text-slate-400 mb-3 opacity-50"></i><p class="text-slate-500 font-bold glow-text">ยังไม่มีประวัติการเช็คชื่อวันนี้</p></div>`;
                 return;
             }
             
@@ -1096,7 +1049,7 @@
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="bg-primary text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm uppercase tracking-wider">ม.${roomOnly}</span>
-                                <span class="text-[12px] font-bold text-slate-500"><i class="fa-regular fa-clock"></i> ${new Date(meta.timestamp).toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'})}</span>
+                                <span class="text-[12px] font-bold text-slate-505"><i class="fa-regular fa-clock"></i> ${new Date(meta.timestamp).toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'})}</span>
                             </div>
                             <h3 class="text-lg font-black text-accent leading-none">${meta.subject}</h3>
                             <p class="text-[12px] font-bold text-slate-600 mt-1">${meta.teacher} (คาบ ${meta.period})</p>
@@ -1186,12 +1139,7 @@
             
             const key = `${State.currentClass}-${State.currentRoom}`;
             if (!State.historyMeta) State.historyMeta = {};
-            State.historyMeta[key] = {
-                subject: State.subjectName,
-                teacher: State.teacherName,
-                period: State.periodCount,
-                timestamp: Date.now()
-            };
+            State.historyMeta[key] = { subject: s, teacher: t, period: p, timestamp: Date.now() };
             saveDailyHistory();
             
             renderAttendanceList(); switchView('view-attendance');
@@ -1226,9 +1174,7 @@
         function resetCurrentRoomAttendance() { 
             showConfirm('ล้างเช็คชื่อใหม่', 'ข้อมูลการเช็คชื่อของวิชานี้ (ห้องนี้) จะถูกลบทั้งหมดเพื่อเริ่มใหม่ คุณแน่ใจหรือไม่?', () => {
                 const key = `${State.currentClass}-${State.currentRoom}`;
-                State.attendance[key] = {}; 
-                saveDailyHistory();
-                renderAttendanceList(); 
+                State.attendance[key] = {}; saveDailyHistory(); renderAttendanceList(); 
                 showToast('ล้างข้อมูลสำเร็จ', 'fa-solid fa-check text-emerald-400');
             });
         }
@@ -1287,10 +1233,7 @@
             
             students.forEach(st => { 
                 const s = data[st.id]; 
-                if(s) { 
-                    counts[s]++; 
-                    if(s !== "มา") statusNames[s].push(st.name); 
-                } 
+                if(s) { counts[s]++; if(s !== "มา") statusNames[s].push(st.name); } 
             });
             
             CONFIG.STATUSES.forEach(s => document.getElementById(`export-count-${s}`).innerText = counts[s]);
@@ -1312,12 +1255,7 @@
                 }
             });
             
-            document.getElementById('export-absent-list').innerHTML = html || `<div class="text-center py-8 border-2 border-dashed border-emerald-200 bg-emerald-50 rounded-[24px]">
-                <div class="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl shadow-sm"><i class="fa-solid fa-check"></i></div>
-                <p class="font-black text-emerald-600 text-[16px]">มาเรียนครบทุกคน!</p>
-                <p class="text-emerald-500/80 text-xs font-bold mt-1">ยอดเยี่ยมมากครับ</p>
-            </div>`;
-            
+            document.getElementById('export-absent-list').innerHTML = html || `<div class="text-center py-8 border-2 border-dashed border-emerald-200 bg-emerald-50 rounded-[24px]"><div class="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl shadow-sm"><i class="fa-solid fa-check"></i></div><p class="font-black text-emerald-600 text-[16px]">มาเรียนครบทุกคน!</p><p class="text-emerald-500/80 text-xs font-bold mt-1">ยอดเยี่ยมมากครับ</p></div>`;
             document.getElementById('export-timestamp').innerText = new Date().toLocaleTimeString('th-TH');
             switchView('view-summary');
         }
@@ -1341,11 +1279,9 @@
                     count++; let pts = 0, issues = [];
                     d.tags.forEach(t => {
                         if(t === 'อื่นๆ') { 
-                            let s = parseInt(d.otherScore)||0; pts += s; 
-                            issues.push(`${d.other||"อื่นๆ"} (-${s})`); 
+                            let s = parseInt(d.otherScore)||0; pts += s; issues.push(`${d.other||"อื่นๆ"} (-${s})`); 
                         } else { 
-                            pts += CONFIG.BEHAVIORS[t]; 
-                            issues.push(`${t} (-${CONFIG.BEHAVIORS[t]})`); 
+                            pts += CONFIG.BEHAVIORS[t]; issues.push(`${t} (-${CONFIG.BEHAVIORS[t]})`); 
                         }
                     });
                     html += `<div class="bg-white border border-slate-100 rounded-[20px] p-4 shadow-sm mb-3 relative overflow-hidden">
@@ -1376,28 +1312,19 @@
                         const fileName = `รายงาน_${type}_ม${State.currentRoom}.png`;
                         
                         if (action === 'download') {
-                            const link = document.createElement('a');
-                            link.download = fileName;
-                            link.href = imgUrl;
-                            link.click();
+                            const link = document.createElement('a'); link.download = fileName; link.href = imgUrl; link.click();
                             showToast('บันทึกลงเครื่องเรียบร้อย', 'fa-solid fa-check text-emerald-500');
                         } else if (action === 'share') {
                             canvas.toBlob(blob => {
                                 const file = new File([blob], fileName, { type: 'image/png' });
                                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                                    navigator.share({ 
-                                        files: [file], 
-                                        title: `รายงาน${type} ม.${State.currentRoom}`, 
-                                        text: `สรุป${type} ม.${State.currentRoom} วิชา ${State.subjectName}` 
-                                    }).catch(err => { console.log('Share cancelled or failed'); });
+                                    navigator.share({ files: [file], title: `รายงาน${type} ม.${State.currentRoom}`, text: `สรุป${type} ม.${State.currentRoom} วิชา ${State.subjectName}` }).catch(err => {});
                                 } else {
                                     showToast('เบราว์เซอร์ไม่รองรับการแชร์โดยตรง', 'fa-solid fa-circle-info text-amber-500');
                                 }
                             });
                         }
-                    }).catch(err => {
-                        showToast('เกิดข้อผิดพลาดในการเซฟรูป', 'fa-solid fa-triangle-exclamation text-red-500');
-                    });
+                    }).catch(err => { showToast('เกิดข้อผิดพลาดในการเซฟรูป', 'fa-solid fa-triangle-exclamation text-red-500'); });
                 }
             }, 600);
         }
