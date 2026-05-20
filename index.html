@@ -178,8 +178,17 @@
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Smooth View Transitions */
-        section { transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1); will-change: opacity, transform; }
+        /* 🎨 Custom Pulse Animation สำหรับตราโลโก้โปร่งใส (กระดึบๆ อย่างสวยงามและลื่นไหล) */
+        @keyframes logo-bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        .logo-pulse {
+            animation: logo-bounce 2s infinite ease-in-out;
+        }
+
+        /* 🚀 High-Performance Instant Navigation (สลับหน้าจอทันทีแบบไร้อาการกระตุก 100%) */
+        section { transition: none !important; transform: none !important; animation: none !important; }
 
         /* Report Canvas Style */
         #export-canvas *, #export-behavior-canvas * { text-shadow: none !important; }
@@ -215,7 +224,7 @@
             const appBody = document.getElementById('app-body');
             if(appBody) appBody.className = `flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)] ${earlyPrefs.theme}`;
             
-            // อัปเดต Theme Color เป็นโปร่งใสเพื่อดัน Status bar (ถ้าเครื่องรองรับ)
+            // อัปเดตสีของ Status bar เป็นโปร่งใสเพื่อดันภาพพื้นหลังเต็มจอ
             const metaTheme = document.getElementById('meta-theme-color');
             if (metaTheme) {
                 if (earlyPrefs.customBg) {
@@ -232,9 +241,11 @@
 
             document.querySelectorAll('.app-school-name-display').forEach(el => el.innerText = earlyPrefs.schoolName);
             
+            // ปรับกล่องโลโก้ทั้งหมดให้เป็นพื้นหลังสีขาวนวล (เพื่อรองรับโลโก้ใส) พร้อมเอฟเฟกต์กระดึบๆ
             document.querySelectorAll('.app-logo-container').forEach(container => {
+                container.className = "w-24 h-24 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container logo-pulse p-2 border border-slate-100";
                 if(earlyPrefs.customLogo) {
-                    container.innerHTML = `<img src="${earlyPrefs.customLogo}" class="w-20 h-20 object-contain rounded-full relative z-10 shadow-sm bg-white" alt="logo">`;
+                    container.innerHTML = `<img src="${earlyPrefs.customLogo}" class="w-20 h-20 object-contain rounded-full relative z-10" alt="logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3596/3596091.png'">`;
                 } else {
                     container.innerHTML = `<span class="text-[40px] font-black text-primary tracking-tighter relative z-10 app-logo-display text-shadow-none">${earlyPrefs.schoolLogo}</span>`;
                 }
@@ -242,7 +253,7 @@
 
             document.querySelectorAll('.app-slip-logo-container').forEach(container => {
                 if(earlyPrefs.customLogo) {
-                    container.innerHTML = `<img src="${earlyPrefs.customLogo}" class="w-16 h-16 object-contain rounded-full mx-auto shadow-sm" alt="logo">`;
+                    container.innerHTML = `<img src="${earlyPrefs.customLogo}" class="w-16 h-16 object-contain rounded-full mx-auto shadow-sm" alt="logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3596/3596091.png'">`;
                 } else {
                     container.innerHTML = `<div class="w-12 h-12 rounded-full border border-primary/20 bg-primary/10 flex items-center justify-center mx-auto"><span class="text-xs font-black text-primary">${earlyPrefs.schoolLogo}</span></div>`;
                 }
@@ -293,7 +304,7 @@
             </div>
             <div class="flex gap-3 w-full">
                 <button id="btn-pwa-cancel" onclick="document.getElementById('pwa-install-modal').classList.remove('active')" class="flex-1 flex items-center justify-center btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn text-shadow-none">ไว้คราวหน้า</button>
-                <button id="btn-pwa-install" class="flex-1 flex items-center justify-center btn-press bg-blue-500 text-white font-bold py-3.5 shape-btn shadow-lg shadow-blue-500/30 text-shadow-none">ติดตั้งแอป</button>
+                <button id="btn-pwa-install" class="flex-1 flex items-center justify-center btn-press bg-blue-50 text-white font-bold py-3.5 shape-btn shadow-lg shadow-blue-500/30 text-shadow-none">ติดตั้งแอป</button>
             </div>
         </div>
     </div>
@@ -315,9 +326,9 @@
     <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative z-10">
         
         <!-- ================= VIEW 1: LANDING ================= -->
-        <section id="view-loading" class="transition-all duration-500 flex flex-col items-center justify-center flex-1">
+        <section id="view-loading" class="flex flex-col items-center justify-center flex-1">
             <header class="text-center mb-10 w-full flex flex-col items-center">
-                <div class="w-24 h-24 glass-panel shape-card shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container"></div>
+                <div class="w-24 h-24 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container logo-pulse p-2 border border-slate-100"></div>
                 <h1 class="text-[38px] font-black text-accent leading-none tracking-tight glow-text text-center w-full">ระบบเช็คชื่อ</h1>
                 <p class="text-[15px] font-bold text-slate-600 mt-2 tracking-wide app-school-name-display opacity-90 glow-text text-center w-full">โรงเรียน</p>
             </header>
@@ -326,8 +337,8 @@
                 <div id="loading-spinner" class="mb-6 flex justify-center w-full">
                     <i class="fa-solid fa-compact-disc fa-spin text-5xl text-primary opacity-90 text-shadow-none"></i>
                 </div>
-                <h2 class="text-xl font-black text-accent mb-1.5 glow-text text-center w-full" id="loading-title">กำลังประสานงาน...</h2>
-                <p class="text-[14px] text-slate-600 mb-8 font-medium glow-text text-center w-full" id="loading-desc">เชื่อมต่อฐานข้อมูล Google Sheets</p>
+                <h2 class="text-xl font-black text-accent mb-1.5 glow-text text-center w-full" id="loading-title">กำลังจัดเตรียมรายชื่อ...</h2>
+                <p class="text-[14px] text-slate-600 mb-8 font-medium glow-text text-center w-full" id="loading-desc">เชื่อมต่อฐานข้อมูล Google Sheets ของโรงเรียน</p>
                 
                 <div id="action-buttons-container" class="hidden flex-col gap-3 w-full">
                     <button id="btn-start" onclick="checkSetupAndStart()" class="btn-press w-full btn-primary font-black text-lg py-4.5 shape-btn shadow-xl flex items-center justify-center gap-3 text-shadow-none">
@@ -357,8 +368,8 @@
             </div>
         </section>
 
-        <!-- ================= VIEW: GUIDE ================= -->
-        <section id="view-guide" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
+        <!-- ================= VIEW: GUIDE (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
+        <section id="view-guide" class="hidden flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
@@ -366,9 +377,6 @@
                     </button>
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">วิธีใช้งาน</h2>
                 </div>
-                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
-                    <i class="fa-solid fa-house"></i>
-                </button>
             </div>
             <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-5">
                 <div class="glass-panel shape-card p-5">
@@ -388,7 +396,7 @@
                     </div>
                     <div class="flex gap-3">
                         <div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 text-shadow-none">2</div>
-                        <p class="text-[13px] font-bold text-accent glow-text text-left">กดเข้าสู่ระบบ เลือกระดับชั้น และห้องเรียน</p>
+                        <p class="text-[13px] font-bold text-accent glow-text text-left">เลือกระดับชั้น และห้องเรียนเพื่อลงมือเช็คชื่อ</p>
                     </div>
                     <div class="flex gap-3">
                         <div class="w-6 h-6 icon-box flex items-center justify-center text-[10px] font-black shrink-0 text-shadow-none">3</div>
@@ -411,8 +419,8 @@
             </div>
         </section>
 
-        <!-- ================= VIEW: SETTINGS ================= -->
-        <section id="view-settings" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
+        <!-- ================= VIEW: SETTINGS (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
+        <section id="view-settings" class="hidden flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="cancelSettingsAndGoBack()">
@@ -420,9 +428,6 @@
                     </button>
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ตั้งค่าระบบ</h2>
                 </div>
-                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="cancelSettingsAndGoBack()">
-                    <i class="fa-solid fa-house"></i>
-                </button>
             </div>
             
             <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4">
@@ -514,7 +519,8 @@
             </div>
         </section>
         
-        <section id="view-history" class="hidden transition-all duration-300 flex-1 flex flex-col h-full">
+        <!-- ================= VIEW: HISTORY (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
+        <section id="view-history" class="hidden flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
@@ -522,14 +528,12 @@
                     </button>
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ประวัติวันนี้</h2>
                 </div>
-                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
-                    <i class="fa-solid fa-house"></i>
-                </button>
             </div>
             <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4" id="history-list-container"></div>
         </section>
 
-        <section id="view-class" class="hidden transition-all duration-300">
+        <!-- ================= VIEW 2: CLASS SELECTION (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
+        <section id="view-class" class="hidden">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-5 btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
@@ -537,14 +541,12 @@
                     </button>
                     <h2 class="text-[30px] font-black text-accent tracking-tighter leading-none glow-text">ระดับชั้น</h2>
                 </div>
-                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
-                    <i class="fa-solid fa-house"></i>
-                </button>
             </div>
             <div id="class-list" class="space-y-3 px-1"></div>
         </section>
 
-        <section id="view-room" class="hidden transition-all duration-300">
+        <!-- ================= VIEW 3: ROOM SELECTION (มีปุ่มโฮมเพื่อย้อนกลับทางลัด) ================= -->
+        <section id="view-room" class="hidden">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-5 btn-press shadow-sm text-shadow-none" onclick="switchView('view-class')">
@@ -555,6 +557,7 @@
                         <h2 class="text-[30px] font-black text-accent tracking-tighter leading-none mt-1 glow-text">ห้องเรียน</h2>
                     </div>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -562,7 +565,8 @@
             <div id="room-list" class="grid grid-cols-2 gap-4"></div>
         </section>
 
-        <section id="view-setup" class="hidden transition-all duration-300">
+        <!-- ================= VIEW 3.5: TEACHING DATA (มีปุ่มโฮมเพื่อย้อนกลับทางลัด) ================= -->
+        <section id="view-setup" class="hidden">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-5 btn-press shadow-sm text-shadow-none" onclick="switchView('view-room')">
@@ -570,6 +574,7 @@
                     </button>
                     <h2 class="text-[30px] font-black text-accent tracking-tighter leading-none glow-text">ข้อมูลการสอน</h2>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -598,7 +603,7 @@
             </button>
         </section>
 
-        <!-- ================= VIEW 4: ATTENDANCE CHECK ================= -->
+        <!-- ================= VIEW 4: ATTENDANCE CHECK (มีปุ่มโฮมขวาสุด) ================= -->
         <section id="view-attendance" class="hidden flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-center pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
@@ -614,7 +619,8 @@
                     <button onclick="resetCurrentRoomAttendance()" class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-red-500 btn-press shadow-sm text-shadow-none" title="ล้างเช็คชื่อ">
                         <i class="fa-solid fa-rotate-right text-lg"></i>
                     </button>
-                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
+                    <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
+                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')" title="กลับหน้าหลัก">
                         <i class="fa-solid fa-house"></i>
                     </button>
                 </div>
@@ -639,7 +645,8 @@
             </div>
         </section>
 
-        <section id="view-behavior" class="hidden transition-all duration-300 flex-1 flex flex-col h-full overflow-hidden">
+        <!-- ================= VIEW 4.5: BEHAVIOR CHECK (มีปุ่มโฮม) ================= -->
+        <section id="view-behavior" class="hidden flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-center pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 btn-press shadow-sm text-shadow-none" onclick="switchView('view-attendance')">
@@ -650,6 +657,7 @@
                         <p class="text-[12px] font-bold text-slate-600 mt-1.5 uppercase tracking-widest glow-text" id="header-behavior-room">...</p>
                     </div>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -666,7 +674,8 @@
             </div>
         </section>
 
-        <section id="view-summary" class="hidden transition-all duration-300 overflow-y-auto scroll-fine h-full">
+        <!-- ================= VIEW 5: ATTENDANCE SUMMARY (มีปุ่มโฮม) ================= -->
+        <section id="view-summary" class="hidden overflow-y-auto scroll-fine h-full">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="switchView('view-attendance')">
@@ -674,6 +683,7 @@
                     </button>
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ใบสรุปผล</h2>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -718,7 +728,8 @@
             </div>
         </section>
 
-        <section id="view-behavior-summary" class="hidden transition-all duration-300 overflow-y-auto scroll-fine h-full">
+        <!-- ================= VIEW 6: BEHAVIOR SUMMARY (มีปุ่มโฮม) ================= -->
+        <section id="view-behavior-summary" class="hidden overflow-y-auto scroll-fine h-full">
             <div class="flex items-center justify-between mb-6 px-1">
                 <div class="flex items-center">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="switchView('view-behavior')">
@@ -726,6 +737,7 @@
                     </button>
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ผลประพฤติ</h2>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -894,23 +906,15 @@
             t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
         }
 
+        // 🚀 High-Performance Navigation Switch (สลับหน้าแบบไร้อาการหน่วงทันที 100%)
         function switchView(viewId) {
             ['view-loading', 'view-settings', 'view-guide', 'view-class', 'view-room', 'view-setup', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary', 'view-history'].forEach(id => {
                 const el = document.getElementById(id);
                 if(!el) return;
                 if (id === viewId) { 
                     el.classList.remove('hidden'); 
-                    // Force browser reflow to enable transition
-                    void el.offsetWidth;
-                    el.style.opacity = '1'; 
-                    el.style.transform = 'translateY(0) scale(1)'; 
-                }
-                else { 
-                    el.style.opacity = '0'; 
-                    el.style.transform = 'translateY(15px) scale(0.98)'; 
-                    setTimeout(() => {
-                        if(el.style.opacity === '0') el.classList.add('hidden');
-                    }, 300); // match transition duration
+                } else { 
+                    el.classList.add('hidden');
                 }
             });
             if(viewId === 'view-class') renderClasses();
@@ -1028,10 +1032,19 @@
                 const data = await res.json();
                 if (data.values && data.values.length > 0) {
                     State.allStudents = data.values.map(r => ({ id: parseInt(r[0]), num: r[1], name: r[2], room: r[3] })).filter(s => !isNaN(s.id) && s.name && s.room);
+                    
+                    // ปิดเอฟเฟกต์หมุนโหลดเมื่อเตรียมข้อมูลเรียบร้อย
                     const spin = document.getElementById('loading-spinner');
-                    if(spin) spin.innerHTML = '<i class="fa-solid fa-shield-check text-7xl text-primary text-shadow-none"></i>';
-                    const t = document.getElementById('loading-title'); if(t) t.innerText = "พร้อมเข้าสู่ระบบ";
-                    const d = document.getElementById('loading-desc'); if(d) d.innerText = `ดาวน์โหลดรายชื่อแล้ว (${State.allStudents.length} คน)`;
+                    if(spin) spin.innerHTML = '<i class="fa-solid fa-circle-check text-7xl text-emerald-500 text-shadow-none"></i>';
+                    
+                    const t = document.getElementById('loading-title'); if(t) t.innerText = "ระบบจัดเตรียมข้อมูลเสร็จสิ้น";
+                    const d = document.getElementById('loading-desc'); if(d) d.innerText = `ดึงข้อมูลจากระบบสำเร็จแล้ว (${State.allStudents.length} คน)`;
+                    
+                    // หยุดแอนิเมชันกระดึบของโลโก้เมื่อโหลดข้อมูลสำเร็จแล้ว
+                    document.querySelectorAll('.app-logo-container').forEach(container => {
+                        container.classList.remove('logo-pulse');
+                    });
+
                     const btnC = document.getElementById('action-buttons-container');
                     if(btnC) { btnC.classList.remove('hidden'); btnC.classList.add('flex'); }
                 } else throw new Error("ไฟล์ว่าง");
@@ -1301,7 +1314,7 @@
                     html += `<div class="bg-${c}-50/60 p-4 rounded-[20px] border border-${c}-100 shadow-sm relative overflow-hidden mb-3">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-${c}-400"></div>
                         <div class="font-black text-${c}-700 mb-2 pb-2 border-b border-${c}-200/50 flex justify-between items-center text-[14px]">
-                            <span><i class="fa-solid ${s === 'ลา' ? 'fa-user-clock' : 'fa-user-xmark'} mr-1.5 opacity-70"></i> สถานะ: ${s}</span>
+                            <span><i class="fa-solid ${s === 'ลา' ? 'fa-user-clock' : 'fa-user-xmark'} mr-1.5 opacity-70"></i> Status: ${s}</span>
                             <span class="bg-white px-3 py-1 rounded-lg shadow-sm text-[11px] font-black">${statusNames[s].length} คน</span>
                         </div>
                         <div class="grid grid-cols-1 gap-1.5">
