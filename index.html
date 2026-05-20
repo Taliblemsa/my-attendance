@@ -292,7 +292,7 @@
 
     <div id="toast"><span id="toast-icon"></span><span id="toast-message" class="font-extrabold tracking-wide text-shadow-none"></span></div>
 
-    <!-- PWA Install Modal -->
+    <!-- PWA Install Modal (ปรับแต่งสีปุ่มให้อ่านง่าย มี Contrast สูง ไม่กลืนกัน) -->
     <div id="pwa-install-modal" class="modal-bg">
         <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-blue-100 !text-blue-500 !border-0 text-shadow-none">
@@ -303,8 +303,10 @@
                 คุณสามารถติดตั้งแอปนี้ลงในเครื่องเพื่อให้เรียกใช้งานง่ายขึ้น และรองรับการทำงานแบบออฟไลน์
             </div>
             <div class="flex gap-3 w-full">
-                <button id="btn-pwa-cancel" onclick="document.getElementById('pwa-install-modal').classList.remove('active')" class="flex-1 flex items-center justify-center btn-press bg-slate-200 text-slate-600 font-bold py-3.5 shape-btn text-shadow-none">ไว้คราวหน้า</button>
-                <button id="btn-pwa-install" class="flex-1 flex items-center justify-center btn-press bg-blue-50 text-white font-bold py-3.5 shape-btn shadow-lg shadow-blue-500/30 text-shadow-none">ติดตั้งแอป</button>
+                <!-- ปุ่ม ไว้คราวหน้า ปรับตัวหนังสือสีเทาเข้ม ชัดเจน -->
+                <button id="btn-pwa-cancel" onclick="document.getElementById('pwa-install-modal').classList.remove('active')" class="flex-1 flex items-center justify-center btn-press bg-slate-200 !text-slate-700 font-black py-3.5 shape-btn text-shadow-none">ไว้คราวหน้า</button>
+                <!-- ปุ่ม ติดตั้งแอป ปรับสีขาวสว่าง ชัดเจน -->
+                <button id="btn-pwa-install" class="flex-1 flex items-center justify-center btn-press bg-blue-600 !text-white font-black py-3.5 shape-btn shadow-lg shadow-blue-600/30 text-shadow-none">ติดตั้งแอป</button>
             </div>
         </div>
     </div>
@@ -325,8 +327,21 @@
 
     <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative z-10">
         
-        <!-- ================= VIEW 1: LANDING ================= -->
-        <section id="view-loading" class="flex flex-col items-center justify-center flex-1">
+        <!-- ================= VIEW 0: SPLASH SCREEN (หน้าดาวน์โหลดแรก โชว์ตราโรงเรียนกระดึ๊บๆ พื้นหลังขาว คลาสสิก) ================= -->
+        <section id="view-splash" class="flex flex-col items-center justify-center flex-1 min-h-[70vh] w-full select-none">
+            <div class="w-32 h-32 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 logo-pulse p-3 border border-slate-100/50">
+                <img src="./logo.png" class="w-24 h-24 object-contain rounded-full relative z-10" alt="logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3596/3596091.png'">
+            </div>
+            <h1 class="text-[34px] font-black text-accent leading-none tracking-tight glow-text text-center w-full">ระบบเช็คชื่อ</h1>
+            <p class="text-[16px] font-extrabold text-slate-600 mt-2 tracking-wide app-school-name-display opacity-90 glow-text text-center w-full">โรงเรียนสันติธรรมวิทยามูลนิธิ</p>
+            <div class="mt-8 flex items-center justify-center gap-2 bg-white/40 px-4 py-2 rounded-full border border-white/50 shadow-sm backdrop-blur-sm">
+                <i class="fa-solid fa-compact-disc fa-spin text-primary text-sm"></i>
+                <span class="text-[12px] font-bold text-slate-600">กำลังเชื่อมต่อฐานข้อมูล Google Sheets...</span>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 1: HOME/MAIN MENU (สลับมาหน้านี้ทันทีเมื่อพร้อม) ================= -->
+        <section id="view-home" class="hidden flex flex-col items-center justify-center flex-1">
             <header class="text-center mb-10 w-full flex flex-col items-center">
                 <div class="w-24 h-24 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container logo-pulse p-2 border border-slate-100"></div>
                 <h1 class="text-[38px] font-black text-accent leading-none tracking-tight glow-text text-center w-full">ระบบเช็คชื่อ</h1>
@@ -334,12 +349,6 @@
             </header>
 
             <div class="glass-panel shape-card w-full p-8 text-center relative flex flex-col items-center">
-                <div id="loading-spinner" class="mb-6 flex justify-center w-full">
-                    <i class="fa-solid fa-compact-disc fa-spin text-5xl text-primary opacity-90 text-shadow-none"></i>
-                </div>
-                <h2 class="text-xl font-black text-accent mb-1.5 glow-text text-center w-full" id="loading-title">กำลังจัดเตรียมรายชื่อ...</h2>
-                <p class="text-[14px] text-slate-600 mb-8 font-medium glow-text text-center w-full" id="loading-desc">เชื่อมต่อฐานข้อมูล Google Sheets ของโรงเรียน</p>
-                
                 <div id="action-buttons-container" class="hidden flex-col gap-3 w-full">
                     <button id="btn-start" onclick="checkSetupAndStart()" class="btn-press w-full btn-primary font-black text-lg py-4.5 shape-btn shadow-xl flex items-center justify-center gap-3 text-shadow-none">
                         <i class="fa-solid fa-clipboard-user text-xl"></i> เริ่มเช็คชื่อนักเรียน
@@ -357,6 +366,7 @@
                     </button>
                 </div>
                 
+                <!-- กล่องข้อความกรณีเกิด Error -->
                 <div id="system-error-msg" class="hidden text-red-600 text-[14px] mt-6 font-black bg-red-50/80 p-5 shape-card border border-red-100 text-shadow-none w-full text-left">
                     <div class="flex items-center gap-2 mb-2 text-red-700">
                         <i class="fa-solid fa-triangle-exclamation"></i>
@@ -372,7 +382,7 @@
         <section id="view-guide" class="hidden flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
-                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
+                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                         <i class="fa-solid fa-arrow-left text-lg"></i>
                     </button>
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">วิธีใช้งาน</h2>
@@ -523,7 +533,7 @@
         <section id="view-history" class="hidden flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
-                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
+                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                         <i class="fa-solid fa-arrow-left text-lg"></i>
                     </button>
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ประวัติวันนี้</h2>
@@ -536,7 +546,7 @@
         <section id="view-class" class="hidden">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center">
-                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-5 btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
+                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-5 btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                         <i class="fa-solid fa-arrow-left text-lg"></i>
                     </button>
                     <h2 class="text-[30px] font-black text-accent tracking-tighter leading-none glow-text">ระดับชั้น</h2>
@@ -558,7 +568,7 @@
                     </div>
                 </div>
                 <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
-                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
+                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                     <i class="fa-solid fa-house"></i>
                 </button>
             </div>
@@ -575,7 +585,7 @@
                     <h2 class="text-[30px] font-black text-accent tracking-tighter leading-none glow-text">ข้อมูลการสอน</h2>
                 </div>
                 <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
-                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
+                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                     <i class="fa-solid fa-house"></i>
                 </button>
             </div>
@@ -620,7 +630,7 @@
                         <i class="fa-solid fa-rotate-right text-lg"></i>
                     </button>
                     <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
-                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')" title="กลับหน้าหลัก">
+                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')" title="กลับหน้าหลัก">
                         <i class="fa-solid fa-house"></i>
                     </button>
                 </div>
@@ -738,7 +748,7 @@
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ผลประพฤติ</h2>
                 </div>
                 <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
-                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-loading')">
+                <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                     <i class="fa-solid fa-house"></i>
                 </button>
             </div>
@@ -908,7 +918,7 @@
 
         // 🚀 High-Performance Navigation Switch (สลับหน้าแบบไร้อาการหน่วงทันที 100%)
         function switchView(viewId) {
-            ['view-loading', 'view-settings', 'view-guide', 'view-class', 'view-room', 'view-setup', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary', 'view-history'].forEach(id => {
+            ['view-splash', 'view-home', 'view-settings', 'view-guide', 'view-class', 'view-room', 'view-setup', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary', 'view-history'].forEach(id => {
                 const el = document.getElementById(id);
                 if(!el) return;
                 if (id === viewId) { 
@@ -933,7 +943,7 @@
             if(document.getElementById('set-bg-blur')) document.getElementById('set-bg-blur').value = earlyPrefs.customBgBlur !== undefined ? earlyPrefs.customBgBlur : 50;
             if(document.getElementById('set-card-opacity')) document.getElementById('set-card-opacity').value = earlyPrefs.cardOpacity !== undefined ? earlyPrefs.cardOpacity : 15;
             if(document.getElementById('set-card-blur')) document.getElementById('set-card-blur').value = earlyPrefs.cardBlur !== undefined ? earlyPrefs.cardBlur : 25;
-            applyPrefs(); switchView('view-loading');
+            applyPrefs(); switchView('view-home');
         }
         
         function loadSettingsToForm() {
@@ -1020,7 +1030,7 @@
             if(document.getElementById('set-card-opacity')) earlyPrefs.cardOpacity = parseInt(document.getElementById('set-card-opacity').value);
             if(document.getElementById('set-card-blur')) earlyPrefs.cardBlur = parseInt(document.getElementById('set-card-blur').value);
             
-            try { localStorage.setItem('stAttendance_prefs', JSON.stringify(earlyPrefs)); applyPrefs(); showToast('บันทึกสำเร็จ', 'fa-solid fa-check text-emerald-400'); switchView('view-loading'); } 
+            try { localStorage.setItem('stAttendance_prefs', JSON.stringify(earlyPrefs)); applyPrefs(); showToast('บันทึกสำเร็จ', 'fa-solid fa-check text-emerald-400'); switchView('view-home'); } 
             catch (e) { showToast('หน่วยความจำเต็ม', 'fa-solid fa-triangle-exclamation text-red-400'); clearCustomBackground(); }
         }
 
@@ -1033,24 +1043,19 @@
                 if (data.values && data.values.length > 0) {
                     State.allStudents = data.values.map(r => ({ id: parseInt(r[0]), num: r[1], name: r[2], room: r[3] })).filter(s => !isNaN(s.id) && s.name && s.room);
                     
-                    // ปิดเอฟเฟกต์หมุนโหลดเมื่อเตรียมข้อมูลเรียบร้อย
-                    const spin = document.getElementById('loading-spinner');
-                    if(spin) spin.innerHTML = '<i class="fa-solid fa-circle-check text-7xl text-emerald-500 text-shadow-none"></i>';
-                    
-                    const t = document.getElementById('loading-title'); if(t) t.innerText = "ระบบจัดเตรียมข้อมูลเสร็จสิ้น";
-                    const d = document.getElementById('loading-desc'); if(d) d.innerText = `ดึงข้อมูลจากระบบสำเร็จแล้ว (${State.allStudents.length} คน)`;
-                    
-                    // หยุดแอนิเมชันกระดึบของโลโก้เมื่อโหลดข้อมูลสำเร็จแล้ว
-                    document.querySelectorAll('.app-logo-container').forEach(container => {
-                        container.classList.remove('logo-pulse');
-                    });
-
                     const btnC = document.getElementById('action-buttons-container');
                     if(btnC) { btnC.classList.remove('hidden'); btnC.classList.add('flex'); }
+
+                    // สลับไปยังหน้าจอหลักอัตโนมัติเมื่อจัดเตรียมข้อมูลเสร็จสิ้น ไร้รอยต่อ 100%
+                    switchView('view-home');
+                    showToast('จัดเตรียมข้อมูลรายชื่อนักเรียนเรียบร้อยแล้ว', 'fa-solid fa-check text-emerald-400');
                 } else throw new Error("ไฟล์ว่าง");
             } catch (err) {
-                const spin = document.getElementById('loading-spinner');
-                if(spin) spin.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-red-500 text-7xl text-shadow-none"></i>';
+                // หากเกิดข้อผิดพลาดในการโหลดข้อมูล ให้ย้อนกลับหน้าแรกเพื่อแสดงกล่องข้อความแจ้งเตือน Error
+                switchView('view-home');
+                const btnC = document.getElementById('action-buttons-container');
+                if(btnC) btnC.classList.add('hidden');
+                
                 const errM = document.getElementById('system-error-msg'); if(errM) errM.classList.remove('hidden');
                 const errD = document.getElementById('error-details'); if(errD) errD.innerText = err.message;
             }
