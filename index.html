@@ -1326,19 +1326,67 @@
                 earlyPrefs.subjects.forEach(sub => { const opt = document.createElement('option'); opt.value = sub; opt.innerText = sub; subjSel.appendChild(opt); });
             }
             const tIn = document.getElementById('input-teacher'); if(tIn) tIn.value = earlyPrefs.teacherName;
+            
+            // ตั้งค่าเริ่มต้นของวันที่และเวลาเป็น "ปัจจุบัน"
+            const now = new Date();
+            const dIn = document.getElementById('input-date');
+            if(dIn) dIn.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            const tInp = document.getElementById('input-time');
+            if(tInp) tInp.value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            
+            switchView('view-setup');
+        }
+
+        // ดึงข้อมูลวันที่เดิมกลับมาหากกดย้อนกลับ
+        function backToSetup() {
+            const key = `${State.currentClass}-${State.currentRoom}`;
+            const meta = State.historyMeta[key];
+            if (meta) {
+                const ts = new Date(meta.timestamp);
+                const dIn = document.getElementById('input-date');
+                if(dIn) dIn.value = `${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,'0')}-${String(ts.getDate()).padStart(2,'0')}`;
+                const tInp = document.getElementById('input-time');
+                if(tInp) tInp.value = `${String(ts.getHours()).padStart(2,'0')}:${String(ts.getMinutes()).padStart(2,'0')}`;
+                
+                const sEl = document.getElementById('input-subject');
+                if(sEl) sEl.value = meta.subject;
+                const pEl = document.getElementById('input-period');
+                if(pEl) pEl.value = meta.period;
+            }
             switchView('view-setup');
         }
 
         function proceedToAttendance() {
-            const sEl = document.getElementById('input-subject'); const tEl = document.getElementById('input-teacher'); const pEl = document.getElementById('input-period');
-            const s = sEl ? sEl.value : ''; const t = tEl ? tEl.value : ''; const p = pEl ? pEl.value : '1';
+            const sEl = document.getElementById('input-subject'); 
+            const tEl = document.getElementById('input-teacher'); 
+            const pEl = document.getElementById('input-period');
+            const dEl = document.getElementById('input-date');
+            const timeEl = document.getElementById('input-time');
             
-            if(!s || !t) return showToast('กรุณาระบุข้อมูลการสอนในหน้าตั้งค่าก่อน', 'fa-solid fa-circle-info text-primary');
+            const s = sEl ? sEl.value : ''; 
+            const t = tEl ? tEl.value : ''; 
+            const p = pEl ? pEl.value : '1';
+            const dVal = dEl ? dEl.value : '';
+            const timeVal = timeEl ? timeEl.value : '';
+            
+            if(!s || !t || !dVal || !timeVal) return showToast('กรุณาระบุข้อมูลการสอนให้ครบถ้วน', 'fa-solid fa-circle-info text-primary');
+            
             State.subjectName = s; State.teacherName = t; State.periodCount = p;
+            
+            // สลับฐานข้อมูลหากครูเลือก "วันที่ย้อนหลัง"
+            if (State.activeDateStr !== dVal) {
+                if(State.activeDateStr) saveDailyHistory(); // เซฟของเก่าก่อนเปลี่ยนวัน
+                loadHistoryByDate(dVal);
+                State.activeDateStr = dVal; // อัปเดตวันที่โฟกัส
+            }
             
             const key = `${State.currentClass}-${State.currentRoom}`;
             if (!State.historyMeta) State.historyMeta = {};
-            State.historyMeta[key] = { subject: s, teacher: t, period: p, timestamp: Date.now() };
+            
+            // แปลงวันที่และเวลาที่เลือกเป็น Timestamp สำหรับโชว์ในสลิป
+            const customTimestamp = new Date(`${dVal}T${timeVal}`).getTime();
+            
+            State.historyMeta[key] = { subject: s, teacher: t, period: p, timestamp: customTimestamp };
             saveDailyHistory();
             
             renderAttendanceList(); switchView('view-attendance');
@@ -1430,11 +1478,14 @@
         }
 
         function prepareAndShowSummary() {
-            const data = State.attendance[`${State.currentClass}-${State.currentRoom}`] || {};
+            const key = `${State.currentClass}-${State.currentRoom}`;
+            const data = State.attendance[key] || {};
             if (Object.keys(data).length === 0) return showToast('ยังไม่ได้เช็คชื่อเลยครับ', 'fa-solid fa-circle-exclamation text-amber-400');
             
             const students = State.allStudents.filter(s => s.room === State.currentRoom);
-            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            const meta = State.historyMeta[key];
+            const recordDate = meta ? new Date(meta.timestamp) : new Date();
+            const dateStr = recordDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
             
             document.getElementById('export-subject-val').innerText = `${State.subjectName} (${State.periodCount} คาบ)`;
             document.getElementById('export-teacher-val').innerText = State.teacherName;
@@ -1469,16 +1520,19 @@
             });
             
             document.getElementById('export-absent-list').innerHTML = html || `<div class="text-center py-8 border-2 border-dashed border-emerald-200 bg-emerald-50 rounded-[24px]"><div class="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl shadow-sm"><i class="fa-solid fa-check"></i></div><p class="font-black text-emerald-600 text-[16px]">มาเรียนครบทุกคน!</p><p class="text-emerald-500/80 text-xs font-bold mt-1">ยอดเยี่ยมมากครับ</p></div>`;
-            document.getElementById('export-timestamp').innerText = new Date().toLocaleTimeString('th-TH');
+            document.getElementById('export-timestamp').innerText = recordDate.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
             switchView('view-summary');
         }
 
         function prepareAndShowBehaviorSummary() {
-            const data = State.behavior[`${State.currentClass}-${State.currentRoom}`] || {};
+            const key = `${State.currentClass}-${State.currentRoom}`;
+            const data = State.behavior[key] || {};
             if (!Object.values(data).some(d => d.tags.length > 0)) return showToast('ยังไม่มีบันทึกพฤติกรรมครับ', 'fa-solid fa-shield text-amber-400');
             
             const students = State.allStudents.filter(s => s.room === State.currentRoom);
-            const dateStr = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+            const meta = State.historyMeta[key];
+            const recordDate = meta ? new Date(meta.timestamp) : new Date();
+            const dateStr = recordDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
             
             document.getElementById('export-behavior-subject-val').innerText = State.subjectName;
             document.getElementById('export-behavior-teacher-val').innerText = State.teacherName;
@@ -1511,7 +1565,7 @@
             });
             
             document.getElementById('export-behavior-list').innerHTML = html;
-            document.getElementById('export-behavior-timestamp').innerText = new Date().toLocaleTimeString('th-TH');
+            document.getElementById('export-behavior-timestamp').innerText = recordDate.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'});
             switchView('view-behavior-summary');
         }
 
