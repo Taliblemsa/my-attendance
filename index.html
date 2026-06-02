@@ -224,6 +224,7 @@
             const appBody = document.getElementById('app-body');
             if(appBody) appBody.className = `flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)] ${earlyPrefs.theme}`;
             
+            // อัปเดตสีของ Status bar เป็นโปร่งใสเพื่อดันภาพพื้นหลังเต็มจอ
             const metaTheme = document.getElementById('meta-theme-color');
             if (metaTheme) {
                 if (earlyPrefs.customBg) {
@@ -240,6 +241,7 @@
 
             document.querySelectorAll('.app-school-name-display').forEach(el => el.innerText = earlyPrefs.schoolName);
             
+            // ปรับกล่องโลโก้ทั้งหมดให้เป็นพื้นหลังสีขาวนวล (เพื่อรองรับโลโก้ใส) พร้อมเอฟเฟกต์กระดึบๆ
             document.querySelectorAll('.app-logo-container').forEach(container => {
                 container.className = "w-24 h-24 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container logo-pulse p-2 border border-slate-100";
                 if(earlyPrefs.customLogo) {
@@ -290,7 +292,7 @@
 
     <div id="toast"><span id="toast-icon"></span><span id="toast-message" class="font-extrabold tracking-wide text-shadow-none"></span></div>
 
-    <!-- PWA Install Modal -->
+    <!-- PWA Install Modal (ปรับแต่งสีปุ่มให้อ่านง่าย มี Contrast สูง ไม่กลืนกัน) -->
     <div id="pwa-install-modal" class="modal-bg">
         <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-blue-100 !text-blue-500 !border-0 text-shadow-none">
@@ -323,8 +325,8 @@
 
     <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative z-10">
         
-        <!-- ================= VIEW 0: SPLASH SCREEN ================= -->
-        <section id="view-loading" class="flex flex-col items-center justify-center flex-1 min-h-[70vh] w-full select-none">
+        <!-- ================= VIEW 0: SPLASH SCREEN (หน้าดาวน์โหลดแรก โชว์ตราโรงเรียนกระดึ๊บๆ พื้นหลังขาว คลาสสิก) ================= -->
+        <section id="view-splash" class="flex flex-col items-center justify-center flex-1 min-h-[70vh] w-full select-none">
             <div class="w-32 h-32 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 logo-pulse p-3 border border-slate-100/50">
                 <img src="./logo.png" class="w-24 h-24 object-contain rounded-full relative z-10" alt="logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3596/3596091.png'">
             </div>
@@ -336,7 +338,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 1: HOME/MAIN MENU ================= -->
+        <!-- ================= VIEW 1: HOME/MAIN MENU (สลับมาหน้านี้ทันทีเมื่อพร้อม) ================= -->
         <section id="view-home" class="hidden flex flex-col items-center justify-center flex-1">
             <header class="text-center mb-10 w-full flex flex-col items-center">
                 <div class="w-24 h-24 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container logo-pulse p-2 border border-slate-100"></div>
@@ -362,6 +364,7 @@
                     </button>
                 </div>
                 
+                <!-- กล่องข้อความกรณีเกิด Error -->
                 <div id="system-error-msg" class="hidden text-red-600 text-[14px] mt-6 font-black bg-red-50/80 p-5 shape-card border border-red-100 text-shadow-none w-full text-left">
                     <div class="flex items-center gap-2 mb-2 text-red-700">
                         <i class="fa-solid fa-triangle-exclamation"></i>
@@ -373,7 +376,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW: GUIDE ================= -->
+        <!-- ================= VIEW: GUIDE (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
         <section id="view-guide" class="hidden flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
@@ -424,7 +427,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW: SETTINGS ================= -->
+        <!-- ================= VIEW: SETTINGS (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
         <section id="view-settings" class="hidden flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
@@ -524,20 +527,38 @@
             </div>
         </section>
         
-        <!-- ================= VIEW: HISTORY ================= -->
+        <!-- ================= VIEW: HISTORY (ปฏิทินอัจฉริยะ) ================= -->
         <section id="view-history" class="hidden flex-1 flex flex-col h-full">
-            <div class="flex items-center justify-between mb-6 shrink-0">
+            <div class="flex items-center justify-between mb-4 shrink-0 px-1">
                 <div class="flex items-center">
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-4 btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                         <i class="fa-solid fa-arrow-left text-lg"></i>
                     </button>
-                    <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ประวัติวันนี้</h2>
+                    <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ประวัติย้อนหลัง</h2>
                 </div>
             </div>
+
+            <!-- Calendar UI -->
+            <div class="glass-panel shape-card p-4 mb-4 shrink-0">
+                <div class="flex justify-between items-center mb-3">
+                    <button onclick="changeHistoryMonth(-1)" class="w-8 h-8 flex items-center justify-center bg-white/50 rounded-full btn-press text-slate-600"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h3 id="calendar-month-display" class="font-black text-accent text-lg glow-text">...</h3>
+                    <button onclick="changeHistoryMonth(1)" class="w-8 h-8 flex items-center justify-center bg-white/50 rounded-full btn-press text-slate-600"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-center text-[10px] font-bold text-slate-500 mb-2">
+                    <div>อา</div><div>จ</div><div>อ</div><div>พ</div><div>พฤ</div><div>ศ</div><div>ส</div>
+                </div>
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center"></div>
+            </div>
+
+            <h3 class="text-[14px] font-black text-primary mb-2 px-1 glow-text flex justify-between items-end">
+                <span><i class="fa-solid fa-list-check"></i> บันทึกของ <span id="selected-date-display" class="text-accent underline decoration-primary/30 decoration-2 underline-offset-4">วันนี้</span></span>
+            </h3>
+
             <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4" id="history-list-container"></div>
         </section>
 
-        <!-- ================= VIEW 2: CLASS SELECTION ================= -->
+        <!-- ================= VIEW 2: CLASS SELECTION (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
         <section id="view-class" class="hidden">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center">
@@ -550,7 +571,7 @@
             <div id="class-list" class="space-y-3 px-1"></div>
         </section>
 
-        <!-- ================= VIEW 3: ROOM SELECTION ================= -->
+        <!-- ================= VIEW 3: ROOM SELECTION (มีปุ่มโฮมเพื่อย้อนกลับทางลัด) ================= -->
         <section id="view-room" class="hidden">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
@@ -562,6 +583,7 @@
                         <h2 class="text-[30px] font-black text-accent tracking-tighter leading-none mt-1 glow-text">ห้องเรียน</h2>
                     </div>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -569,7 +591,7 @@
             <div id="room-list" class="grid grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- ================= VIEW 3.5: TEACHING DATA ================= -->
+        <!-- ================= VIEW 3.5: TEACHING DATA (มีปุ่มโฮมเพื่อย้อนกลับทางลัด) ================= -->
         <section id="view-setup" class="hidden">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
@@ -578,6 +600,7 @@
                     </button>
                     <h2 class="text-[30px] font-black text-accent tracking-tighter leading-none glow-text">ข้อมูลการสอน</h2>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -606,7 +629,7 @@
             </button>
         </section>
 
-        <!-- ================= VIEW 4: ATTENDANCE CHECK ================= -->
+        <!-- ================= VIEW 4: ATTENDANCE CHECK (มีปุ่มโฮมขวาสุด) ================= -->
         <section id="view-attendance" class="hidden flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-center pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
@@ -622,6 +645,7 @@
                     <button onclick="resetCurrentRoomAttendance()" class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-red-500 btn-press shadow-sm text-shadow-none" title="ล้างเช็คชื่อ">
                         <i class="fa-solid fa-rotate-right text-lg"></i>
                     </button>
+                    <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                     <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')" title="กลับหน้าหลัก">
                         <i class="fa-solid fa-house"></i>
                     </button>
@@ -647,7 +671,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 4.5: BEHAVIOR CHECK ================= -->
+        <!-- ================= VIEW 4.5: BEHAVIOR CHECK (มีปุ่มโฮม) ================= -->
         <section id="view-behavior" class="hidden flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-center pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
@@ -659,6 +683,7 @@
                         <p class="text-[12px] font-bold text-slate-600 mt-1.5 uppercase tracking-widest glow-text" id="header-behavior-room">...</p>
                     </div>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -675,7 +700,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 5: ATTENDANCE SUMMARY ================= -->
+        <!-- ================= VIEW 5: ATTENDANCE SUMMARY (มีปุ่มโฮม) ================= -->
         <section id="view-summary" class="hidden overflow-y-auto scroll-fine h-full">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
@@ -684,6 +709,7 @@
                     </button>
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ใบสรุปผล</h2>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -714,18 +740,15 @@
                 <div id="export-absent-list" class="space-y-3 relative z-10"></div>
                 
                 <div class="mt-6 pt-4 border-t border-dashed border-slate-300 text-center relative z-10">
+                    <!-- ปุ่มส่งข้อมูลขึ้น Sheets สำหรับเช็คชื่อ -->
+                    <button id="btn-sync-attendance" onclick="syncDataToCloud('attendance')" class="w-full btn-press bg-blue-600 text-white font-black py-4 shape-btn shadow-xl shadow-blue-600/30 text-[15px] flex items-center justify-center gap-2 mb-4 text-shadow-none">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูลลง Google Sheets
+                    </button>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center w-full">บันทึกเมื่อ: <span id="export-timestamp"></span></p>
                 </div>
             </div>
             
-            <div class="mt-6">
-                <!-- ปุ่มส่งข้อมูลขึ้น Sheets สำหรับเช็คชื่อ -->
-                <button id="btn-sync-attendance" onclick="syncDataToCloud('attendance')" class="w-full btn-press bg-blue-600 text-white font-black py-4 shape-btn shadow-xl shadow-blue-600/30 text-[15px] flex items-center justify-center gap-2 mb-4 text-shadow-none">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูลลง Google Sheets
-                </button>
-            </div>
-            
-            <div class="flex gap-3 mt-4 mb-12">
+            <div class="flex gap-3 mt-6 mb-12">
                 <button onclick="processImageExport('export-canvas', 'เช็คชื่อ', 'download')" class="flex-1 btn-press bg-emerald-500 text-white font-black py-4 shape-btn shadow-xl shadow-emerald-500/30 text-[15px] flex items-center justify-center gap-2 text-shadow-none">
                     <i class="fa-solid fa-download"></i> บันทึก
                 </button>
@@ -735,7 +758,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 6: BEHAVIOR SUMMARY ================= -->
+        <!-- ================= VIEW 6: BEHAVIOR SUMMARY (มีปุ่มโฮม) ================= -->
         <section id="view-behavior-summary" class="hidden overflow-y-auto scroll-fine h-full">
             <div class="flex items-center justify-between mb-6 px-1">
                 <div class="flex items-center">
@@ -744,6 +767,7 @@
                     </button>
                     <h2 class="text-[28px] font-black text-accent tracking-tighter leading-none glow-text">ผลประพฤติ</h2>
                 </div>
+                <!-- ปุ่มโฮมเพื่อลัดกลับหน้าแรก -->
                 <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-primary btn-press shadow-sm text-shadow-none" onclick="switchView('view-home')">
                     <i class="fa-solid fa-house"></i>
                 </button>
@@ -769,18 +793,15 @@
                 <div id="export-behavior-list" class="space-y-3 relative z-10"></div>
                 
                 <div class="mt-6 pt-4 border-t border-dashed border-slate-300 text-center relative z-10">
+                    <!-- ปุ่มส่งข้อมูลขึ้น Sheets สำหรับพฤติกรรม -->
+                    <button id="btn-sync-behavior" onclick="syncDataToCloud('behavior')" class="w-full btn-press bg-blue-600 text-white font-black py-4 shape-btn shadow-xl shadow-blue-600/30 text-[15px] flex items-center justify-center gap-2 mb-4 text-shadow-none">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูลลง Google Sheets
+                    </button>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center w-full">บันทึกเมื่อ: <span id="export-behavior-timestamp"></span></p>
                 </div>
             </div>
             
-            <div class="mt-6">
-                <!-- ปุ่มส่งข้อมูลขึ้น Sheets สำหรับพฤติกรรม -->
-                <button id="btn-sync-behavior" onclick="syncDataToCloud('behavior')" class="w-full btn-press bg-blue-600 text-white font-black py-4 shape-btn shadow-xl shadow-blue-600/30 text-[15px] flex items-center justify-center gap-2 mb-4 text-shadow-none">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูลลง Google Sheets
-                </button>
-            </div>
-
-            <div class="flex gap-3 mt-4 mb-12">
+            <div class="flex gap-3 mt-6 mb-12">
                 <button onclick="processImageExport('export-behavior-canvas', 'ความประพฤติ', 'download')" class="flex-1 btn-press bg-emerald-500 text-white font-black py-4 shape-btn shadow-xl shadow-emerald-500/30 text-[15px] flex items-center justify-center gap-2 text-shadow-none">
                     <i class="fa-solid fa-download"></i> บันทึก
                 </button>
@@ -795,8 +816,7 @@
         const CONFIG = {
             SHEET_ID: "1mPl20ilAZAJmgfktHVPIDxZWSWQKNK7Y1_wJxAIMeBY", 
             API_KEY: "AIzaSyBEIDAElc5HiX9sX6Ldwx__ll55DZJj85s", 
-            // URL สำหรับส่งข้อมูลขึ้น Google Sheets ของโรงเรียนสันติธรรมวิทยามูลนิธิ
-            GAS_URL: "https://script.google.com/macros/s/AKfycbykBBAAvnVDB2dl3bhVvi2IZkNqhvDT82wMFCbKakONKoublJXRSbK2sZgdoq0ERE1fmg/exec", 
+            GAS_URL: "https://script.google.com/macros/s/AKfycbykBBAAvnVDB2dl3bhVvi2IZkNqhvDT82wMFCbKakONKoublJXRSbK2sZgdoq0ERE1fmg/exec",
             RANGE: "A:D", 
             CLASSES: {
                 "ชั้น ม.1": ["1/1", "1/2", "1/3", "1/4"],
@@ -811,6 +831,10 @@
         };
 
         const State = { allStudents: [], attendance: {}, behavior: {}, historyMeta: {}, currentClass: "", currentRoom: "", subjectName: "", teacherName: "", periodCount: "1" };
+
+        // ตัวแปรสำหรับระบบปฏิทิน
+        let calendarCurrentDate = new Date();
+        State.activeDateStr = "";
 
         document.addEventListener('DOMContentLoaded', () => {
             const uploadEl = document.getElementById('set-bg-upload');
@@ -922,7 +946,7 @@
         }
 
         function switchView(viewId) {
-            ['view-loading', 'view-splash', 'view-home', 'view-settings', 'view-guide', 'view-class', 'view-room', 'view-setup', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary', 'view-history'].forEach(id => {
+            ['view-splash', 'view-home', 'view-settings', 'view-guide', 'view-class', 'view-room', 'view-setup', 'view-attendance', 'view-summary', 'view-behavior', 'view-behavior-summary', 'view-history'].forEach(id => {
                 const el = document.getElementById(id);
                 if(!el) return;
                 if (id === viewId) { 
@@ -1051,7 +1075,6 @@
                     if(btnC) { btnC.classList.remove('hidden'); btnC.classList.add('flex'); }
 
                     switchView('view-home');
-                    showToast('จัดเตรียมข้อมูลรายชื่อนักเรียนเรียบร้อยแล้ว', 'fa-solid fa-check text-emerald-400');
                 } else throw new Error("ไฟล์ว่าง");
             } catch (err) {
                 switchView('view-home');
@@ -1063,36 +1086,110 @@
             }
         }
 
-        function loadDailyHistory() {
-            const today = new Date().toDateString();
-            const stored = JSON.parse(localStorage.getItem('st_daily_history'));
-            if(stored && stored.date === today) {
-                State.attendance = stored.data || {};
-                State.behavior = stored.behavior || {};
-                State.historyMeta = stored.meta || {};
+        // ====== HISTORY & CALENDAR LOGIC ======
+        function loadHistoryByDate(dateStr) {
+            State.activeDateStr = dateStr;
+            const allHistory = JSON.parse(localStorage.getItem('st_app_history_v2')) || {};
+            const dayData = allHistory[dateStr];
+            if(dayData) {
+                State.attendance = dayData.data || {};
+                State.behavior = dayData.behavior || {};
+                State.historyMeta = dayData.meta || {};
             } else { 
-                localStorage.removeItem('st_daily_history'); 
+                State.attendance = {};
+                State.behavior = {};
+                State.historyMeta = {};
             }
         }
 
+        function loadDailyHistory() {
+            const t = new Date();
+            const todayStr = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+            loadHistoryByDate(todayStr);
+        }
+
         function saveDailyHistory() {
-            const today = new Date().toDateString();
-            localStorage.setItem('st_daily_history', JSON.stringify({ 
-                date: today, 
+            if(!State.activeDateStr) {
+                const t = new Date();
+                State.activeDateStr = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+            }
+            let allHistory = JSON.parse(localStorage.getItem('st_app_history_v2')) || {};
+            allHistory[State.activeDateStr] = { 
                 data: State.attendance, 
                 behavior: State.behavior,
                 meta: State.historyMeta
-            }));
+            };
+            localStorage.setItem('st_app_history_v2', JSON.stringify(allHistory));
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthDisplay = document.getElementById('calendar-month-display');
+            if(!grid || !monthDisplay) return;
+
+            const year = calendarCurrentDate.getFullYear();
+            const month = calendarCurrentDate.getMonth();
+            const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+            monthDisplay.innerText = `${thaiMonths[month]} ${year + 543}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const t = new Date();
+            const todayStr = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+            
+            let allHistory = JSON.parse(localStorage.getItem('st_app_history_v2')) || {};
+
+            let html = '';
+            for (let i = 0; i < firstDay; i++) { html += `<div></div>`; }
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasData = allHistory[dStr] && Object.keys(allHistory[dStr].meta || {}).length > 0;
+                
+                let btnClass = "w-8 h-8 mx-auto rounded-full flex items-center justify-center text-[13px] font-bold transition-all ";
+                
+                if (dStr === State.activeDateStr) {
+                    btnClass += "bg-primary text-white shadow-md transform scale-110";
+                } else if (dStr === todayStr) {
+                    btnClass += "bg-white text-accent border-2 border-primary/50";
+                } else {
+                    btnClass += "text-slate-600 hover:bg-white/50";
+                }
+
+                let dotHtml = hasData ? `<div class="w-1.5 h-1.5 rounded-full bg-emerald-500 mx-auto mt-0.5 shadow-sm"></div>` : `<div class="w-1.5 h-1.5 rounded-full bg-transparent mx-auto mt-0.5"></div>`;
+                
+                html += `<div class="py-1 cursor-pointer" onclick="selectHistoryDate('${dStr}')">
+                    <div class="${btnClass}">${day}</div>
+                    ${dotHtml}
+                </div>`;
+            }
+            grid.innerHTML = html;
+            
+            const selDateObj = new Date(State.activeDateStr);
+            const displayDate = State.activeDateStr === todayStr ? "วันนี้" : `${selDateObj.getDate()} ${thaiMonths[selDateObj.getMonth()]} ${selDateObj.getFullYear() + 543}`;
+            const dateDisplayEl = document.getElementById('selected-date-display');
+            if(dateDisplayEl) dateDisplayEl.innerText = displayDate;
+        }
+
+        function changeHistoryMonth(dir) {
+            calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + dir);
+            renderCalendar();
+        }
+
+        function selectHistoryDate(dateStr) {
+            loadHistoryByDate(dateStr);
+            renderHistoryList();
         }
 
         function renderHistoryList() {
+            renderCalendar();
             const container = document.getElementById('history-list-container');
             if(!container) return;
             container.innerHTML = '';
             
             const keys = Object.keys(State.historyMeta);
             if(keys.length === 0) {
-                container.innerHTML = `<div class="text-center py-10 glass-panel shape-card border-dashed"><i class="fa-solid fa-folder-open text-4xl text-slate-400 mb-3 opacity-50"></i><p class="text-slate-500 font-bold glow-text">ยังไม่มีประวัติการเช็คชื่อวันนี้</p></div>`;
+                container.innerHTML = `<div class="text-center py-10 glass-panel shape-card border-dashed"><i class="fa-solid fa-folder-open text-4xl text-slate-400 mb-3 opacity-50"></i><p class="text-slate-500 font-bold glow-text">ไม่มีประวัติการเช็คชื่อในวันนี้</p></div>`;
                 return;
             }
             
@@ -1125,13 +1222,52 @@
                         <button onclick="resumeHistoryItem('${key}')" class="flex-1 bg-white border border-slate-200 text-slate-700 font-bold py-2.5 shape-btn shadow-sm text-[13px] flex justify-center items-center gap-2 active:scale-95 transition">
                             <i class="fa-solid fa-pen-to-square text-primary"></i> แก้ไข/สรุปยอด
                         </button>
-                        <button onclick="deleteHistoryItem('${key}')" class="w-12 bg-red-50 border border-red-100 text-red-500 font-bold py-2.5 shape-btn shadow-sm text-[13px] flex justify-center items-center active:scale-95 transition">
+                        <button onclick="exportToICS('${key}')" class="w-12 bg-blue-50 border border-blue-100 text-blue-500 font-bold py-2.5 shape-btn shadow-sm text-[13px] flex justify-center items-center active:scale-95 transition" title="บันทึกลงปฏิทินเครื่อง">
+                            <i class="fa-solid fa-calendar-plus"></i>
+                        </button>
+                        <button onclick="deleteHistoryItem('${key}')" class="w-12 bg-red-50 border border-red-100 text-red-500 font-bold py-2.5 shape-btn shadow-sm text-[13px] flex justify-center items-center active:scale-95 transition" title="ลบข้อมูล">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // ฟังก์ชันสร้างไฟล์ปฏิทิน (.ics) เพื่อเพิ่มลงแอป Calendar ของเครื่อง
+        function exportToICS(key) {
+            const meta = State.historyMeta[key];
+            const data = State.attendance[key] || {};
+            const roomNum = key.split('-')[1];
+            
+            const students = State.allStudents.filter(s => s.room === roomNum);
+            let absentees = [];
+            students.forEach(st => {
+                if (data[st.id] === "ลา" || data[st.id] === "ขาด") {
+                    absentees.push(`- ${st.name} (${data[st.id]})`);
+                }
+            });
+
+            const dateStr = State.activeDateStr.replace(/-/g, '');
+            const description = absentees.length > 0 ? `นักเรียนที่ไม่มาเรียน:\\n${absentees.join('\\n')}` : "มาครบทุกคน";
+            
+            let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//S.T. Attendance//TH\n";
+            icsContent += "BEGIN:VEVENT\n";
+            icsContent += `SUMMARY:ขาด/ลา ${meta.subject} ม.${roomNum}\n`;
+            icsContent += `DESCRIPTION:${description}\n`;
+            icsContent += `DTSTART;VALUE=DATE:${dateStr}\n`;
+            icsContent += `DTEND;VALUE=DATE:${dateStr}\n`;
+            icsContent += "END:VEVENT\nEND:VCALENDAR";
+
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `บันทึก_${meta.subject}_ม${roomNum}.ics`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('สร้างกิจกรรมปฏิทินสำเร็จ กดเปิดเพื่อเพิ่มลงเครื่อง', 'fa-regular fa-calendar-check text-emerald-500');
         }
         
         function resumeHistoryItem(key) {
@@ -1159,6 +1295,7 @@
                 showToast('ลบประวัติสำเร็จ', 'fa-solid fa-trash text-emerald-400');
             });
         }
+        // ============================================
 
         function renderClasses() {
             const c = document.getElementById('class-list'); if(!c) return;
@@ -1378,7 +1515,6 @@
             switchView('view-behavior-summary');
         }
 
-        // ฟังก์ชันส่งข้อมูลขึ้นคลาวด์ (Google Sheets)
         async function syncDataToCloud(type) {
             if (!CONFIG.GAS_URL || CONFIG.GAS_URL === "วาง_WEB_APP_URL_ของคุณครูที่นี่") {
                 return showConfirm('ยังไม่ได้เชื่อมต่อ', 'กรุณานำ Web App URL จาก Google Apps Script มาวางในตัวแปร CONFIG.GAS_URL ในโค้ดก่อนครับ', () => {});
@@ -1393,8 +1529,25 @@
             if (type === 'attendance') {
                 const data = State.attendance[key] || {};
                 students.forEach(st => {
-                    records.push({ id: st.id, name: st.name, status: data[st.id] || "ไม่ได้เช็ค" });
+                    const status = data[st.id];
+                    // กรองเอาเฉพาะคนที่ "ลา" หรือ "ขาด" เท่านั้น
+                    if (status === "ลา" || status === "ขาด") {
+                        records.push({ id: st.id, name: st.name, status: status });
+                    }
                 });
+                
+                // ถ้านักเรียนมาครบทุกคน (ไม่มีใครลาหรือขาดเลย)
+                if (records.length === 0) {
+                    const btn = document.getElementById('btn-sync-attendance');
+                    if (btn) {
+                        btn.innerHTML = `<i class="fa-solid fa-check-double"></i> มาครบทุกคน`;
+                        btn.classList.replace('bg-blue-600', 'bg-emerald-500');
+                        btn.classList.replace('shadow-blue-600/30', 'shadow-emerald-500/30');
+                        btn.disabled = true;
+                    }
+                    return showToast('มาครบทุกคน ไม่มีการบันทึกคนขาดลงชีต', 'fa-solid fa-circle-check text-emerald-500');
+                }
+                
             } else if (type === 'behavior') {
                 const data = State.behavior[key] || {};
                 students.forEach(st => {
@@ -1416,7 +1569,7 @@
 
             const payload = {
                 type: type,
-                timestamp: new Date().toLocaleString('th-TH'),
+                timestamp: new Date(meta.timestamp).toLocaleString('th-TH'),
                 subject: meta.subject,
                 teacher: meta.teacher,
                 classLvl: State.currentClass,
