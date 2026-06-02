@@ -178,16 +178,14 @@
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* 🎨 Custom Pulse Animation สำหรับตราโลโก้โปร่งใส (กระดึบๆ อย่างสวยงามและลื่นไหล) */
+        /* 🎨 Custom Pulse Animation สำหรับตราโลโก้โปร่งใส */
         @keyframes logo-bounce {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.08); }
         }
-        .logo-pulse {
-            animation: logo-bounce 2s infinite ease-in-out;
-        }
+        .logo-pulse { animation: logo-bounce 2s infinite ease-in-out; }
 
-        /* 🚀 High-Performance Instant Navigation (สลับหน้าจอทันทีแบบไร้อาการกระตุก 100%) */
+        /* 🚀 High-Performance Instant Navigation */
         section { transition: none !important; transform: none !important; animation: none !important; }
 
         /* Report Canvas Style */
@@ -224,7 +222,6 @@
             const appBody = document.getElementById('app-body');
             if(appBody) appBody.className = `flex flex-col items-center min-h-screen pt-[max(env(safe-area-inset-top),1rem)] ${earlyPrefs.theme}`;
             
-            // อัปเดตสีของ Status bar เป็นโปร่งใสเพื่อดันภาพพื้นหลังเต็มจอ
             const metaTheme = document.getElementById('meta-theme-color');
             if (metaTheme) {
                 if (earlyPrefs.customBg) {
@@ -241,7 +238,6 @@
 
             document.querySelectorAll('.app-school-name-display').forEach(el => el.innerText = earlyPrefs.schoolName);
             
-            // ปรับกล่องโลโก้ทั้งหมดให้เป็นพื้นหลังสีขาวนวล (เพื่อรองรับโลโก้ใส) พร้อมเอฟเฟกต์กระดึบๆ
             document.querySelectorAll('.app-logo-container').forEach(container => {
                 container.className = "w-24 h-24 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container logo-pulse p-2 border border-slate-100";
                 if(earlyPrefs.customLogo) {
@@ -292,7 +288,7 @@
 
     <div id="toast"><span id="toast-icon"></span><span id="toast-message" class="font-extrabold tracking-wide text-shadow-none"></span></div>
 
-    <!-- PWA Install Modal (ปรับแต่งสีปุ่มให้อ่านง่าย มี Contrast สูง ไม่กลืนกัน) -->
+    <!-- PWA Install Modal -->
     <div id="pwa-install-modal" class="modal-bg">
         <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-blue-100 !text-blue-500 !border-0 text-shadow-none">
@@ -309,6 +305,7 @@
         </div>
     </div>
 
+    <!-- Confirm Modal -->
     <div id="confirm-modal" class="modal-bg">
         <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-red-100 !text-red-500 !border-0 text-shadow-none">
@@ -325,7 +322,7 @@
 
     <main class="container mx-auto max-w-md px-7 pt-12 pb-12 flex-1 w-full flex flex-col h-full overflow-hidden text-left relative z-10">
         
-        <!-- ================= VIEW 0: SPLASH SCREEN (หน้าดาวน์โหลดแรก โชว์ตราโรงเรียนกระดึ๊บๆ พื้นหลังขาว คลาสสิก) ================= -->
+        <!-- ================= VIEW 0: SPLASH SCREEN ================= -->
         <section id="view-splash" class="flex flex-col items-center justify-center flex-1 min-h-[70vh] w-full select-none">
             <div class="w-32 h-32 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 logo-pulse p-3 border border-slate-100/50">
                 <img src="./logo.png" class="w-24 h-24 object-contain rounded-full relative z-10" alt="logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3596/3596091.png'">
@@ -338,7 +335,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 1: HOME/MAIN MENU (สลับมาหน้านี้ทันทีเมื่อพร้อม) ================= -->
+        <!-- ================= VIEW 1: HOME/MAIN MENU ================= -->
         <section id="view-home" class="hidden flex flex-col items-center justify-center flex-1">
             <header class="text-center mb-10 w-full flex flex-col items-center">
                 <div class="w-24 h-24 bg-white rounded-full shadow-2xl flex items-center justify-center mb-6 relative overflow-hidden group app-logo-container logo-pulse p-2 border border-slate-100"></div>
@@ -364,7 +361,7 @@
                     </button>
                 </div>
                 
-                <!-- กล่องข้อความกรณีเกิด Error -->
+                <!-- System Error Message -->
                 <div id="system-error-msg" class="hidden text-red-600 text-[14px] mt-6 font-black bg-red-50/80 p-5 shape-card border border-red-100 text-shadow-none w-full text-left">
                     <div class="flex items-center gap-2 mb-2 text-red-700">
                         <i class="fa-solid fa-triangle-exclamation"></i>
@@ -376,7 +373,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW: GUIDE (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
+        <!-- ================= VIEW: GUIDE ================= -->
         <section id="view-guide" class="hidden flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
@@ -427,7 +424,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW: SETTINGS (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
+        <!-- ================= VIEW: SETTINGS ================= -->
         <section id="view-settings" class="hidden flex-1 flex flex-col h-full">
             <div class="flex items-center justify-between mb-6 shrink-0">
                 <div class="flex items-center">
@@ -558,7 +555,7 @@
             <div class="overflow-y-auto scroll-fine pr-1 pb-6 flex-1 space-y-4" id="history-list-container"></div>
         </section>
 
-        <!-- ================= VIEW 2: CLASS SELECTION (ลบปุ่มโฮมออก - มีเฉพาะ Back ย้อนกลับหน้าแรก) ================= -->
+        <!-- ================= VIEW 2: CLASS SELECTION ================= -->
         <section id="view-class" class="hidden">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center">
@@ -571,7 +568,7 @@
             <div id="class-list" class="space-y-3 px-1"></div>
         </section>
 
-        <!-- ================= VIEW 3: ROOM SELECTION (มีปุ่มโฮมเพื่อย้อนกลับทางลัด) ================= -->
+        <!-- ================= VIEW 3: ROOM SELECTION ================= -->
         <section id="view-room" class="hidden">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
@@ -591,11 +588,11 @@
             <div id="room-list" class="grid grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- ================= VIEW 3.5: TEACHING DATA (มีปุ่มโฮมเพื่อย้อนกลับทางลัด) ================= -->
+        <!-- ================= VIEW 3.5: TEACHING DATA ================= -->
         <section id="view-setup" class="hidden">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
-                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-5 btn-press shadow-sm text-shadow-none" onclick="switchView('view-room')">
+                    <button class="w-11 h-11 glass-panel shape-btn flex items-center justify-center text-slate-600 mr-5 btn-press shadow-sm text-shadow-none" onclick="backToSetup()">
                         <i class="fa-solid fa-arrow-left text-lg"></i>
                     </button>
                     <h2 class="text-[30px] font-black text-accent tracking-tighter leading-none glow-text">ข้อมูลการสอน</h2>
@@ -618,6 +615,19 @@
                         </select>
                     </div>
                 </div>
+
+                <!-- Fields for Date and Time Selection -->
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div class="text-left">
+                        <label class="text-[10px] font-black uppercase text-slate-700 ml-2 mb-2 block tracking-widest glow-text">วันที่สอน</label>
+                        <input type="date" id="input-date" class="input-field shape-input font-bold text-[13px]">
+                    </div>
+                    <div class="text-left">
+                        <label class="text-[10px] font-black uppercase text-slate-700 ml-2 mb-2 block tracking-widest glow-text">เวลา</label>
+                        <input type="time" id="input-time" class="input-field shape-input font-bold text-[13px]">
+                    </div>
+                </div>
+
                 <div class="text-left">
                     <label class="text-[10px] font-black uppercase text-slate-700 ml-2 mb-2 block tracking-widest glow-text">ชื่อครูผู้สอน</label>
                     <input type="text" id="input-teacher" class="input-field shape-input bg-white/50 cursor-not-allowed opacity-80" readonly>
@@ -629,7 +639,7 @@
             </button>
         </section>
 
-        <!-- ================= VIEW 4: ATTENDANCE CHECK (มีปุ่มโฮมขวาสุด) ================= -->
+        <!-- ================= VIEW 4: ATTENDANCE CHECK ================= -->
         <section id="view-attendance" class="hidden flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-center pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
@@ -671,7 +681,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 4.5: BEHAVIOR CHECK (มีปุ่มโฮม) ================= -->
+        <!-- ================= VIEW 4.5: BEHAVIOR CHECK ================= -->
         <section id="view-behavior" class="hidden flex-1 flex flex-col h-full overflow-hidden">
             <div class="flex justify-between items-center pb-6 shrink-0 px-1">
                 <div class="flex items-center gap-4">
@@ -700,7 +710,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 5: ATTENDANCE SUMMARY (มีปุ่มโฮม) ================= -->
+        <!-- ================= VIEW 5: ATTENDANCE SUMMARY ================= -->
         <section id="view-summary" class="hidden overflow-y-auto scroll-fine h-full">
             <div class="flex items-center justify-between mb-8 px-1">
                 <div class="flex items-center">
@@ -758,7 +768,7 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 6: BEHAVIOR SUMMARY (มีปุ่มโฮม) ================= -->
+        <!-- ================= VIEW 6: BEHAVIOR SUMMARY ================= -->
         <section id="view-behavior-summary" class="hidden overflow-y-auto scroll-fine h-full">
             <div class="flex items-center justify-between mb-6 px-1">
                 <div class="flex items-center">
@@ -1319,25 +1329,6 @@
             });
         }
 
-        function openSetupView() {
-            const subjSel = document.getElementById('input-subject');
-            if(subjSel) {
-                subjSel.innerHTML = '';
-                earlyPrefs.subjects.forEach(sub => { const opt = document.createElement('option'); opt.value = sub; opt.innerText = sub; subjSel.appendChild(opt); });
-            }
-            const tIn = document.getElementById('input-teacher'); if(tIn) tIn.value = earlyPrefs.teacherName;
-            
-            // ตั้งค่าเริ่มต้นของวันที่และเวลาเป็น "ปัจจุบัน"
-            const now = new Date();
-            const dIn = document.getElementById('input-date');
-            if(dIn) dIn.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-            const tInp = document.getElementById('input-time');
-            if(tInp) tInp.value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            
-            switchView('view-setup');
-        }
-
-        // ดึงข้อมูลวันที่เดิมกลับมาหากกดย้อนกลับ
         function backToSetup() {
             const key = `${State.currentClass}-${State.currentRoom}`;
             const meta = State.historyMeta[key];
@@ -1353,6 +1344,24 @@
                 const pEl = document.getElementById('input-period');
                 if(pEl) pEl.value = meta.period;
             }
+            switchView('view-setup');
+        }
+
+        function openSetupView() {
+            const subjSel = document.getElementById('input-subject');
+            if(subjSel) {
+                subjSel.innerHTML = '';
+                earlyPrefs.subjects.forEach(sub => { const opt = document.createElement('option'); opt.value = sub; opt.innerText = sub; subjSel.appendChild(opt); });
+            }
+            const tIn = document.getElementById('input-teacher'); if(tIn) tIn.value = earlyPrefs.teacherName;
+            
+            // ตั้งค่าเริ่มต้นของวันที่และเวลาเป็น "ปัจจุบัน"
+            const now = new Date();
+            const dIn = document.getElementById('input-date');
+            if(dIn) dIn.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            const tInp = document.getElementById('input-time');
+            if(tInp) tInp.value = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            
             switchView('view-setup');
         }
 
