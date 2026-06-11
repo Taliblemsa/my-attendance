@@ -824,17 +824,13 @@
 
     <script>
         const CONFIG = {
-            SHEET_ID: "1mPl20ilAZAJmgfktHVPIDxZWSWQKNK7Y1_wJxAIMeBY", 
-            API_KEY: "AIzaSyBEIDAElc5HiX9sX6Ldwx__ll55DZJj85s", 
-            GAS_URL: "https://script.google.com/macros/s/AKfycbykBBAAvnVDB2dl3bhVvi2IZkNqhvDT82wMFCbKakONKoublJXRSbK2sZgdoq0ERE1fmg/exec",
-            RANGE: "A:D", 
+            GAS_URL: "https://script.google.com/macros/s/AKfycbzOyUzpvtNGWMTb01JEpuvRGOTWgbu4uT_6U_T1zHCYLVH7N9TCvEj7_6wVt2l_bepe5Q/exec",
             CLASSES: {
-                "ชั้น ม.1": ["1/1", "1/2", "1/3", "1/4"],
                 "ชั้น ม.2": ["2/1", "2/2", "2/3", "2/4"],
-                "ชั้น ม.3": ["3/1", "3/2", "3/3", "3/4"],
                 "ชั้น ม.4": ["4/1", "4/2", "4/3"],
-                "ชั้น ม.5": ["5/1", "5/2", "5/3"],
-                "ชั้น ม.6": ["6/1", "6/2", "6/3"]
+                "ชั้น ม.5": ["5/1", "5/2"],
+                "ชั้น ม.6": ["6/1", "6/2", "6/3"],
+                "อัลกุรอาน(เช้า)": ["อัลกุรอาน"]
             },
             STATUSES: ["มา", "ลา", "ขาด"],
             BEHAVIORS: { "แต่งกายไม่สุภาพ": 1, "เข้าเรียนสาย": 1, "โดดเรียน": 5, "แต่งหน้า": 2, "ไม่ส่งงาน": 2, "ไม่มีอุปกรณ์การเรียน": 2, "กินในห้อง": 2, "หลับในห้อง": 2, "พูดจาไม่สุภาพ": 5, "แสดงกิริยาก้าวร้าว": 30, "อื่นๆ": 0 }
@@ -1073,19 +1069,36 @@
         }
 
         async function fetchStudentData() {
-            const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${CONFIG.RANGE}?key=${CONFIG.API_KEY}`;
+            if (!CONFIG.GAS_URL || CONFIG.GAS_URL === "วาง_WEB_APP_URL_ของคุณครูที่นี่") {
+                const errM = document.getElementById('system-error-msg'); if(errM) errM.classList.remove('hidden');
+                const errD = document.getElementById('error-details'); if(errD) errD.innerText = "ยังไม่ได้เชื่อมต่อ Google Apps Script";
+                return;
+            }
+
             try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error("เข้าถึงปฏิเสธ");
-                const data = await res.json();
-                if (data.values && data.values.length > 0) {
-                    State.allStudents = data.values.map(r => ({ id: parseInt(r[0]), num: r[1], name: r[2], room: r[3] })).filter(s => !isNaN(s.id) && s.name && s.room);
+                // เรียกข้อมูลผ่าน Google Apps Script (POST)
+                const response = await fetch(CONFIG.GAS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'getStudents' })
+                });
+                
+                if (!response.ok) throw new Error("เข้าถึงปฏิเสธหรือ URL ไม่ถูกต้อง");
+                
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data && result.data.length > 0) {
+                    State.allStudents = result.data.map(s => ({ 
+                        num: parseInt(s.num) || s.num, 
+                        name: String(s.name).trim(), 
+                        room: String(s.room).trim() 
+                    })).filter(s => s.name !== "undefined" && s.room !== "undefined" && s.name !== "" && s.room !== "");
                     
                     const btnC = document.getElementById('action-buttons-container');
                     if(btnC) { btnC.classList.remove('hidden'); btnC.classList.add('flex'); }
 
                     switchView('view-home');
-                } else throw new Error("ไฟล์ว่าง");
+                } else throw new Error(result.message || "ไม่พบข้อมูลนักเรียน หรือไฟล์ว่าง");
             } catch (err) {
                 switchView('view-home');
                 const btnC = document.getElementById('action-buttons-container');
@@ -1253,8 +1266,8 @@
             const students = State.allStudents.filter(s => s.room === roomNum);
             let absentees = [];
             students.forEach(st => {
-                if (data[st.id] === "ลา" || data[st.id] === "ขาด") {
-                    absentees.push(`- ${st.name} (${data[st.id]})`);
+                if (data[st.num] === "ลา" || data[st.num] === "ขาด") {
+                    absentees.push(`- ${st.name} (${data[st.num]})`);
                 }
             });
 
@@ -1404,24 +1417,24 @@
         function renderAttendanceList() {
             const key = `${State.currentClass}-${State.currentRoom}`; 
             const hs = document.getElementById('header-subject-room'); if(hs) hs.innerText = `ม.${State.currentRoom}`;
-            const students = State.allStudents.filter(s => s.room === State.currentRoom).sort((a,b) => a.id - b.id);
+            const students = State.allStudents.filter(s => s.room === State.currentRoom).sort((a,b) => a.num - b.num);
             const hc = document.getElementById('header-student-count'); if(hc) hc.innerText = `${students.length} คนในห้องนี้`;
             const c = document.getElementById('student-list'); if(!c) return;
             c.innerHTML = '';
             if (!State.attendance[key]) State.attendance[key] = {};
             
             students.forEach(st => {
-                const cur = State.attendance[key][st.id]; const item = document.createElement('div');
+                const cur = State.attendance[key][st.num]; const item = document.createElement('div');
                 item.className = "glass-panel shape-card p-4 mb-4 shadow-sm fade-in text-left text-shadow-none border-white/60";
-                let html = `<div class="flex items-center gap-4 mb-3 text-left"><div class="w-10 h-10 icon-box font-black text-sm flex items-center justify-center shrink-0 shadow-inner">${st.id}</div><span class="font-black text-accent text-[17px] leading-none tracking-tight glow-text text-left">${st.name}</span></div><div class="status-container shape-input text-left">`;
+                let html = `<div class="flex items-center gap-4 mb-3 text-left"><div class="w-10 h-10 icon-box font-black text-sm flex items-center justify-center shrink-0 shadow-inner">${st.num}</div><span class="font-black text-accent text-[17px] leading-none tracking-tight glow-text text-left">${st.name}</span></div><div class="status-container shape-input text-left">`;
                 CONFIG.STATUSES.forEach(stat => {
-                    const act = cur === stat ? 'active' : ''; html += `<button class="status-tab shape-btn ${act}" data-id="${st.id}" data-status="${stat}">${stat}</button>`;
+                    const act = cur === stat ? 'active' : ''; html += `<button class="status-tab shape-btn ${act}" data-num="${st.num}" data-status="${stat}">${stat}</button>`;
                 });
                 item.innerHTML = html + `</div>`; c.appendChild(item);
                 item.querySelectorAll('.status-tab').forEach(btn => {
                     btn.onclick = function() {
                         item.querySelectorAll('.status-tab').forEach(b => b.classList.remove('active')); this.classList.add('active');
-                        State.attendance[key][st.id] = this.getAttribute('data-status'); saveDailyHistory();
+                        State.attendance[key][st.num] = this.getAttribute('data-status'); saveDailyHistory();
                     };
                 });
             });
@@ -1433,7 +1446,7 @@
             if (!State.attendance[key]) State.attendance[key] = {};
             
             students.forEach(st => {
-                State.attendance[key][st.id] = "มา";
+                State.attendance[key][st.num] = "มา";
             });
             
             saveDailyHistory();
@@ -1454,19 +1467,19 @@
         function renderBehaviorList() {
             const key = `${State.currentClass}-${State.currentRoom}`; 
             const hr = document.getElementById('header-behavior-room'); if(hr) hr.innerText = `ม.${State.currentRoom}`;
-            const students = State.allStudents.filter(s => s.room === State.currentRoom).sort((a,b) => a.id - b.id);
+            const students = State.allStudents.filter(s => s.room === State.currentRoom).sort((a,b) => a.num - b.num);
             const c = document.getElementById('behavior-student-list'); if(!c) return;
             c.innerHTML = '';
             if (!State.behavior[key]) State.behavior[key] = {};
             
             students.forEach(st => {
-                if (!State.behavior[key][st.id]) State.behavior[key][st.id] = { tags: [], other: "", otherScore: "" };
-                const cur = State.behavior[key][st.id]; const item = document.createElement('div');
+                if (!State.behavior[key][st.num]) State.behavior[key][st.num] = { tags: [], other: "", otherScore: "" };
+                const cur = State.behavior[key][st.num]; const item = document.createElement('div');
                 item.className = "glass-panel shape-card p-4 mb-4 shadow-sm fade-in text-left text-shadow-none border-white/60";
                 let tagsHtml = cur.tags.map(tag => {
                     return `<span class="inline-flex items-center gap-1.5 bg-red-50 text-red-600 px-2.5 py-1 shape-btn text-[11px] font-black border border-red-100 text-left shadow-sm">${tag} <i class="fa-solid fa-xmark cursor-pointer behavior-remove-btn opacity-50 ml-0.5" data-tag="${tag}"></i></span>`;
                 }).join('');
-                let html = `<div class="flex gap-4 mb-3 border-b border-white/30 pb-3 items-center text-left"><div class="w-9 h-9 icon-box font-black flex items-center justify-center shrink-0 text-xs shadow-inner">${st.id}</div><span class="font-black text-accent text-[16px] text-left glow-text">${st.name}</span></div>`;
+                let html = `<div class="flex gap-4 mb-3 border-b border-white/30 pb-3 items-center text-left"><div class="w-9 h-9 icon-box font-black flex items-center justify-center shrink-0 text-xs shadow-inner">${st.num}</div><span class="font-black text-accent text-[16px] text-left glow-text">${st.name}</span></div>`;
                 if(tagsHtml) html += `<div class="flex flex-wrap gap-1.5 mb-2 text-left">${tagsHtml}</div>`;
                 html += `<select class="input-field shape-input !py-2.5 !text-sm behavior-select cursor-pointer font-extrabold text-accent/50 text-left shadow-inner"><option value="" disabled selected>+ ระบุพฤติกรรม</option>`;
                 Object.keys(CONFIG.BEHAVIORS).forEach(b => html += `<option value="${b}">${b} (-${CONFIG.BEHAVIORS[b]})</option>`);
@@ -1475,14 +1488,14 @@
                 html += `<div class="${showO} mt-2 gap-2 animate-fade-in text-left"><input type="text" class="input-field shape-input !py-2.5 flex-[3] text-sm behavior-other-input text-left shadow-inner" placeholder="ระบุเหตุผล..." value="${cur.other}"><input type="number" class="input-field shape-input !py-2.5 flex-[1.5] text-sm text-center text-red-600 font-black behavior-other-score-input shadow-inner" placeholder="คะแนน" value="${cur.otherScore}"></div>`;
                 item.innerHTML = html; c.appendChild(item);
                 
-                item.querySelector('.behavior-select').onchange = function() { if(this.value && !State.behavior[key][st.id].tags.includes(this.value)) { State.behavior[key][st.id].tags.push(this.value); saveDailyHistory(); renderBehaviorList(); } };
+                item.querySelector('.behavior-select').onchange = function() { if(this.value && !State.behavior[key][st.num].tags.includes(this.value)) { State.behavior[key][st.num].tags.push(this.value); saveDailyHistory(); renderBehaviorList(); } };
                 item.querySelectorAll('.behavior-remove-btn').forEach(btn => btn.onclick = function() {
-                    const tag = this.getAttribute('data-tag'); State.behavior[key][st.id].tags = State.behavior[key][st.id].tags.filter(t => t !== tag);
-                    if(tag === 'อื่นๆ') { State.behavior[key][st.id].other = ""; State.behavior[key][st.id].otherScore = ""; }
+                    const tag = this.getAttribute('data-tag'); State.behavior[key][st.num].tags = State.behavior[key][st.num].tags.filter(t => t !== tag);
+                    if(tag === 'อื่นๆ') { State.behavior[key][st.num].other = ""; State.behavior[key][st.num].otherScore = ""; }
                     saveDailyHistory(); renderBehaviorList();
                 });
-                const oIn = item.querySelector('.behavior-other-input'); if(oIn) oIn.oninput = function() { State.behavior[key][st.id].other = this.value.trim(); saveDailyHistory(); };
-                const sIn = item.querySelector('.behavior-other-score-input'); if(sIn) sIn.oninput = function() { State.behavior[key][st.id].otherScore = this.value; saveDailyHistory(); };
+                const oIn = item.querySelector('.behavior-other-input'); if(oIn) oIn.oninput = function() { State.behavior[key][st.num].other = this.value.trim(); saveDailyHistory(); };
+                const sIn = item.querySelector('.behavior-other-score-input'); if(sIn) sIn.oninput = function() { State.behavior[key][st.num].otherScore = this.value; saveDailyHistory(); };
             });
         }
 
@@ -1505,7 +1518,7 @@
             const statusNames = { "ลา": [], "ขาด": [] };
             
             students.forEach(st => { 
-                const s = data[st.id]; 
+                const s = data[st.num]; 
                 if(s) { counts[s]++; if(s !== "มา") statusNames[s].push(st.name); } 
             });
             
@@ -1550,7 +1563,7 @@
             
             let html = '', count = 0;
             students.forEach(st => {
-                const d = data[st.id];
+                const d = data[st.num];
                 if(d && d.tags.length > 0) {
                     count++; let pts = 0, issues = [];
                     d.tags.forEach(t => {
@@ -1563,7 +1576,7 @@
                     html += `<div class="bg-white border border-slate-100 rounded-[20px] p-4 shadow-sm mb-3 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500"></div>
                         <div class="flex justify-between items-start mb-2.5">
-                            <div class="font-black text-accent text-[15px] tracking-tight leading-tight">${count}. ${st.name} <br><span class="text-slate-400 font-bold text-[11px]">(เลขที่ ${st.id})</span></div>
+                            <div class="font-black text-accent text-[15px] tracking-tight leading-tight">${count}. ${st.name} <br><span class="text-slate-400 font-bold text-[11px]">(เลขที่ ${st.num})</span></div>
                             <div class="bg-red-50 text-red-600 text-[11px] font-black px-2.5 py-1 rounded-lg border border-red-100 shadow-sm uppercase shrink-0 mt-0.5">หัก ${pts} คะแนน</div>
                         </div>
                         <div class="text-[12px] font-bold text-slate-500 flex items-start gap-2 pl-1 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100/50">
@@ -1592,14 +1605,12 @@
             if (type === 'attendance') {
                 const data = State.attendance[key] || {};
                 students.forEach(st => {
-                    const status = data[st.id];
-                    // กรองเอาเฉพาะคนที่ "ลา" หรือ "ขาด" เท่านั้น
+                    const status = data[st.num];
                     if (status === "ลา" || status === "ขาด") {
-                        records.push({ id: st.id, name: st.name, status: status });
+                        records.push({ num: st.num, name: st.name, status: status });
                     }
                 });
                 
-                // ถ้านักเรียนมาครบทุกคน (ไม่มีใครลาหรือขาดเลย)
                 if (records.length === 0) {
                     const btn = document.getElementById('btn-sync-attendance');
                     if (btn) {
@@ -1614,7 +1625,7 @@
             } else if (type === 'behavior') {
                 const data = State.behavior[key] || {};
                 students.forEach(st => {
-                    const d = data[st.id];
+                    const d = data[st.num];
                     if(d && d.tags.length > 0) {
                         let pts = 0; let issues = [];
                         d.tags.forEach(t => {
@@ -1624,13 +1635,14 @@
                                 pts += CONFIG.BEHAVIORS[t]; issues.push(`${t} (-${CONFIG.BEHAVIORS[t]})`);
                             }
                         });
-                        records.push({ id: st.id, name: st.name, behavior: issues.join(', '), deduct: pts });
+                        records.push({ num: st.num, name: st.name, behavior: issues.join(', '), deduct: pts });
                     }
                 });
                 if(records.length === 0) return showToast('ไม่มีข้อมูลพฤติกรรมให้บันทึก', 'fa-solid fa-shield text-amber-500');
             }
 
             const payload = {
+                action: 'saveData',
                 type: type,
                 timestamp: new Date(meta.timestamp).toLocaleString('th-TH'),
                 subject: meta.subject,
