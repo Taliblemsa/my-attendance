@@ -289,7 +289,7 @@
     <div id="toast"><span id="toast-icon"></span><span id="toast-message" class="font-extrabold tracking-wide text-shadow-none"></span></div>
 
     <!-- PWA Install Modal -->
-    <div id="pwa-install-modal" class="modal-bg">
+    <div id="pwa-install-modal" class="modal-bg z-[2000]">
         <div class="modal-box shape-card flex flex-col items-center justify-center">
             <div class="w-16 h-16 icon-box flex items-center justify-center text-3xl mb-4 !bg-blue-100 !text-blue-500 !border-0 text-shadow-none">
                 <i class="fa-solid fa-mobile-screen-button"></i>
@@ -839,7 +839,6 @@
                     <i class="fa-solid fa-share-nodes"></i> แชร์ต่อ
                 </button>
             </div>
-        <!-- ... existing code ... -->
         </section>
     </main>
 
@@ -1135,9 +1134,6 @@
             }
         }
 
-        // ============================================
-        // ฟังก์ชันระบบ Custom Group (อัลกุรอาน)
-        // ============================================
         function loadCustomGroup() {
             currentCustomGroup = JSON.parse(localStorage.getItem('st_group_' + State.teacherName)) || [];
         }
@@ -1219,7 +1215,6 @@
             }
         }
 
-        // ====== HISTORY & CALENDAR LOGIC ======
         function loadHistoryByDate(dateStr) {
             State.activeDateStr = dateStr;
             const allHistory = JSON.parse(localStorage.getItem('st_app_history_v2')) || {};
@@ -1385,8 +1380,7 @@
 
             let absentees = [];
             students.forEach(st => {
-                const isQuran = key.split('-')[0] === "อัลกุรอาน(เช้า)";
-                const stId = isQuran ? st.uid : st.num;
+                const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
                 if (data[stId] === "ลา" || data[stId] === "ขาด") {
                     absentees.push(`- ${st.name} (${data[stId]})`);
                 }
@@ -1439,8 +1433,7 @@
                 showToast('ลบประวัติสำเร็จ', 'fa-solid fa-trash text-emerald-400');
             });
         }
-        // ============================================
-
+        
         function renderClasses() {
             const c = document.getElementById('class-list'); if(!c) return;
             c.innerHTML = '';
@@ -1574,14 +1567,15 @@
                     <div class="text-center py-12 glass-panel shape-card border-dashed">
                         <i class="fa-solid fa-users-slash text-4xl text-slate-400 mb-4 opacity-50"></i>
                         <p class="text-slate-500 font-bold glow-text text-sm">ยังไม่มีนักเรียนในกลุ่มของคุณครู</p>
-                        <button onclick="openCustomGroupModal()" class="mt-4 bg-primary text-white text-xs font-black px-4 py-2 shape-btn shadow text-shadow-none">จัดกลุ่มตอนนี้</button>
+                        ${State.currentClass === "อัลกุรอาน(เช้า)" ? `<button onclick="openCustomGroupModal()" class="mt-4 bg-primary text-white text-xs font-black px-4 py-2 shape-btn shadow text-shadow-none">จัดกลุ่มตอนนี้</button>` : `<p class="text-red-400 text-xs mt-2 font-bold">*ไม่พบรายชื่อห้องนี้ใน Google Sheets</p>`}
                     </div>`;
                 return;
             }
             
             students.forEach(st => {
                 const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
-                const cur = State.attendance[key][stId]; const item = document.createElement('div');
+                const cur = State.attendance[key][stId]; 
+                const item = document.createElement('div');
                 item.className = "glass-panel shape-card p-4 mb-4 shadow-sm fade-in text-left text-shadow-none border-white/60";
                 
                 // สำหรับวิชาอัลกุรอาน ให้แสดงป้ายชื่อห้องกำกับไว้เพื่อกันสับสนเลขที่
@@ -1625,7 +1619,7 @@
         }
 
         function resetCurrentRoomAttendance() { 
-            showConfirm('ล้างเช็คชื่อใหม่', 'ข้อมูลการเช็คชื่อของวิชานี้ (ห้องนี้/กลุ่มนี้) จะถูกลบทั้งหมดเพื่อเริ่มใหม่ คุณแน่ใจหรือไม่?', () => {
+            showConfirm('ล้างเช็คชื่อใหม่', 'ข้อมูลการเช็คชื่อของวิชานี้ จะถูกลบทั้งหมดเพื่อเริ่มใหม่ คุณแน่ใจหรือไม่?', () => {
                 const key = `${State.currentClass}-${State.currentRoom}`;
                 State.attendance[key] = {}; saveDailyHistory(); renderAttendanceList(); 
                 showToast('ล้างข้อมูลสำเร็จ', 'fa-solid fa-check text-emerald-400');
@@ -1652,7 +1646,8 @@
             students.forEach(st => {
                 const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
                 if (!State.behavior[key][stId]) State.behavior[key][stId] = { tags: [], other: "", otherScore: "" };
-                const cur = State.behavior[key][stId]; const item = document.createElement('div');
+                const cur = State.behavior[key][stId]; 
+                const item = document.createElement('div');
                 item.className = "glass-panel shape-card p-4 mb-4 shadow-sm fade-in text-left text-shadow-none border-white/60";
                 
                 let tagsHtml = cur.tags.map(tag => {
@@ -1691,6 +1686,14 @@
             const data = State.attendance[key] || {};
             if (Object.keys(data).length === 0) return showToast('ยังไม่ได้เช็คชื่อเลยครับ', 'fa-solid fa-circle-exclamation text-amber-400');
             
+            // --- รีเซ็ตปุ่มบันทึกลง Google Sheets ให้กลับเป็นสถานะเริ่มต้นเสมอกันปุ่มล็อก ---
+            const btnSync = document.getElementById('btn-sync-attendance');
+            if(btnSync) {
+                btnSync.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูลลง Google Sheets`;
+                btnSync.className = "w-full btn-press bg-blue-600 text-white font-black py-4 shape-btn shadow-xl shadow-blue-600/30 text-[15px] flex items-center justify-center gap-2 mb-4 text-shadow-none";
+                btnSync.disabled = false;
+            }
+
             const students = getTargetStudents();
             const meta = State.historyMeta[key];
             const recordDate = meta ? new Date(meta.timestamp) : new Date();
@@ -1699,7 +1702,7 @@
             document.getElementById('export-subject-val').innerText = `${State.subjectName} (${State.periodCount} คาบ)`;
             document.getElementById('export-teacher-val').innerText = State.teacherName;
             document.getElementById('export-header-date').innerHTML = `<i class="fa-regular fa-calendar text-slate-400"></i> <span class="ml-1">${dateStr}</span>`;
-            document.getElementById('export-room-only').innerText = State.currentClass === "อัลกุรอาน(เช้า)" ? "อัลกุรอาน" : `ม.${State.currentRoom}`;
+            document.getElementById('export-room-only').innerText = State.currentClass === "อัลกุรอาน(เช้า)" ? "กลุ่มอัลกุรอาน" : `ม.${State.currentRoom}`;
             
             const counts = { "มา": 0, "ลา": 0, "ขาด": 0 }; 
             const statusNames = { "ลา": [], "ขาด": [] };
@@ -1745,6 +1748,14 @@
             const data = State.behavior[key] || {};
             if (!Object.values(data).some(d => d.tags.length > 0)) return showToast('ยังไม่มีบันทึกพฤติกรรมครับ', 'fa-solid fa-shield text-amber-400');
             
+            // --- รีเซ็ตปุ่มบันทึกลง Google Sheets ---
+            const btnSyncBehav = document.getElementById('btn-sync-behavior');
+            if(btnSyncBehav) {
+                btnSyncBehav.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> บันทึกข้อมูลลง Google Sheets`;
+                btnSyncBehav.className = "w-full btn-press bg-blue-600 text-white font-black py-4 shape-btn shadow-xl shadow-blue-600/30 text-[15px] flex items-center justify-center gap-2 mb-4 text-shadow-none";
+                btnSyncBehav.disabled = false;
+            }
+
             const students = getTargetStudents();
             const meta = State.historyMeta[key];
             const recordDate = meta ? new Date(meta.timestamp) : new Date();
