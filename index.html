@@ -826,7 +826,9 @@
         const CONFIG = {
             GAS_URL: "https://script.google.com/macros/s/AKfycbzOyUzpvtNGWMTb01JEpuvRGOTWgbu4uT_6U_T1zHCYLVH7N9TCvEj7_6wVt2l_bepe5Q/exec",
             CLASSES: {
+                "ชั้น ม.1": ["1/1", "1/2", "1/3", "1/4"],
                 "ชั้น ม.2": ["2/1", "2/2", "2/3", "2/4"],
+                "ชั้น ม.3": ["3/1", "3/2", "3/3"],
                 "ชั้น ม.4": ["4/1", "4/2", "4/3"],
                 "ชั้น ม.5": ["5/1", "5/2"],
                 "ชั้น ม.6": ["6/1", "6/2", "6/3"],
@@ -1069,7 +1071,7 @@
         }
 
         async function fetchStudentData() {
-            if (!CONFIG.GAS_URL || CONFIG.GAS_URL === "วาง_WEB_APP_URL_ของคุณครูที่นี่") {
+            if (!CONFIG.GAS_URL || CONFIG.GAS_URL === "https://script.google.com/macros/s/AKfycbx8AdS4VE4KOaIaJ0qrOoRUzX7Uif05VTF2NuIMMC2Ojt6QO1gowG0jCBpouQdRQqzkhA/exec") {
                 const errM = document.getElementById('system-error-msg'); if(errM) errM.classList.remove('hidden');
                 const errD = document.getElementById('error-details'); if(errD) errD.innerText = "ยังไม่ได้เชื่อมต่อ Google Apps Script";
                 return;
