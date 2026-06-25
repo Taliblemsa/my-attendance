@@ -839,6 +839,7 @@
                     <i class="fa-solid fa-share-nodes"></i> แชร์ต่อ
                 </button>
             </div>
+        <!-- ... existing code ... -->
         </section>
     </main>
 
@@ -1115,7 +1116,8 @@
                     State.allStudents = result.data.map(s => ({ 
                         num: parseInt(s.num) || s.num, 
                         name: String(s.name).trim(), 
-                        room: String(s.room).trim() 
+                        room: String(s.room).trim(),
+                        uid: `${String(s.room).trim()}-${parseInt(s.num) || s.num}` // สร้างรหัสลับกันคนซ้ำ
                     })).filter(s => s.name !== "undefined" && s.room !== "undefined" && s.name !== "" && s.room !== "");
                     
                     const btnC = document.getElementById('action-buttons-container');
@@ -1169,22 +1171,22 @@
                 );
             } else {
                 // ถ้ายังไม่พิมพ์ค้นหา ให้โชว์รายชื่อที่เคยเลือกไว้ + สุ่ม 30 รายชื่อแรก
-                filtered = State.allStudents.filter(s => currentCustomGroup.includes(s.num)).concat(
-                    State.allStudents.filter(s => !currentCustomGroup.includes(s.num)).slice(0, 30)
+                filtered = State.allStudents.filter(s => currentCustomGroup.includes(s.uid)).concat(
+                    State.allStudents.filter(s => !currentCustomGroup.includes(s.uid)).slice(0, 30)
                 );
             }
 
             // ตัดรายชื่อที่ซ้ำกัน
-            filtered = [...new Map(filtered.map(item => [item.num, item])).values()];
+            filtered = [...new Map(filtered.map(item => [item.uid, item])).values()];
 
             let html = '';
             filtered.forEach(st => {
-                const isSelected = currentCustomGroup.includes(st.num);
+                const isSelected = currentCustomGroup.includes(st.uid);
                 const btnClass = isSelected ? 'bg-emerald-100 border-emerald-400 text-emerald-700 shadow-md' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100';
                 const icon = isSelected ? '<i class="fa-solid fa-circle-check text-emerald-500 text-2xl"></i>' : '<i class="fa-regular fa-circle text-slate-300 text-2xl"></i>';
                 
                 html += `
-                <div onclick="toggleCustomGroupStudent('${st.num}')" class="flex justify-between items-center p-3 mb-2 rounded-xl border cursor-pointer transition-all active:scale-95 ${btnClass}">
+                <div onclick="toggleCustomGroupStudent('${st.uid}')" class="flex justify-between items-center p-3 mb-2 rounded-xl border cursor-pointer transition-all active:scale-95 ${btnClass}">
                     <div class="flex flex-col text-left">
                         <span class="font-black text-[15px] leading-tight glow-text">${st.name}</span>
                         <span class="text-[12px] font-bold opacity-70 mt-1"><i class="fa-solid fa-address-card mr-1"></i>เลขที่ ${st.num} | ห้อง ม.${st.room}</span>
@@ -1197,13 +1199,12 @@
             container.innerHTML = html;
         }
 
-        function toggleCustomGroupStudent(num) {
-            num = parseInt(num) || num;
-            const idx = currentCustomGroup.indexOf(num);
+        function toggleCustomGroupStudent(uid) {
+            const idx = currentCustomGroup.indexOf(uid);
             if (idx > -1) {
                 currentCustomGroup.splice(idx, 1);
             } else {
-                currentCustomGroup.push(num);
+                currentCustomGroup.push(uid);
             }
             saveCustomGroup();
             renderSearchResults();
@@ -1212,7 +1213,7 @@
         function getTargetStudents() {
             if (State.currentClass === "อัลกุรอาน(เช้า)") {
                 loadCustomGroup();
-                return State.allStudents.filter(s => currentCustomGroup.includes(s.num));
+                return State.allStudents.filter(s => currentCustomGroup.includes(s.uid));
             } else {
                 return State.allStudents.filter(s => s.room === State.currentRoom).sort((a,b) => a.num - b.num);
             }
@@ -1384,8 +1385,10 @@
 
             let absentees = [];
             students.forEach(st => {
-                if (data[st.num] === "ลา" || data[st.num] === "ขาด") {
-                    absentees.push(`- ${st.name} (${data[st.num]})`);
+                const isQuran = key.split('-')[0] === "อัลกุรอาน(เช้า)";
+                const stId = isQuran ? st.uid : st.num;
+                if (data[stId] === "ลา" || data[stId] === "ขาด") {
+                    absentees.push(`- ${st.name} (${data[stId]})`);
                 }
             });
 
@@ -1577,7 +1580,8 @@
             }
             
             students.forEach(st => {
-                const cur = State.attendance[key][st.num]; const item = document.createElement('div');
+                const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
+                const cur = State.attendance[key][stId]; const item = document.createElement('div');
                 item.className = "glass-panel shape-card p-4 mb-4 shadow-sm fade-in text-left text-shadow-none border-white/60";
                 
                 // สำหรับวิชาอัลกุรอาน ให้แสดงป้ายชื่อห้องกำกับไว้เพื่อกันสับสนเลขที่
@@ -1593,13 +1597,13 @@
                     <div class="status-container shape-input text-left">`;
                 
                 CONFIG.STATUSES.forEach(stat => {
-                    const act = cur === stat ? 'active' : ''; html += `<button class="status-tab shape-btn ${act}" data-num="${st.num}" data-status="${stat}">${stat}</button>`;
+                    const act = cur === stat ? 'active' : ''; html += `<button class="status-tab shape-btn ${act}" data-uid="${stId}" data-status="${stat}">${stat}</button>`;
                 });
                 item.innerHTML = html + `</div>`; c.appendChild(item);
                 item.querySelectorAll('.status-tab').forEach(btn => {
                     btn.onclick = function() {
                         item.querySelectorAll('.status-tab').forEach(b => b.classList.remove('active')); this.classList.add('active');
-                        State.attendance[key][st.num] = this.getAttribute('data-status'); saveDailyHistory();
+                        State.attendance[key][stId] = this.getAttribute('data-status'); saveDailyHistory();
                     };
                 });
             });
@@ -1611,7 +1615,8 @@
             if (!State.attendance[key]) State.attendance[key] = {};
             
             students.forEach(st => {
-                State.attendance[key][st.num] = "มา";
+                const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
+                State.attendance[key][stId] = "มา";
             });
             
             saveDailyHistory();
@@ -1645,8 +1650,9 @@
             }
 
             students.forEach(st => {
-                if (!State.behavior[key][st.num]) State.behavior[key][st.num] = { tags: [], other: "", otherScore: "" };
-                const cur = State.behavior[key][st.num]; const item = document.createElement('div');
+                const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
+                if (!State.behavior[key][stId]) State.behavior[key][stId] = { tags: [], other: "", otherScore: "" };
+                const cur = State.behavior[key][stId]; const item = document.createElement('div');
                 item.className = "glass-panel shape-card p-4 mb-4 shadow-sm fade-in text-left text-shadow-none border-white/60";
                 
                 let tagsHtml = cur.tags.map(tag => {
@@ -1669,14 +1675,14 @@
                 html += `<div class="${showO} mt-2 gap-2 animate-fade-in text-left"><input type="text" class="input-field shape-input !py-2.5 flex-[3] text-sm behavior-other-input text-left shadow-inner" placeholder="ระบุเหตุผล..." value="${cur.other}"><input type="number" class="input-field shape-input !py-2.5 flex-[1.5] text-sm text-center text-red-600 font-black behavior-other-score-input shadow-inner" placeholder="คะแนน" value="${cur.otherScore}"></div>`;
                 item.innerHTML = html; c.appendChild(item);
                 
-                item.querySelector('.behavior-select').onchange = function() { if(this.value && !State.behavior[key][st.num].tags.includes(this.value)) { State.behavior[key][st.num].tags.push(this.value); saveDailyHistory(); renderBehaviorList(); } };
+                item.querySelector('.behavior-select').onchange = function() { if(this.value && !State.behavior[key][stId].tags.includes(this.value)) { State.behavior[key][stId].tags.push(this.value); saveDailyHistory(); renderBehaviorList(); } };
                 item.querySelectorAll('.behavior-remove-btn').forEach(btn => btn.onclick = function() {
-                    const tag = this.getAttribute('data-tag'); State.behavior[key][st.num].tags = State.behavior[key][st.num].tags.filter(t => t !== tag);
-                    if(tag === 'อื่นๆ') { State.behavior[key][st.num].other = ""; State.behavior[key][st.num].otherScore = ""; }
+                    const tag = this.getAttribute('data-tag'); State.behavior[key][stId].tags = State.behavior[key][stId].tags.filter(t => t !== tag);
+                    if(tag === 'อื่นๆ') { State.behavior[key][stId].other = ""; State.behavior[key][stId].otherScore = ""; }
                     saveDailyHistory(); renderBehaviorList();
                 });
-                const oIn = item.querySelector('.behavior-other-input'); if(oIn) oIn.oninput = function() { State.behavior[key][st.num].other = this.value.trim(); saveDailyHistory(); };
-                const sIn = item.querySelector('.behavior-other-score-input'); if(sIn) sIn.oninput = function() { State.behavior[key][st.num].otherScore = this.value; saveDailyHistory(); };
+                const oIn = item.querySelector('.behavior-other-input'); if(oIn) oIn.oninput = function() { State.behavior[key][stId].other = this.value.trim(); saveDailyHistory(); };
+                const sIn = item.querySelector('.behavior-other-score-input'); if(sIn) sIn.oninput = function() { State.behavior[key][stId].otherScore = this.value; saveDailyHistory(); };
             });
         }
 
@@ -1699,7 +1705,8 @@
             const statusNames = { "ลา": [], "ขาด": [] };
             
             students.forEach(st => { 
-                const s = data[st.num]; 
+                const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
+                const s = data[stId]; 
                 if(s) { 
                     counts[s]++; 
                     if(s !== "มา") {
@@ -1750,7 +1757,8 @@
             
             let html = '', count = 0;
             students.forEach(st => {
-                const d = data[st.num];
+                const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
+                const d = data[stId];
                 if(d && d.tags.length > 0) {
                     count++; let pts = 0, issues = [];
                     d.tags.forEach(t => {
@@ -1795,7 +1803,8 @@
             if (type === 'attendance') {
                 const data = State.attendance[key] || {};
                 students.forEach(st => {
-                    const status = data[st.num];
+                    const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
+                    const status = data[stId];
                     if (status === "ลา" || status === "ขาด") {
                         records.push({ num: st.num, name: st.name, status: status, originalRoom: st.room });
                     }
@@ -1815,7 +1824,8 @@
             } else if (type === 'behavior') {
                 const data = State.behavior[key] || {};
                 students.forEach(st => {
-                    const d = data[st.num];
+                    const stId = State.currentClass === "อัลกุรอาน(เช้า)" ? st.uid : st.num;
+                    const d = data[stId];
                     if(d && d.tags.length > 0) {
                         let pts = 0; let issues = [];
                         d.tags.forEach(t => {
